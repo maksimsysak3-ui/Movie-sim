@@ -438,27 +438,27 @@ html, body {
           <div class="card-header"><div class="card-title">Create New Movie</div><span class="card-badge badge-gold">DEVELOPMENT</span></div>
           <div class="grid-2">
             <div>
-              <div class="form-group"><label class="form-label">Movie Title</label><input type="text" class="form-input" id="movie-title" placeholder="Enter title..."></div>
-              <div class="form-group"><label class="form-label">Genre</label><select class="form-select" id="movie-genre" onchange="updateSubgenres()"><option value="">Select...</option><option>Action</option><option>Drama</option><option>Horror</option><option>Sci-Fi</option><option>Fantasy</option><option>Comedy</option><option>Thriller</option><option>Mystery</option><option>Romance</option><option>Crime</option><option>War</option><option>Animation</option><option>Adventure</option><option>Musical</option><option>Documentary</option></select></div>
-              <div class="form-group"><label class="form-label">Subgenre</label><select class="form-select" id="movie-subgenre"><option value="">Select...</option></select></div>
-              <div class="form-group"><label class="form-label">Tone</label><select class="form-select" id="movie-tone"><option>Dark</option><option>Light</option><option>Gritty</option><option>Whimsical</option><option>Epic</option><option>Intimate</option><option>Satirical</option></select></div>
+              <div class="form-group"><label class="form-label" for="movie-title">Movie Title</label><input type="text" class="form-input" id="movie-title" placeholder="Enter title..."></div>
+              <div class="form-group"><label class="form-label" for="movie-genre">Genre</label><select class="form-select" id="movie-genre" onchange="updateSubgenres()"><option value="">Select...</option><option>Action</option><option>Drama</option><option>Horror</option><option>Sci-Fi</option><option>Fantasy</option><option>Comedy</option><option>Thriller</option><option>Mystery</option><option>Romance</option><option>Crime</option><option>War</option><option>Animation</option><option>Adventure</option><option>Musical</option><option>Documentary</option></select></div>
+              <div class="form-group"><label class="form-label" for="movie-subgenre">Subgenre</label><select class="form-select" id="movie-subgenre"><option value="">Select...</option></select></div>
+              <div class="form-group"><label class="form-label" for="movie-tone">Tone</label><select class="form-select" id="movie-tone"><option>Dark</option><option>Light</option><option>Gritty</option><option>Whimsical</option><option>Epic</option><option>Intimate</option><option>Satirical</option></select></div>
             </div>
             <div>
-              <div class="form-group"><label class="form-label">Rating</label><select class="form-select" id="movie-rating"><option>G</option><option>PG</option><option selected>PG-13</option><option>R</option></select></div>
-              <div class="form-group"><label class="form-label">Production Scale</label><select class="form-select" id="movie-scale" onchange="updateBudgetEstimate()"><option value="Micro">Micro ($50K-$500K)</option><option value="Low">Low ($500K-$5M)</option><option value="Medium" selected>Medium ($5M-$30M)</option><option value="High">High ($30M-$100M)</option><option value="Blockbuster">Blockbuster ($100M+)</option></select></div>
-              <div class="form-group"><label class="form-label">Release Season</label><select class="form-select" id="movie-season"><option value="Winter">Winter (Awards)</option><option>Spring</option><option value="Summer" selected>Summer (Blockbuster)</option><option>Fall</option><option>Holiday</option></select></div>
-              <div class="form-group"><label class="form-label">Budget Estimate</label><div id="budget-estimate" style="font-size:24px;font-weight:700;color:#4ade80;font-family:'JetBrains Mono','Courier New',monospace;" data-value="10000000">$10.0M</div></div>
+              <div class="form-group"><label class="form-label" for="movie-rating">Rating</label><select class="form-select" id="movie-rating"><option>G</option><option>PG</option><option selected>PG-13</option><option>R</option></select></div>
+              <div class="form-group"><label class="form-label" for="movie-scale">Production Scale</label><select class="form-select" id="movie-scale" onchange="updateBudgetEstimate()"><option value="Micro">Micro ($50K-$500K)</option><option value="Low">Low ($500K-$5M)</option><option value="Medium" selected>Medium ($5M-$30M)</option><option value="High">High ($30M-$100M)</option><option value="Blockbuster">Blockbuster ($100M+)</option></select></div>
+              <div class="form-group"><label class="form-label" for="movie-season">Release Season</label><select class="form-select" id="movie-season"><option value="Winter">Winter (Awards)</option><option>Spring</option><option value="Summer" selected>Summer (Blockbuster)</option><option>Fall</option><option>Holiday</option></select></div>
+              <div class="form-group"><span class="form-label">Budget Estimate</span><div id="budget-estimate" style="font-size:24px;font-weight:700;color:#4ade80;font-family:'JetBrains Mono','Courier New',monospace;" data-value="10000000">$10.0M</div></div>
             </div>
           </div>
         </div>
         <div class="grid-3">
-          <div class="form-group"><label class="form-label">Lead Actor</label><select class="form-select" id="cast-lead"></select></div>
-          <div class="form-group"><label class="form-label">Director</label><select class="form-select" id="cast-director"></select></div>
-          <div class="form-group"><label class="form-label">Composer</label><select class="form-select" id="cast-composer"></select></div>
+          <div class="form-group"><label class="form-label" for="cast-lead">Lead Actor</label><select class="form-select" id="cast-lead"></select></div>
+          <div class="form-group"><label class="form-label" for="cast-director">Director</label><select class="form-select" id="cast-director"></select></div>
+          <div class="form-group"><label class="form-label" for="cast-composer">Composer</label><select class="form-select" id="cast-composer"></select></div>
         </div>
         <div class="grid-2">
-          <div class="form-group"><label class="form-label">VFX Quality</label><select class="form-select" id="vfx-quality"><option value="Cheap">Cheap</option><option value="Standard" selected>Standard</option><option value="Premium">Premium</option><option value="Elite">Elite</option></select></div>
-          <div class="form-group"><label class="form-label">Release Strategy</label><select class="form-select" id="release-strategy"><option value="Wide">Wide Theatrical</option><option value="Limited">Limited Release</option><option value="Streaming">Streaming Exclusive</option><option value="Festival">Festival Launch</option><option value="Hybrid">Hybrid</option></select></div>
+          <div class="form-group"><label class="form-label" for="vfx-quality">VFX Quality</label><select class="form-select" id="vfx-quality"><option value="Cheap">Cheap</option><option value="Standard" selected>Standard</option><option value="Premium">Premium</option><option value="Elite">Elite</option></select></div>
+          <div class="form-group"><label class="form-label" for="release-strategy">Release Strategy</label><select class="form-select" id="release-strategy"><option value="Wide">Wide Theatrical</option><option value="Limited">Limited Release</option><option value="Streaming">Streaming Exclusive</option><option value="Festival">Festival Launch</option><option value="Hybrid">Hybrid</option></select></div>
         </div>
         <div style="text-align:center;margin-top:20px;"><button class="btn btn-red btn-lg" onclick="startProductionPipeline()">&#127916; BEGIN PRODUCTION</button></div>
       </div>
@@ -486,8 +486,8 @@ html, body {
   <div style="max-width:500px;width:90%;">
     <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:32px;margin-bottom:30px;text-align:center;">Settings</h2>
     <div class="card">
-      <div class="form-group"><label class="form-label">Studio Name</label><input type="text" class="form-input" id="setting-studio-name" value="Empire Pictures"></div>
-      <div class="form-group"><label class="form-label">Difficulty</label><select class="form-select" id="setting-difficulty"><option value="Easy">Easy</option><option value="Normal" selected>Normal</option><option value="Hard">Hard</option><option value="Mogul">Mogul</option></select></div>
+      <div class="form-group"><label class="form-label" for="setting-studio-name">Studio Name</label><input type="text" class="form-input" id="setting-studio-name" value="Empire Pictures"></div>
+      <div class="form-group"><label class="form-label" for="setting-difficulty">Difficulty</label><select class="form-select" id="setting-difficulty"><option value="Easy">Easy</option><option value="Normal" selected>Normal</option><option value="Hard">Hard</option><option value="Mogul">Mogul</option></select></div>
     </div>
     <div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="showScreen('main-menu')">Back</button></div>
   </div>
