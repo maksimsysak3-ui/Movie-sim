@@ -739,7 +739,7 @@ const AWARD_SHOWS=[
   {name:'BAFTA',prestige:75,icon:'&#127468;',categories:['Best Film','Best Director','Best Actor']}
 ];
 
-const TECH_TREE=[
+var TECH_TREE=[
   {id:'dolby',name:'Dolby Sound',cost:500000,era:'1980s',desc:'Enhanced audio',effect:{quality:5},requires:[]},
   {id:'steadicam',name:'Steadicam',cost:300000,era:'1980s',desc:'Smooth tracking',effect:{quality:3},requires:[]},
   {id:'cgi_basic',name:'Basic CGI',cost:2000000,era:'1990s',desc:'Computer effects',effect:{vfx:10},requires:['dolby']},
@@ -751,7 +751,7 @@ const TECH_TREE=[
   {id:'ai_vfx',name:'AI VFX',cost:30000000,era:'2030s',desc:'Neural rendering',effect:{vfx:30,speed:15},requires:['virtual_prod']}
 ];
 
-const SKILL_TREES={
+var SKILL_TREES={
   producer:[
     {id:'negotiation1',name:'Negotiation',cost:1,desc:'-10% talent costs',effect:'talentDiscount',value:.1,requires:[]},
     {id:'negotiation2',name:'Power Negotiation',cost:2,desc:'-20% talent costs',effect:'talentDiscount',value:.1,requires:['negotiation1']},
