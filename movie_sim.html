@@ -699,7 +699,32 @@ function generateComposers(count){let c=[];const styles=['Orchestral','Synthwave
 
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function showTab(tabId){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tabId).classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`.nav-btn[data-tab="${tabId}"]`)?.classList.add('active');onTabShow(tabId)}
-function onTabShow(t){if(t==='actors')renderActors();if(t==='directors')renderDirectors();if(t==='composers')renderComposers();if(t==='finance')renderFinance();if(t==='rivals')renderRivals();if(t==='awards')renderAwards();if(t==='skills')renderSkillTree();if(t==='tech')renderTechTree();if(t==='franchise')renderFranchises();if(t==='new-movie'){updateBudgetEstimate();populateTalentDropdowns()}}
+function onTabShow(t){
+  try{
+    if(t==='actors')renderActors();
+    if(t==='directors')renderDirectors();
+    if(t==='composers')renderComposers();
+    if(t==='finance')renderFinance();
+    if(t==='rivals')renderRivals();
+    if(t==='awards')renderAwards();
+    if(t==='skills')renderSkillTree();
+    if(t==='tech')renderTechTree();
+    if(t==='franchise')renderFranchises();
+    if(t==='marketing')renderMarketingTab();
+    if(t==='new-movie'){updateBudgetEstimate();populateTalentDropdowns();}
+    if(t==='production')renderProductionTab();
+  }catch(e){console.error('Tab render error:',t,e);}
+}
+
+function renderProductionTab(){
+  var c=document.getElementById('production-content');
+  if(!c)return;
+  if(!G.currentMovie&&G.inProduction.length===0){
+    c.innerHTML='<div class="empty-state"><div class="empty-state-icon">&#9881;</div><div class="empty-state-text">No movies in production</div><button class="btn btn-red btn-sm" onclick="showTab(\'new-movie\')">NEW MOVIE</button></div>';
+  } else if(G.currentMovie){
+    c.innerHTML='<div class="card"><div class="card-header"><div class="card-title">'+G.currentMovie.title+'</div><span class="card-badge badge-gold">IN PIPELINE</span></div><p style="color:var(--text-light);">This movie is currently going through the production pipeline minigames.</p></div>';
+  }
+}
 function closeModal(){document.getElementById('modal-overlay').classList.remove('active')}
 
 function notify(title,text,type='info'){const c=document.getElementById('notif-container');const d=document.createElement('div');d.className='notification '+type;d.innerHTML=`<div class="notif-title">${title}</div><div class="notif-text">${text}</div>`;c.appendChild(d);setTimeout(()=>{d.style.opacity='0';d.style.transform='translateX(100px)';d.style.transition='all .5s';setTimeout(()=>d.remove(),500)},5000)}
@@ -1583,9 +1608,58 @@ function renderLibrary(){
 // ============================
 // TALENT RENDERING
 // ============================
-function renderActors(){document.getElementById('actors-grid').innerHTML=G.actors.map(a=>{const c=['#e63946','#457b9d','#2a9d8f','#e76f51','#6d6875','#b5838d'][a.name.charCodeAt(0)%6];return`<div class="talent-card"><div style="width:40px;height:40px;border-radius:50%;background:${c}20;color:${c};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;margin-bottom:8px;">${a.name.charAt(0)}</div><div style="font-size:14px;font-weight:600;">${a.name}</div><div style="font-size:10px;color:var(--text-muted);">${a.available?'Available':'Busy'} | Age ${a.age}</div><div style="margin-top:8px;"><div class="stat-bar-container"><span class="stat-label">Charisma</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.charisma}%;background:var(--accent-gold);"></div></div><span class="stat-value">${a.charisma}</span></div><div class="stat-bar-container"><span class="stat-label">Popularity</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.popularity}%;background:var(--accent-blue);"></div></div><span class="stat-value">${a.popularity}</span></div><div class="stat-bar-container"><span class="stat-label">Box Office</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.boxOfficeDraw}%;background:#4ade80;"></div></div><span class="stat-value">${a.boxOfficeDraw}</span></div></div><div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$${formatMoney(a.salary)}/film</div></div>`}).join('')}
-function renderDirectors(){document.getElementById('directors-grid').innerHTML=G.directors.map(d=>`<div class="talent-card"><div style="font-size:14px;font-weight:600;">${d.name}</div><div style="font-size:10px;color:var(--text-muted);">${d.style} | Age ${d.age}</div><div style="margin-top:8px;"><div class="stat-bar-container"><span class="stat-label">Vision</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.vision}%;background:var(--accent-purple);"></div></div><span class="stat-value">${d.vision}</span></div><div class="stat-bar-container"><span class="stat-label">Innovation</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.innovation}%;background:var(--accent-blue);"></div></div><span class="stat-value">${d.innovation}</span></div></div><div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$${formatMoney(d.salary)}/film</div></div>`).join('')}
-function renderComposers(){document.getElementById('composers-grid').innerHTML=G.composers.map(c=>`<div class="talent-card"><div style="font-size:14px;font-weight:600;">${c.name}</div><div style="font-size:10px;color:var(--text-muted);">${c.style}</div><div style="margin-top:8px;"><div class="stat-bar-container"><span class="stat-label">Talent</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${c.talent}%;background:var(--accent-purple);"></div></div><span class="stat-value">${c.talent}</span></div></div><div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$${formatMoney(c.salary)}/film</div></div>`).join('')}
+function renderActors(){
+  const grid=document.getElementById('actors-grid');
+  if(!grid)return;
+  if(!G.actors||G.actors.length===0){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-text">No actors available</div></div>';return}
+  grid.innerHTML=G.actors.map(function(a){
+    var colors=['#e63946','#457b9d','#2a9d8f','#e76f51','#6d6875','#b5838d'];
+    var col=colors[a.name.charCodeAt(0)%colors.length];
+    return '<div class="talent-card">'
+      +'<div style="width:40px;height:40px;border-radius:50%;background:'+col+'20;color:'+col+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;margin-bottom:8px;">'+a.name.charAt(0)+'</div>'
+      +'<div style="font-size:14px;font-weight:600;">'+a.name+'</div>'
+      +'<div style="font-size:10px;color:var(--text-muted);">'+(a.available?'Available':'Busy')+' | Age '+a.age+'</div>'
+      +'<div style="margin-top:8px;">'
+      +'<div class="stat-bar-container"><span class="stat-label">Charisma</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+a.charisma+'%;background:var(--accent-gold);"></div></div><span class="stat-value">'+a.charisma+'</span></div>'
+      +'<div class="stat-bar-container"><span class="stat-label">Popularity</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+a.popularity+'%;background:var(--accent-blue);"></div></div><span class="stat-value">'+a.popularity+'</span></div>'
+      +'<div class="stat-bar-container"><span class="stat-label">Box Office</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+a.boxOfficeDraw+'%;background:#4ade80;"></div></div><span class="stat-value">'+a.boxOfficeDraw+'</span></div>'
+      +'</div>'
+      +'<div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$'+formatMoney(a.salary)+'/film</div>'
+      +'</div>';
+  }).join('');
+}
+function renderDirectors(){
+  const grid=document.getElementById('directors-grid');
+  if(!grid)return;
+  if(!G.directors||G.directors.length===0){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-text">No directors available</div></div>';return}
+  grid.innerHTML=G.directors.map(function(d){
+    return '<div class="talent-card">'
+      +'<div style="font-size:14px;font-weight:600;">'+d.name+'</div>'
+      +'<div style="font-size:10px;color:var(--text-muted);">'+d.style+' | Age '+d.age+' | '+(d.available?'Available':'Busy')+'</div>'
+      +'<div style="margin-top:8px;">'
+      +'<div class="stat-bar-container"><span class="stat-label">Vision</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+d.vision+'%;background:var(--accent-purple);"></div></div><span class="stat-value">'+d.vision+'</span></div>'
+      +'<div class="stat-bar-container"><span class="stat-label">Innovation</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+d.innovation+'%;background:var(--accent-blue);"></div></div><span class="stat-value">'+d.innovation+'</span></div>'
+      +'</div>'
+      +'<div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$'+formatMoney(d.salary)+'/film</div>'
+      +'</div>';
+  }).join('');
+}
+function renderComposers(){
+  const grid=document.getElementById('composers-grid');
+  if(!grid)return;
+  if(!G.composers||G.composers.length===0){grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-text">No composers available</div></div>';return}
+  grid.innerHTML=G.composers.map(function(comp){
+    return '<div class="talent-card">'
+      +'<div style="font-size:14px;font-weight:600;">'+comp.name+'</div>'
+      +'<div style="font-size:10px;color:var(--text-muted);">'+comp.style+' | '+(comp.available?'Available':'Busy')+'</div>'
+      +'<div style="margin-top:8px;">'
+      +'<div class="stat-bar-container"><span class="stat-label">Talent</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+comp.talent+'%;background:var(--accent-purple);"></div></div><span class="stat-value">'+comp.talent+'</span></div>'
+      +'<div class="stat-bar-container"><span class="stat-label">Fame</span><div class="stat-bar"><div class="stat-bar-fill" style="width:'+comp.fame+'%;background:var(--accent-gold);"></div></div><span class="stat-value">'+comp.fame+'</span></div>'
+      +'</div>'
+      +'<div style="margin-top:6px;font-size:12px;color:var(--accent-gold);">$'+formatMoney(comp.salary)+'/film</div>'
+      +'</div>';
+  }).join('');
+}
 
 // ============================
 // MARKETING, FINANCE, RIVALS, AWARDS, SKILLS, TECH, FRANCHISE
