@@ -529,6 +529,11 @@ html, body {
 
       <!-- New Movie -->
       <div class="tab-content" id="tab-new-movie">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="btn btn-red" id="toggle-movie-btn" onclick="toggleProductionMode('movie')" style="flex:1;font-size:16px;padding:12px;">MOVIE</button>
+          <button class="btn" id="toggle-tv-btn" onclick="toggleProductionMode('tv')" style="flex:1;font-size:16px;padding:12px;background:var(--bg-tertiary);color:var(--text-secondary);">TV SHOW</button>
+        </div>
+        <div id="movie-creation-form">
         <div class="card">
           <div class="card-header"><div class="card-title">Create New Movie</div><span class="card-badge badge-gold">DEVELOPMENT</span></div>
           <div class="grid-2">
@@ -555,7 +560,26 @@ html, body {
           <div class="form-group"><label class="form-label" for="vfx-quality">VFX Quality</label><select class="form-select" id="vfx-quality"><option value="Cheap">Cheap</option><option value="Standard" selected>Standard</option><option value="Premium">Premium</option><option value="Elite">Elite</option></select></div>
           <div class="form-group"><label class="form-label" for="release-strategy">Release Strategy</label><select class="form-select" id="release-strategy"><option value="Wide">Wide Theatrical</option><option value="Limited">Limited Release</option><option value="Streaming">Streaming Exclusive</option><option value="Festival">Festival Launch</option><option value="Hybrid">Hybrid</option></select></div>
         </div>
-        <div style="text-align:center;margin-top:20px;"><button class="btn btn-red btn-lg" onclick="startProductionPipeline()">&#127916; BEGIN PRODUCTION</button></div>
+        <div style="text-align:center;margin-top:20px;"><button class="btn btn-red btn-lg" onclick="startProductionPipeline()">BEGIN PRODUCTION</button></div>
+        </div><!-- end movie-creation-form -->
+        <div id="tv-creation-form" style="display:none;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Create New TV Show</div><span class="card-badge badge-blue">TELEVISION</span></div>
+          <div class="grid-2">
+            <div>
+              <div class="form-group"><label class="form-label" for="tv-title">Show Title</label><input type="text" class="form-input" id="tv-title" placeholder="Enter show title..."></div>
+              <div class="form-group"><label class="form-label" for="tv-genre">Genre</label><select class="form-select" id="tv-genre"><option>Drama</option><option>Comedy</option><option>Thriller</option><option>Sci-Fi</option><option>Fantasy</option><option>Crime</option><option>Horror</option><option>Mystery</option><option>Action</option><option>Documentary</option></select></div>
+              <div class="form-group"><label class="form-label" for="tv-episodes">Episodes per Season</label><select class="form-select" id="tv-episodes"><option value="6">6 Episodes (Limited)</option><option value="8" selected>8 Episodes (Standard)</option><option value="10">10 Episodes (Full)</option><option value="13">13 Episodes (Extended)</option><option value="22">22 Episodes (Network)</option></select></div>
+            </div>
+            <div>
+              <div class="form-group"><label class="form-label" for="tv-budget">Budget per Episode</label><select class="form-select" id="tv-budget"><option value="500000">$500K (Basic Cable)</option><option value="2000000">$2M (Standard)</option><option value="5000000" selected>$5M (Premium)</option><option value="10000000">$10M (Prestige)</option><option value="20000000">$20M (Blockbuster)</option></select></div>
+              <div class="form-group"><label class="form-label" for="tv-platform">Platform</label><select class="form-select" id="tv-platform"><option>Network TV</option><option>Cable</option><option>Premium Cable</option><option>Streaming</option><option>International</option></select></div>
+              <div class="form-group"><label class="form-label" for="tv-lead-select">Showrunner</label><select class="form-select" id="tv-lead-select"></select></div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;"><button class="btn btn-blue btn-lg" onclick="createTVShow()">GREENLIGHT SHOW</button></div>
+        </div><!-- end tv-creation-form -->
       </div>
 
       <!-- Other tabs -->
@@ -3494,6 +3518,29 @@ deleteSlot=function(slot){
   localStorage.removeItem('empire_posters_'+slot);
   renderSaveSlots();
   notify('Deleted','Slot '+(slot+1)+' cleared.','info');
+};
+
+// --- 16b. PRODUCTION MODE TOGGLE (Movie / TV Show) ---
+window.toggleProductionMode=function(mode){
+  var movieForm=document.getElementById('movie-creation-form');
+  var tvForm=document.getElementById('tv-creation-form');
+  var movieBtn=document.getElementById('toggle-movie-btn');
+  var tvBtn=document.getElementById('toggle-tv-btn');
+  if(mode==='tv'){
+    movieForm.style.display='none';
+    tvForm.style.display='block';
+    movieBtn.style.background='var(--bg-tertiary)';movieBtn.style.color='var(--text-secondary)';movieBtn.classList.remove('btn-red');
+    tvBtn.style.background='';tvBtn.style.color='';tvBtn.classList.add('btn-blue');
+    // Populate showrunner dropdown
+    var sel=document.getElementById('tv-lead-select');
+    sel.innerHTML='<option value="">Select Showrunner...</option>';
+    if(G.directors){G.directors.forEach(function(d){if(d.available!==false){sel.innerHTML+='<option value="'+d.id+'">'+d.name+' (Vision: '+d.vision+')</option>';}});}
+  } else {
+    movieForm.style.display='block';
+    tvForm.style.display='none';
+    tvBtn.style.background='var(--bg-tertiary)';tvBtn.style.color='var(--text-secondary)';tvBtn.classList.remove('btn-blue');
+    movieBtn.style.background='';movieBtn.style.color='';movieBtn.classList.add('btn-red');
+  }
 };
 
 // --- 17. TV SHOW MINIGAME PIPELINE ---
