@@ -3524,9 +3524,10 @@ createTVShow=function(){
   if(director)director.available=false;
   G.tvShows.push(show);
   closeModal();
-  notify('Greenlit!','"'+title+'" greenlit! Go to TV Shows tab to produce episodes.','success');
+  notify('Greenlit!','"'+title+'" greenlit! Producing Episode 1 now.','success');
   addNews(G.studioName+' greenlights "'+title+'" for '+platform+'.');
-  showTab('tvshows');
+  // Auto-launch first episode minigame
+  produceEpisode(show.id,0);
 };
 
 // Override renderTVShows to add produce buttons
@@ -3800,7 +3801,7 @@ function launchTVEditMinigame(tv,epIndex){
       G.reputation=clamp(G.reputation+Math.round(tv.criticScore/15),0,100);
       G.fans+=tv.viewership;
       G.skillPoints+=tv.criticScore>70?2:1;
-      G.money+=Math.round(tv.viewership*tv.quality*30);
+      G.money+=Math.round(tv.viewership*tv.quality*0.1);
 
       notify('Season '+tv.currentSeason+' Complete!','"'+tv.title+'" premieres! Critics: '+tv.criticScore+'/100 | Viewers: '+formatMoney(tv.viewership),'success');
       addNews('"'+tv.title+'" S'+tv.currentSeason+' premieres on '+tv.platform+' to '+formatMoney(tv.viewership)+' viewers.');
@@ -3835,33 +3836,9 @@ window.renewShowWithMinigames=function(tvId){
   renderTVShows();
 };
 
-// Disable auto-progression for TV shows that use minigames
+// TV shows never auto-progress — all episodes use minigames
 processTVShows=function(){
-  // Only auto-progress old-format shows (without needsMinigame flag)
-  if(!G.tvShows)return;
-  G.tvShows.forEach(function(tv){
-    if(tv.cancelled||tv.airing||tv.needsMinigame)return;
-    // Legacy auto-progress for any old saves
-    tv.weeksInProd++;
-    var epInterval=Math.max(2,Math.floor(tv.totalWeeks/tv.episodes));
-    if(tv.weeksInProd%epInterval===0&&tv.episodesCompleted<tv.episodes){
-      tv.episodesCompleted++;
-      if(tv.weeksInProd<tv.totalWeeks*0.3)tv.phase='Writing';
-      else if(tv.weeksInProd<tv.totalWeeks*0.7)tv.phase='Filming';
-      else tv.phase='Post-Production';
-    }
-    if(tv.episodesCompleted>=tv.episodes){
-      tv.airing=true;tv.phase='Complete';
-      var showrunnerBonus=tv.showrunner?tv.showrunner.vision/5:0;
-      tv.quality=clamp(Math.round(50+tv.budgetPerEp/500000+showrunnerBonus+rnd(-10,15)),10,100);
-      tv.criticScore=clamp(tv.quality+rnd(-10,10),5,100);
-      tv.audienceScore=clamp(tv.quality+rnd(-5,15),5,100);
-      tv.viewership=Math.round(tv.audienceScore*10000+tv.budgetPerEp/10);
-      tv.seasons.push({season:tv.currentSeason,quality:tv.quality,criticScore:tv.criticScore});
-      G.reputation=clamp(G.reputation+Math.round(tv.criticScore/20),0,100);
-      G.fans+=tv.viewership;
-    }
-  });
+  // No auto-progression. Player produces each episode manually via minigames.
 };
 
 // --- 18. MOVIE SEASONS (New Season = same IP, new production) ---
