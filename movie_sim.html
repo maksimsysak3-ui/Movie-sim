@@ -705,12 +705,12 @@ html, body {
 // ============================
 // DATA
 // ============================
-const GENRES=['Action','Drama','Horror','Sci-Fi','Fantasy','Comedy','Thriller','Mystery','Romance','Crime','War','Animation','Adventure','Musical','Documentary'];
-const SUBGENRES={Action:['Superhero','Martial Arts','Military','Heist','Spy'],Drama:['Political','Family','Legal','Historical','Biographical'],Horror:['Psychological Horror','Slasher','Supernatural','Zombie','Body Horror'],'Sci-Fi':['Cyberpunk','Space Opera','Time Travel','Post-Apocalyptic','Hard Sci-Fi'],Fantasy:['Dark Fantasy','Epic Fantasy','Urban Fantasy','Fairy Tale','Mythological'],Comedy:['Romantic Comedy','Dark Comedy','Slapstick','Satire','Parody'],Thriller:['Political Thriller','Psychological Thriller','Legal Thriller','Tech Thriller','Conspiracy'],Mystery:['Noir','Whodunit','Detective','True Crime'],Romance:['Period Romance','Contemporary','Tragic Romance'],Crime:['Heist','Gangster','Drug Trade','Serial Killer'],War:['WW2','Vietnam','Modern Warfare','Anti-War'],Animation:['Family','Adult Animation','Anime-Style','Stop-Motion'],Adventure:['Treasure Hunt','Survival','Exploration','Pirate'],Musical:['Broadway Adaptation','Original Musical','Rock Musical'],Documentary:['True Crime','Nature','Political','Social']};
-const FIRST_NAMES=['James','Sarah','Michael','Emma','David','Olivia','Robert','Sophia','William','Isabella','Richard','Mia','Thomas','Charlotte','Daniel','Amelia','Christopher','Harper','Matthew','Evelyn','Anthony','Luna','Mark','Chloe','Steven','Grace','Kevin','Lily','Brian','Zoe','Jason','Nora','Ryan','Elena','Eric','Stella','Alex','Violet','Sam','Clara','Nathan','Diana','Peter','Rose','George','Maya','Frank','Ada','Victor','Iris','Leo','Nina','Oscar','Vera','Max','Tessa','Felix','Ingrid','Hugo','Lena','Yuki','Akira','Raj','Priya','Chen','Lin','Omar','Layla','Carlos','Sofia','Diego','Valentina','Andre','Monique','Jean','Marie'];
-const LAST_NAMES=['Anderson','Baker','Clark','Davis','Evans','Foster','Garcia','Harris','Johnson','King','Lee','Martinez','Nelson','Parker','Quinn','Roberts','Smith','Taylor','Underwood','Vance','Williams','Young','Zhang','Monroe','Sterling','Blackwood','Silverstone','Goldwyn','Lancaster','Crawford','Valentino','Bergman','Hepburn','Eastwood','Redford','Streep','Coppola','Kurosawa','Kubrick','Hitchcock','Nolan','Villeneuve','Stone','Cross','Reeves','Hart','Bell','Rivera','Rhodes','Blake','Hayes','Pierce','Fox','Knight','Price','Banks','Wolf','Frost','Wells','Nash','Cole','Hunt','Grant'];
+var GENRES=['Action','Drama','Horror','Sci-Fi','Fantasy','Comedy','Thriller','Mystery','Romance','Crime','War','Animation','Adventure','Musical','Documentary'];
+var SUBGENRES={Action:['Superhero','Martial Arts','Military','Heist','Spy'],Drama:['Political','Family','Legal','Historical','Biographical'],Horror:['Psychological Horror','Slasher','Supernatural','Zombie','Body Horror'],'Sci-Fi':['Cyberpunk','Space Opera','Time Travel','Post-Apocalyptic','Hard Sci-Fi'],Fantasy:['Dark Fantasy','Epic Fantasy','Urban Fantasy','Fairy Tale','Mythological'],Comedy:['Romantic Comedy','Dark Comedy','Slapstick','Satire','Parody'],Thriller:['Political Thriller','Psychological Thriller','Legal Thriller','Tech Thriller','Conspiracy'],Mystery:['Noir','Whodunit','Detective','True Crime'],Romance:['Period Romance','Contemporary','Tragic Romance'],Crime:['Heist','Gangster','Drug Trade','Serial Killer'],War:['WW2','Vietnam','Modern Warfare','Anti-War'],Animation:['Family','Adult Animation','Anime-Style','Stop-Motion'],Adventure:['Treasure Hunt','Survival','Exploration','Pirate'],Musical:['Broadway Adaptation','Original Musical','Rock Musical'],Documentary:['True Crime','Nature','Political','Social']};
+var FIRST_NAMES=['James','Sarah','Michael','Emma','David','Olivia','Robert','Sophia','William','Isabella','Richard','Mia','Thomas','Charlotte','Daniel','Amelia','Christopher','Harper','Matthew','Evelyn','Anthony','Luna','Mark','Chloe','Steven','Grace','Kevin','Lily','Brian','Zoe','Jason','Nora','Ryan','Elena','Eric','Stella','Alex','Violet','Sam','Clara','Nathan','Diana','Peter','Rose','George','Maya','Frank','Ada','Victor','Iris','Leo','Nina','Oscar','Vera','Max','Tessa','Felix','Ingrid','Hugo','Lena','Yuki','Akira','Raj','Priya','Chen','Lin','Omar','Layla','Carlos','Sofia','Diego','Valentina','Andre','Monique','Jean','Marie'];
+var LAST_NAMES=['Anderson','Baker','Clark','Davis','Evans','Foster','Garcia','Harris','Johnson','King','Lee','Martinez','Nelson','Parker','Quinn','Roberts','Smith','Taylor','Underwood','Vance','Williams','Young','Zhang','Monroe','Sterling','Blackwood','Silverstone','Goldwyn','Lancaster','Crawford','Valentino','Bergman','Hepburn','Eastwood','Redford','Streep','Coppola','Kurosawa','Kubrick','Hitchcock','Nolan','Villeneuve','Stone','Cross','Reeves','Hart','Bell','Rivera','Rhodes','Blake','Hayes','Pierce','Fox','Knight','Price','Banks','Wolf','Frost','Wells','Nash','Cole','Hunt','Grant'];
 
-const RIVAL_STUDIOS=[
+var RIVAL_STUDIOS=[
   {name:'Titan Films',style:'Aggressive',color:'#e63946',personality:'Blockbuster-focused',money:50000000,rep:60,movies:[],strategy:'commercial'},
   {name:'Lumiere Cinema',style:'Prestige',color:'#f4a261',personality:'Award-chasing arthouse',money:20000000,rep:75,movies:[],strategy:'prestige'},
   {name:'Nova Studios',style:'Commercial',color:'#2a9d8f',personality:'Franchise-heavy',money:80000000,rep:50,movies:[],strategy:'franchise'},
@@ -719,7 +719,7 @@ const RIVAL_STUDIOS=[
   {name:'Golden Gate Films',style:'Balanced',color:'#d4a373',personality:'Diversified portfolio',money:40000000,rep:58,movies:[],strategy:'balanced'}
 ];
 
-const NEWS_TEMPLATES=[
+var NEWS_TEMPLATES=[
   "{{rival}} announces a ${{budget}}M {{genre}} epic.",
   "Critics buzz about the upcoming awards season.",
   "{{genre}} movies dominate this quarter's box office.",
@@ -730,7 +730,7 @@ const NEWS_TEMPLATES=[
   "{{rival}} acquires streaming rights for ${{budget}}M."
 ];
 
-const AWARD_SHOWS=[
+var AWARD_SHOWS=[
   {name:'Academy Awards',prestige:100,icon:'&#127942;',categories:['Best Picture','Best Director','Best Actor','Best Score','Best VFX']},
   {name:'Golden Globes',prestige:80,icon:'&#127760;',categories:['Best Drama','Best Comedy','Best Director']},
   {name:'Cannes',prestige:90,icon:'&#127796;',categories:['Palme d\'Or','Grand Prix','Best Director']},
@@ -773,7 +773,7 @@ var SKILL_TREES={
   ]
 };
 
-const STUDIO_LEVELS=[
+var STUDIO_LEVELS=[
   {name:'Garage Studio',capacity:1,costToUpgrade:500000},
   {name:'Small Office',capacity:2,costToUpgrade:2000000},
   {name:'Warehouse',capacity:3,costToUpgrade:10000000},
@@ -785,7 +785,7 @@ const STUDIO_LEVELS=[
 // ============================
 // SCRIPT WRITING MINIGAME DATA
 // ============================
-const SCRIPT_ELEMENTS = {
+var SCRIPT_ELEMENTS = {
   openings: [
     {name:'Cold Open',icon:'&#10052;',desc:'Start with action, hook viewers immediately',bonus:{massFeel:15,pacing:10,criticFeel:-5}},
     {name:'Slow Burn',icon:'&#128293;',desc:'Atmospheric buildup, set mood and tone',bonus:{criticFeel:15,depth:10,massFeel:-5}},
@@ -828,7 +828,7 @@ const SCRIPT_ELEMENTS = {
   ]
 };
 
-const SCENE_TEMPLATES = {
+var SCENE_TEMPLATES = {
   Action: [
     {name:'Car Chase',desc:'A high-speed pursuit through city streets.',choices:[{label:'Practical Stunts',desc:'Real cars, real danger — more authentic',quality:8,risk:15},{label:'CGI Enhanced',desc:'Digital effects for impossible moves',quality:6,risk:5},{label:'Single Take',desc:'One continuous shot — extremely ambitious',quality:15,risk:30},{label:'Quick Cuts',desc:'Rapid editing for intensity',quality:5,risk:3}]},
     {name:'Fight Scene',desc:'The hero confronts the villain\'s henchmen.',choices:[{label:'Choreographed Martial Arts',desc:'Elegant, precise combat',quality:10,risk:10},{label:'Brutal & Raw',desc:'Realistic, visceral fighting',quality:8,risk:8},{label:'Weapon Combat',desc:'Swords, staffs, or guns',quality:7,risk:12},{label:'Improvised',desc:'Let actors find the rhythm',quality:5,risk:20}]},
@@ -851,7 +851,7 @@ const SCENE_TEMPLATES = {
   }
 });
 
-const EDITING_OPERATIONS = [
+var EDITING_OPERATIONS = [
   {name:'Tighten Cut',desc:'Remove 10% runtime, improve pacing',effect:{pacing:10,depth:-3}},
   {name:'Add B-Roll',desc:'Insert establishing shots for atmosphere',effect:{visual:8,pacing:-3}},
   {name:'Extend Scene',desc:'Let a key moment breathe longer',effect:{depth:8,pacing:-5}},
@@ -860,7 +860,7 @@ const EDITING_OPERATIONS = [
   {name:'Remove Scene',desc:'Cut an underperforming scene entirely',effect:{pacing:8,depth:-8}}
 ];
 
-const COLOR_GRADES = [
+var COLOR_GRADES = [
   {name:'Teal & Orange',colors:['#008080','#ff8c00'],desc:'Hollywood standard, commercial feel',effect:{visual:8,massFeel:10}},
   {name:'Desaturated',colors:['#4a4a4a','#6a6a6a'],desc:'Gritty, realistic tone',effect:{visual:10,criticFeel:8}},
   {name:'High Contrast',colors:['#000000','#ffffff'],desc:'Bold, dramatic shadows',effect:{visual:12,originality:5}},
@@ -871,7 +871,7 @@ const COLOR_GRADES = [
   {name:'Sepia Dream',colors:['#704214','#c8a882'],desc:'Timeless, classic cinema',effect:{visual:7,awardPotential:8}}
 ];
 
-const AUDIENCE_REACTIONS = ['&#128525;','&#128522;','&#128528;','&#128533;','&#128557;','&#128562;','&#129327;','&#128564;','&#128556;','&#129321;'];
+var AUDIENCE_REACTIONS = ['&#128525;','&#128522;','&#128528;','&#128533;','&#128557;','&#128562;','&#129327;','&#128564;','&#128556;','&#129321;'];
 
 // ============================
 // GAME STATE
