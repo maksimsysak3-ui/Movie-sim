@@ -3886,7 +3886,6 @@ showMovieResultModal=function(movie){
     +'<div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:6px;"><span style="font-weight:700;">Worldwide</span><span style="color:var(--accent-gold);font-weight:700;font-size:18px;">$'+formatMoney(m.boxOffice.worldwide)+'</span></div>'
     +'</div>'
     +'<div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">'
-    +(m.criticScore>50?'<button class="btn btn-blue btn-sm" onclick="startMovieSeason(\''+m.id+'\')">New Season</button>':'')
     +(m.criticScore>60&&!m.isFranchise?'<button class="btn btn-gold btn-sm" onclick="startFranchise(\''+m.id+'\')">Start Franchise</button>':'')
     +'<button class="btn btn-red" onclick="closeModal()">Continue</button>'
     +'</div>';
