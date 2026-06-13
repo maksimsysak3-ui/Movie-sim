@@ -3693,8 +3693,80 @@ window.pickTVEpDirection=function(idx){
   if(!tv)return;
 
   window._tvEpData={quality:choice.quality,audience:choice.audience,critic:choice.critic,choiceName:choice.name};
-  launchTVShootingMinigame(tv,ctx.epIndex);
+  launchTVCastingMinigame(tv,ctx.epIndex);
 };
+
+function launchTVCastingMinigame(tv,epIndex){
+  var roles=[
+    {role:'Lead',importance:3},
+    {role:'Supporting',importance:2},
+    {role:'Guest Star',importance:1}
+  ];
+  var roleIdx=0;
+  var castQuality=0;
+  var budget=tv.budgetPerEp;
+  var spent=0;
+
+  function renderCasting(){
+    if(roleIdx>=roles.length){
+      window._tvEpData.castQuality=castQuality;
+      launchTVShootingMinigame(tv,epIndex);
+      return;
+    }
+    var r=roles[roleIdx];
+    var actors=[];
+    for(var i=0;i<4;i++){
+      var talent=rnd(20,95);var salary=Math.round(talent*talent*budget*0.000005);
+      var chemistry=rnd(-10,15);var diva=rnd(0,100)<talent/3;
+      actors.push({name:pick(window.FIRST_NAMES||['Alex','Sam','Morgan','Jordan'])+' '+pick(window.LAST_NAMES||['Smith','Jones','Lee','Park']),talent:talent,salary:salary,chemistry:chemistry,diva:diva});
+    }
+    actors.sort(function(a,b){return b.talent-a.talent;});
+
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Casting</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Cast the '+r.role+' (Role '+(roleIdx+1)+'/'+roles.length+')</div></div>'
+      +'<div class="minigame-phase badge-blue card-badge">CASTING</div></div>'
+      +'<div class="minigame-body" style="max-width:800px;margin:0 auto;">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:12px;">'
+      +'<span style="color:var(--text-muted);">Cast Quality: <strong style="color:#4ade80;">'+castQuality+'</strong></span>'
+      +'<span style="color:var(--text-muted);">Budget Spent: <strong style="color:var(--accent-red);">$'+formatMoney(spent)+'</strong> / $'+formatMoney(budget)+'</span></div>'
+      +'<div class="grid-2">'
+      +actors.map(function(a,i){
+        var overBudget=spent+a.salary>budget;
+        return '<div class="script-card" onclick="tvCastPick('+i+')" style="padding:16px;'+(overBudget?'opacity:.6;border-color:var(--accent-red);':'')+'">'
+          +'<div style="font-weight:700;font-size:14px;margin-bottom:4px;">'+a.name+'</div>'
+          +'<div style="display:flex;gap:12px;font-size:11px;margin-bottom:6px;">'
+          +'<span style="color:#4ade80;">Talent: '+a.talent+'</span>'
+          +'<span style="color:var(--accent-gold);">Chemistry: '+(a.chemistry>0?'+':'')+a.chemistry+'</span>'
+          +'</div>'
+          +'<div style="font-size:11px;color:var(--accent-red);">Salary: $'+formatMoney(a.salary)+(a.diva?' (Diva)':'')+'</div>'
+          +(overBudget?'<div style="font-size:9px;color:var(--accent-red);margin-top:4px;">OVER BUDGET</div>':'')
+          +'</div>';
+      }).join('')
+      +'</div></div></div>';
+
+    window._tvCastActors=actors;
+  }
+
+  window.tvCastPick=function(idx){
+    var a=window._tvCastActors[idx];
+    var r=roles[roleIdx];
+    if(spent+a.salary>tv.budgetPerEp){
+      notify('Over Budget!','Cannot afford '+a.name+'.','error');
+      return;
+    }
+    spent+=a.salary;
+    var q=Math.round((a.talent+a.chemistry)*r.importance/3);
+    if(a.diva){q-=rnd(3,8);notify('Diva Alert!',a.name+' is difficult on set.','error');}
+    castQuality+=Math.max(0,q);
+    notify('Cast!',a.name+' joins as '+r.role+'.','success');
+    roleIdx++;
+    renderCasting();
+  };
+
+  renderCasting();
+}
 
 function launchTVShootingMinigame(tv,epIndex){
   var scenes=[
@@ -3803,7 +3875,7 @@ function launchTVEditMinigame(tv,epIndex){
       }).join('')
       +'</div>'
       +'<div style="text-align:center;margin-top:20px;">'
-      +'<button class="btn btn-red btn-lg" onclick="finishTVEpisode()">LOCK EPISODE</button>'
+      +'<button class="btn btn-red btn-lg" onclick="launchTVSoundMinigame()">PROCEED TO SOUND</button>'
       +'</div></div></div>';
   }
 
@@ -3818,10 +3890,85 @@ function launchTVEditMinigame(tv,epIndex){
     renderEdit();
   };
 
+  window.launchTVSoundMinigame=function(){
+    window._tvEpData.editPacing=pacing;window._tvEpData.editTension=tension;window._tvEpData.editEmotion=emotion;
+    var ctx=window._tvProducing;
+    var tv2=G.tvShows.find(function(t){return t.id===ctx.tvId;});
+    if(!tv2)return;
+
+    var soundScore=0;
+    var layers=[
+      {name:'Score & Music',choices:[
+        {label:'Orchestral',desc:'Full symphony — dramatic, expensive, powerful',quality:rnd(12,20),mood:'epic'},
+        {label:'Synth/Electronic',desc:'Modern, atmospheric, edgy',quality:rnd(10,18),mood:'tense'},
+        {label:'Minimalist Piano',desc:'Subtle, emotional, intimate',quality:rnd(8,16),mood:'emotional'},
+        {label:'Licensed Tracks',desc:'Popular songs — audience appeal but less original',quality:rnd(6,14),mood:'fun'}
+      ]},
+      {name:'Sound Effects',choices:[
+        {label:'Realistic Foley',desc:'Hand-crafted, every footstep and door creak',quality:rnd(10,18),mood:'immersive'},
+        {label:'Stylized FX',desc:'Heightened reality — punchy, cinematic impacts',quality:rnd(12,20),mood:'bombastic'},
+        {label:'Ambient Focus',desc:'Environmental sounds drive the mood',quality:rnd(8,16),mood:'atmospheric'},
+        {label:'Minimal',desc:'Let silence do the talking',quality:rnd(6,14),mood:'stark'}
+      ]},
+      {name:'Sound Mix',choices:[
+        {label:'Dialog-Forward',desc:'Crystal clear dialog, lower effects',quality:rnd(8,15),mood:'clear'},
+        {label:'Immersive Surround',desc:'Enveloping soundscape, spatial audio',quality:rnd(12,20),mood:'cinematic'},
+        {label:'Dynamic Range',desc:'Whispers to explosions — theatrical experience',quality:rnd(10,18),mood:'dramatic'},
+        {label:'Broadcast Safe',desc:'Consistent levels, safe for all platforms',quality:rnd(6,12),mood:'safe'}
+      ]}
+    ];
+    var layerIdx=0;
+
+    function renderSoundLayer(){
+      if(layerIdx>=layers.length){
+        window._tvEpData.soundScore=soundScore;
+        finishTVEpisode();
+        return;
+      }
+      var layer=layers[layerIdx];
+      document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+        +'<div class="minigame-header"><div>'
+        +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg> '+tv2.title+' S'+tv2.currentSeason+'E'+(ctx.epIndex+1)+' — Sound Design</div>'
+        +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Layer '+(layerIdx+1)+'/'+layers.length+': '+layer.name+'</div></div>'
+        +'<div class="minigame-phase badge-purple card-badge">SOUND</div></div>'
+        +'<div class="minigame-body" style="max-width:700px;margin:0 auto;">'
+        +'<div style="text-align:center;margin-bottom:20px;">'
+        +'<div style="font-size:14px;color:var(--text-muted);">Sound Quality: <strong style="color:#4ade80;font-size:20px;">'+soundScore+'</strong></div></div>'
+        +'<div class="grid-2">'
+        +layer.choices.map(function(c,i){
+          return '<div class="script-card" onclick="tvSoundPick('+i+')" style="padding:16px;">'
+            +'<div style="font-weight:700;font-size:14px;margin-bottom:4px;">'+c.label+'</div>'
+            +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">'+c.desc+'</div>'
+            +'<div style="display:flex;gap:12px;font-size:10px;">'
+            +'<span style="color:#4ade80;">Quality: +'+c.quality+'</span>'
+            +'<span style="color:var(--accent-blue);">Mood: '+c.mood+'</span>'
+            +'</div></div>';
+        }).join('')
+        +'</div></div></div>';
+
+      window._tvSoundChoices=layer.choices;
+    }
+
+    window.tvSoundPick=function(idx){
+      var c=window._tvSoundChoices[idx];
+      soundScore+=c.quality;
+      if(Math.random()<0.25){
+        var bonus=rnd(2,6);soundScore+=bonus;
+        notify('Sound!','Perfect sonic pairing! +'+bonus+' bonus.','success');
+      }
+      layerIdx++;
+      renderSoundLayer();
+    };
+
+    renderSoundLayer();
+  };
+
   window.finishTVEpisode=function(){
     var epData=window._tvEpData;
-    var editQ=Math.round((pacing+tension+emotion)/3);
-    var totalScore=clamp(Math.round((epData.quality*3+epData.shootQuality+editQ)/3),10,100);
+    var castQ=epData.castQuality||0;
+    var soundQ=epData.soundScore||0;
+    var editQ=Math.round(((epData.editPacing||50)+(epData.editTension||50)+(epData.editEmotion||50))/3);
+    var totalScore=clamp(Math.round((epData.quality*2+castQ+epData.shootQuality+editQ+soundQ)/6),10,100);
 
     var ctx=window._tvProducing;
     var tv=G.tvShows.find(function(t){return t.id===ctx.tvId;});
@@ -3831,8 +3978,6 @@ function launchTVEditMinigame(tv,epIndex){
     tv.episodeScores.push(totalScore);
     tv.episodesCompleted++;
     tv.quality+=totalScore;
-
-    document.getElementById('minigame-container').innerHTML='';
 
     if(tv.episodesCompleted>=tv.episodes){
       // Season complete! Air it
@@ -3853,8 +3998,24 @@ function launchTVEditMinigame(tv,epIndex){
       notify('Season '+tv.currentSeason+' Complete!','"'+tv.title+'" premieres! Critics: '+tv.criticScore+'/100 | Viewers: '+formatMoney(tv.viewership),'success');
       addNews('"'+tv.title+'" S'+tv.currentSeason+' premieres on '+tv.platform+' to '+formatMoney(tv.viewership)+' viewers.');
     } else {
-      notify('Episode '+(ctx.epIndex+1)+' Done!','Score: '+totalScore+'/100. '+(tv.episodes-tv.episodesCompleted)+' episodes left.','success');
+      // Show episode result then auto-chain to next episode
+      document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+        +'<div class="minigame-header"><div>'
+        +'<div class="minigame-title">'+tv.title+' — Episode '+(ctx.epIndex+1)+' Complete</div></div>'
+        +'<div class="minigame-phase badge-gold card-badge">WRAP</div></div>'
+        +'<div class="minigame-body" style="max-width:600px;margin:0 auto;text-align:center;">'
+        +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:42px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;">'+totalScore+'/100</div>'
+        +'<div style="font-size:14px;color:var(--text-light);margin-bottom:24px;">Episode '+(ctx.epIndex+1)+' of '+tv.episodes+' wrapped. '+(tv.episodes-tv.episodesCompleted)+' episodes remaining.</div>'
+        +'<div class="progress-bar" style="height:12px;margin-bottom:24px;"><div class="progress-fill progress-gold" style="width:'+(tv.episodesCompleted/tv.episodes*100)+'%;"></div></div>'
+        +'<button class="btn btn-red btn-lg" onclick="continueNextEpisode()">NEXT EPISODE &rarr;</button>'
+        +'</div></div>';
+      window.continueNextEpisode=function(){
+        produceEpisode(ctx.tvId,tv.episodesCompleted);
+      };
+      updateAllUI();
+      return;
     }
+    document.getElementById('minigame-container').innerHTML='';
     updateAllUI();
     renderTVShows();
   };
