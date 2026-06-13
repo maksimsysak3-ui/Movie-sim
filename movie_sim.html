@@ -1349,7 +1349,7 @@ const STUDIO_LEVELS = [
 // ============================
 let G = {
   studioName: 'Empire Pictures',
-  money: 250000,
+  money: 10000000,
   reputation: 0,
   fans: 0,
   week: 1,
@@ -1495,9 +1495,9 @@ function showTab(tabId) {
 function startCareerMode() {
   G.studioName = document.getElementById('setting-studio-name')?.value || 'Empire Pictures';
   G.difficulty = document.getElementById('setting-difficulty')?.value || 'Normal';
-  if (G.difficulty === 'Easy') { G.money = 500000; }
-  else if (G.difficulty === 'Hard') { G.money = 150000; }
-  else if (G.difficulty === 'Mogul') { G.money = 100000; }
+  if (G.difficulty === 'Easy') { G.money = 20000000; }
+  else if (G.difficulty === 'Hard') { G.money = 5000000; }
+  else if (G.difficulty === 'Mogul') { G.money = 2000000; }
   initGame();
   showScreen('game-screen');
   notify('Career Started', `Welcome to ${G.studioName}. You have $${formatMoney(G.money)} to begin your empire.`, 'success');
