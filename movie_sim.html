@@ -1,12 +1,2717 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie Sim</title>
-  <style>
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empire Pictures</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --primary: #0B0F18;
+  --secondary: #151C2C;
+  --accent-red: #D72638;
+  --accent-gold: #F5C518;
+  --accent-blue: #00C2FF;
+  --accent-purple: #8B5CF6;
+  --text-white: #FFFFFF;
+  --text-light: #B8C1D1;
+  --text-muted: #7A869A;
+  --bg-card: #1a2236;
+  --bg-hover: #202a40;
+  --border: #2a3550;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  background: var(--primary);
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* Film grain overlay */
+#film-grain {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  pointer-events: none; z-index: 9999; opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+/* Screen transitions */
+.screen {
+  display: none; width:100%; height:100%;
+  position: absolute; top:0; left:0;
+  animation: fadeIn 0.5s ease;
+}
+.screen.active { display: flex; flex-direction: column; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+@keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(215,38,56,0.3); } 50% { box-shadow: 0 0 40px rgba(215,38,56,0.6); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes spotlightMove { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+
+/* ========== MAIN MENU ========== */
+#main-menu {
+  justify-content: center; align-items: center;
+  background: radial-gradient(ellipse at 50% 120%, #1a2540 0%, var(--primary) 70%);
+  overflow: hidden;
+}
+
+.menu-bg {
+  position: absolute; top:0; left:0; width:100%; height:100%;
+  overflow: hidden;
+}
+
+.spotlight {
+  position: absolute; width: 300px; height: 300px;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: spotlightMove 20s linear infinite;
+}
+.spotlight-1 { top:-100px; left:20%; background: rgba(215,38,56,0.15); animation-duration:25s; }
+.spotlight-2 { bottom:-100px; right:10%; background: rgba(0,194,255,0.1); animation-duration:30s; animation-direction:reverse; }
+.spotlight-3 { top:40%; left:60%; background: rgba(139,92,246,0.08); animation-duration:35s; }
+
+.menu-content {
+  position: relative; z-index: 10;
+  text-align: center;
+  animation: slideUp 1s ease;
+}
+
+.menu-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 72px; font-weight: 900;
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent-gold), #fff, var(--accent-gold));
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+  text-shadow: none;
+}
+
+.menu-subtitle {
+  font-size: 14px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 60px;
+}
+
+.menu-buttons {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+
+.menu-btn {
+  width: 320px; padding: 16px 24px;
+  background: rgba(21,28,44,0.7);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; border-radius: 4px;
+  transition: all 0.3s ease;
+  position: relative; overflow: hidden;
+}
+.menu-btn:hover {
+  background: rgba(215,38,56,0.15);
+  border-color: var(--accent-red);
+  color: var(--text-white);
+  transform: translateX(4px);
+}
+.menu-btn.primary-btn {
+  background: linear-gradient(135deg, var(--accent-red), #a01a2a);
+  border-color: var(--accent-red);
+  color: white; font-weight: 700;
+  animation: glow 3s ease infinite;
+}
+.menu-btn.primary-btn:hover {
+  background: linear-gradient(135deg, #e83a4e, var(--accent-red));
+  transform: translateX(4px) scale(1.02);
+}
+
+.menu-version {
+  position: absolute; bottom: 30px; right: 40px;
+  font-size: 11px; color: var(--text-muted); letter-spacing: 2px;
+}
+
+/* ========== GAME HUD ========== */
+#game-screen {
+  flex-direction: row;
+}
+
+.sidebar {
+  width: 240px; min-width: 240px;
+  background: var(--secondary);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding: 0;
+}
+
+.sidebar-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  padding: 20px 20px 16px;
+  color: var(--accent-gold);
+  letter-spacing: 3px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-nav { flex:1; overflow-y: auto; padding: 8px 0; }
+
+.nav-section {
+  padding: 16px 20px 6px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav-btn {
+  width:100%; padding: 10px 20px;
+  background: none; border: none;
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 400;
+  text-align: left; cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 10px;
+  border-left: 3px solid transparent;
+}
+.nav-btn:hover { background: var(--bg-hover); color: white; }
+.nav-btn.active {
+  background: rgba(215,38,56,0.1);
+  border-left-color: var(--accent-red);
+  color: white; font-weight: 600;
+}
+.nav-btn .nav-icon { font-size: 16px; width: 24px; text-align: center; }
+
+.sidebar-stats {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+.stat-row {
+  display: flex; justify-content: space-between;
+  margin-bottom: 6px; color: var(--text-muted);
+}
+.stat-row span:last-child { color: var(--text-light); font-weight: 600; }
+
+/* Top bar */
+.top-bar {
+  height: 56px; min-height: 56px;
+  background: var(--secondary);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.top-bar-left { display: flex; align-items: center; gap: 16px; }
+.top-bar-title { font-size: 16px; font-weight: 600; }
+.top-bar-era {
+  font-size: 11px; padding: 4px 12px;
+  background: rgba(139,92,246,0.2);
+  border: 1px solid var(--accent-purple);
+  border-radius: 20px; color: var(--accent-purple);
+  font-weight: 600; letter-spacing: 1px;
+}
+.top-bar-right { display: flex; align-items: center; gap: 20px; }
+.top-bar-stat {
+  font-size: 12px; color: var(--text-muted);
+}
+.top-bar-stat span { color: var(--accent-gold); font-weight: 700; font-size: 14px; }
+.top-bar-stat.money span { color: #4ade80; }
+.top-bar-stat.rep span { color: var(--accent-blue); }
+
+.top-bar-btn {
+  padding: 6px 16px;
+  background: var(--accent-red);
+  border: none; border-radius: 4px;
+  color: white; font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.top-bar-btn:hover { background: #e83a4e; }
+
+/* Main content area */
+.main-content {
+  flex: 1; overflow-y: auto;
+  padding: 24px;
+  background: var(--primary);
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.3s;
+}
+.card:hover { border-color: var(--accent-blue); }
+.card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 16px; font-weight: 700; letter-spacing: 1px;
+}
+.card-badge {
+  font-size: 10px; padding: 3px 10px;
+  border-radius: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.badge-gold { background: rgba(245,197,24,0.2); color: var(--accent-gold); }
+.badge-red { background: rgba(215,38,56,0.2); color: var(--accent-red); }
+.badge-blue { background: rgba(0,194,255,0.2); color: var(--accent-blue); }
+.badge-purple { background: rgba(139,92,246,0.2); color: var(--accent-purple); }
+.badge-green { background: rgba(74,222,128,0.2); color: #4ade80; }
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* Progress bar */
+.progress-bar {
+  width:100%; height: 6px; background: var(--primary);
+  border-radius: 3px; overflow: hidden; margin: 8px 0;
+}
+.progress-fill {
+  height:100%; border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.progress-red { background: linear-gradient(90deg, var(--accent-red), #e83a4e); }
+.progress-gold { background: linear-gradient(90deg, #b8960f, var(--accent-gold)); }
+.progress-blue { background: linear-gradient(90deg, #0080aa, var(--accent-blue)); }
+.progress-purple { background: linear-gradient(90deg, #6b3fc7, var(--accent-purple)); }
+.progress-green { background: linear-gradient(90deg, #22a85a, #4ade80); }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 1px; text-transform: uppercase;
+  background: var(--bg-card); color: var(--text-light);
+}
+.btn:hover { background: var(--bg-hover); color: white; }
+.btn-red { background: var(--accent-red); border-color: var(--accent-red); color: white; }
+.btn-red:hover { background: #e83a4e; }
+.btn-gold { background: rgba(245,197,24,0.2); border-color: var(--accent-gold); color: var(--accent-gold); }
+.btn-gold:hover { background: rgba(245,197,24,0.3); }
+.btn-blue { background: rgba(0,194,255,0.15); border-color: var(--accent-blue); color: var(--accent-blue); }
+.btn-blue:hover { background: rgba(0,194,255,0.25); }
+.btn-purple { background: rgba(139,92,246,0.15); border-color: var(--accent-purple); color: var(--accent-purple); }
+.btn-purple:hover { background: rgba(139,92,246,0.25); }
+.btn-sm { padding: 6px 14px; font-size: 11px; }
+.btn-lg { padding: 14px 28px; font-size: 14px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Form elements */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block; margin-bottom: 6px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.form-input, .form-select {
+  width:100%; padding: 10px 14px;
+  background: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-white);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+.form-select option { background: var(--primary); }
+
+/* Table */
+.data-table {
+  width:100%; border-collapse: collapse;
+}
+.data-table th {
+  text-align: left; padding: 10px 14px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(42,53,80,0.5);
+  color: var(--text-light);
+}
+.data-table tr:hover td { background: rgba(0,194,255,0.03); }
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  justify-content: center; align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 700px; width: 90%;
+  max-height: 80vh; overflow-y: auto;
+  animation: slideUp 0.4s ease;
+}
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700;
+  margin-bottom: 20px;
+}
+.modal-close {
+  float: right; background: none; border: none;
+  color: var(--text-muted); font-size: 24px;
+  cursor: pointer;
+}
+.modal-close:hover { color: white; }
+
+/* Ticker / news */
+.news-ticker {
+  height: 36px;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  overflow: hidden;
+  padding: 0 16px;
+  font-size: 12px; color: var(--text-muted);
+}
+.ticker-label {
+  color: var(--accent-red);
+  font-weight: 700; letter-spacing: 2px;
+  margin-right: 16px; white-space: nowrap;
+}
+.ticker-text {
+  white-space: nowrap;
+  animation: tickerScroll 30s linear infinite;
+}
+@keyframes tickerScroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-200%); }
+}
+
+/* Tab system */
+.tab-bar {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  padding: 10px 20px;
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--text-light); }
+.tab-btn.active { color: var(--accent-red); border-bottom-color: var(--accent-red); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+/* Stat bars for talent */
+.stat-bar-container {
+  display: flex; align-items: center; gap: 8px;
+  margin: 4px 0;
+}
+.stat-label {
+  font-size: 11px; color: var(--text-muted);
+  width: 80px; text-align: right;
+}
+.stat-bar {
+  flex:1; height: 4px; background: var(--primary);
+  border-radius: 2px; overflow: hidden;
+}
+.stat-bar-fill {
+  height:100%; border-radius: 2px;
+  background: var(--accent-blue);
+  transition: width 0.5s ease;
+}
+.stat-value {
+  font-size: 11px; color: var(--text-light);
+  width: 30px; font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Selection chips */
+.chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 6px 14px;
+  background: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px; color: var(--text-muted);
+  cursor: pointer; transition: all 0.2s;
+}
+.chip:hover { border-color: var(--accent-blue); color: var(--text-light); }
+.chip.selected {
+  background: rgba(0,194,255,0.15);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue); font-weight: 600;
+}
+
+/* Notification */
+.notification {
+  position: fixed; top: 20px; right: 20px;
+  padding: 16px 24px;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-gold);
+  border-radius: 8px;
+  z-index: 2000;
+  animation: slideUp 0.4s ease;
+  max-width: 400px;
+  font-size: 13px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.notification.error { border-left-color: var(--accent-red); }
+.notification.success { border-left-color: #4ade80; }
+.notification.info { border-left-color: var(--accent-blue); }
+.notif-title { font-weight: 700; margin-bottom: 4px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.notif-text { color: var(--text-light); }
+
+/* Dashboard specific */
+.dashboard-hero {
+  background: linear-gradient(135deg, rgba(215,38,56,0.1), rgba(139,92,246,0.05));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 20px;
+}
+.dashboard-hero h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; margin-bottom: 8px;
+}
+.dashboard-hero p { color: var(--text-muted); font-size: 14px; }
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-card-value {
+  font-size: 28px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 4px;
+}
+.stat-card-label {
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-muted);
+}
+
+/* Movie card in library */
+.movie-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.movie-card:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.movie-card-genre {
+  font-size: 10px; color: var(--accent-blue);
+  letter-spacing: 1px; text-transform: uppercase;
+  font-weight: 600; margin-bottom: 6px;
+}
+.movie-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.movie-card-stats {
+  display: flex; gap: 12px;
+  font-size: 11px; color: var(--text-muted);
+}
+.movie-card-stats span { display: flex; align-items: center; gap: 4px; }
+
+/* Talent card */
+.talent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.talent-card:hover {
+  border-color: var(--accent-purple);
+  transform: translateY(-2px);
+}
+.talent-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 10px;
+}
+.talent-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.talent-type { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+
+/* Production timeline */
+.timeline {
+  position: relative; padding-left: 24px;
+}
+.timeline::before {
+  content: ''; position: absolute;
+  left: 8px; top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.timeline-item {
+  position: relative; margin-bottom: 20px;
+  padding-left: 24px;
+}
+.timeline-item::before {
+  content: ''; position: absolute;
+  left: -20px; top: 6px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  border: 2px solid var(--secondary);
+}
+.timeline-item.completed::before { background: #4ade80; }
+.timeline-item.active::before { background: var(--accent-gold); animation: pulse 2s infinite; }
+.timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.timeline-text { font-size: 13px; color: var(--text-light); }
+
+/* Rivalry display */
+.rival-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex; align-items: center; gap: 16px;
+}
+.rival-logo {
+  width: 50px; height: 50px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900;
+  font-family: 'Playfair Display', serif;
+}
+.rival-info { flex:1; }
+.rival-name { font-size: 14px; font-weight: 700; }
+.rival-style { font-size: 11px; color: var(--text-muted); }
+
+/* ========== SKILL TREE ========== */
+.skill-node {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.skill-node:hover { border-color: var(--accent-purple); }
+.skill-node.unlocked { border-color: #4ade80; background: rgba(74,222,128,0.05); }
+.skill-node.locked { opacity: 0.5; }
+.skill-node-icon { font-size: 24px; margin-bottom: 6px; }
+.skill-node-name { font-size: 11px; font-weight: 600; }
+.skill-node-cost { font-size: 10px; color: var(--accent-gold); }
+
+/* Box office animation */
+.box-office-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 36px; font-weight: 700;
+  color: #4ade80;
+}
+
+/* Award display */
+.award-trophy {
+  text-align: center; padding: 20px;
+}
+.award-trophy-icon { font-size: 64px; margin-bottom: 12px; }
+.award-trophy-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state-text { font-size: 14px; margin-bottom: 20px; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .sidebar { width: 200px; min-width: 200px; }
+  .menu-logo { font-size: 48px; }
+}
+</style>
 </head>
-<body></body>
+<body>
+
+<div id="film-grain"></div>
+
+<!-- ==================== MAIN MENU ==================== -->
+<div id="main-menu" class="screen active">
+  <div class="menu-bg">
+    <div class="spotlight spotlight-1"></div>
+    <div class="spotlight spotlight-2"></div>
+    <div class="spotlight spotlight-3"></div>
+  </div>
+  <div class="menu-content">
+    <div class="menu-logo">EMPIRE PICTURES</div>
+    <div class="menu-subtitle">A Cinematic Empire Simulation</div>
+    <div class="menu-buttons">
+      <button class="menu-btn primary-btn" onclick="startCareerMode()">Career Mode</button>
+      <button class="menu-btn" onclick="startSandboxMode()">Sandbox Mode</button>
+      <button class="menu-btn" onclick="showScreen('hall-of-fame')">Hall of Fame</button>
+      <button class="menu-btn" onclick="showScreen('settings-screen')">Settings</button>
+    </div>
+  </div>
+  <div class="menu-version">V 1.0 &mdash; EMPIRE PICTURES</div>
+</div>
+
+<!-- ==================== GAME SCREEN ==================== -->
+<div id="game-screen" class="screen">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">EMPIRE</div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Studio</div>
+      <button class="nav-btn active" onclick="showTab('dashboard')" data-tab="dashboard">
+        <span class="nav-icon">&#9632;</span> Dashboard
+      </button>
+      <button class="nav-btn" onclick="showTab('new-movie')" data-tab="new-movie">
+        <span class="nav-icon">&#9654;</span> New Movie
+      </button>
+      <button class="nav-btn" onclick="showTab('production')" data-tab="production">
+        <span class="nav-icon">&#9881;</span> Production
+      </button>
+      <button class="nav-btn" onclick="showTab('library')" data-tab="library">
+        <span class="nav-icon">&#9733;</span> Film Library
+      </button>
+
+      <div class="nav-section">Talent</div>
+      <button class="nav-btn" onclick="showTab('actors')" data-tab="actors">
+        <span class="nav-icon">&#9834;</span> Actors
+      </button>
+      <button class="nav-btn" onclick="showTab('directors')" data-tab="directors">
+        <span class="nav-icon">&#9668;</span> Directors
+      </button>
+      <button class="nav-btn" onclick="showTab('composers')" data-tab="composers">
+        <span class="nav-icon">&#9835;</span> Composers
+      </button>
+
+      <div class="nav-section">Business</div>
+      <button class="nav-btn" onclick="showTab('marketing')" data-tab="marketing">
+        <span class="nav-icon">&#9670;</span> Marketing
+      </button>
+      <button class="nav-btn" onclick="showTab('finance')" data-tab="finance">
+        <span class="nav-icon">&#9679;</span> Finances
+      </button>
+      <button class="nav-btn" onclick="showTab('rivals')" data-tab="rivals">
+        <span class="nav-icon">&#9876;</span> Rivals
+      </button>
+      <button class="nav-btn" onclick="showTab('franchise')" data-tab="franchise">
+        <span class="nav-icon">&#10070;</span> Franchises
+      </button>
+
+      <div class="nav-section">Prestige</div>
+      <button class="nav-btn" onclick="showTab('awards')" data-tab="awards">
+        <span class="nav-icon">&#127942;</span> Awards
+      </button>
+      <button class="nav-btn" onclick="showTab('skills')" data-tab="skills">
+        <span class="nav-icon">&#9733;</span> Skill Tree
+      </button>
+      <button class="nav-btn" onclick="showTab('tech')" data-tab="tech">
+        <span class="nav-icon">&#128300;</span> Tech Lab
+      </button>
+      <button class="nav-btn" onclick="showTab('streaming')" data-tab="streaming">
+        <span class="nav-icon">&#128250;</span> Streaming
+      </button>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-row"><span>Week</span><span id="week-display">1</span></div>
+      <div class="stat-row"><span>Year</span><span id="year-display">1982</span></div>
+      <div class="stat-row"><span>Movies</span><span id="movies-count">0</span></div>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="top-bar-title" id="studio-name-display">Your Studio</div>
+        <div class="top-bar-era" id="era-display">1980s ERA</div>
+      </div>
+      <div class="top-bar-right">
+        <div class="top-bar-stat money">Money: <span id="money-display">$250,000</span></div>
+        <div class="top-bar-stat rep">Rep: <span id="rep-display">0</span></div>
+        <div class="top-bar-stat">Fans: <span id="fans-display" style="color:var(--accent-purple)">0</span></div>
+        <button class="top-bar-btn" onclick="advanceWeek()">&#9654; NEXT WEEK</button>
+        <button class="top-bar-btn" style="background:var(--accent-purple)" onclick="saveGame()">SAVE</button>
+        <button class="top-bar-btn" style="background:var(--border)" onclick="showScreen('main-menu')">MENU</button>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="main-content" id="main-content">
+      <!-- Dashboard Tab -->
+      <div class="tab-content active" id="tab-dashboard">
+        <div class="dashboard-hero">
+          <h2 id="dash-greeting">Welcome, Producer</h2>
+          <p id="dash-subtitle">Your journey to building a movie empire begins now.</p>
+        </div>
+        <div class="grid-4" id="dash-stats"></div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Active Productions</div>
+              <span class="card-badge badge-blue">LIVE</span>
+            </div>
+            <div id="active-productions">
+              <div class="empty-state">
+                <div class="empty-state-icon">&#127916;</div>
+                <div class="empty-state-text">No active productions yet</div>
+                <button class="btn btn-red" onclick="showTab('new-movie')">CREATE YOUR FIRST MOVIE</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Recent News</div>
+              <span class="card-badge badge-red">LIVE</span>
+            </div>
+            <div id="news-feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Movie Tab -->
+      <div class="tab-content" id="tab-new-movie">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Create New Movie</div>
+            <span class="card-badge badge-gold">DEVELOPMENT</span>
+          </div>
+          <div class="grid-2">
+            <div>
+              <div class="form-group">
+                <label class="form-label">Movie Title</label>
+                <input type="text" class="form-input" id="movie-title" placeholder="Enter movie title...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Genre</label>
+                <select class="form-select" id="movie-genre" onchange="updateSubgenres()">
+                  <option value="">Select genre...</option>
+                  <option value="Action">Action</option>
+                  <option value="Drama">Drama</option>
+                  <option value="Horror">Horror</option>
+                  <option value="Sci-Fi">Sci-Fi</option>
+                  <option value="Fantasy">Fantasy</option>
+                  <option value="Comedy">Comedy</option>
+                  <option value="Thriller">Thriller</option>
+                  <option value="Mystery">Mystery</option>
+                  <option value="Romance">Romance</option>
+                  <option value="Crime">Crime</option>
+                  <option value="War">War</option>
+                  <option value="Animation">Animation</option>
+                  <option value="Adventure">Adventure</option>
+                  <option value="Musical">Musical</option>
+                  <option value="Documentary">Documentary</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Subgenre</label>
+                <select class="form-select" id="movie-subgenre">
+                  <option value="">Select subgenre...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tone</label>
+                <select class="form-select" id="movie-tone">
+                  <option value="Dark">Dark</option>
+                  <option value="Light">Light</option>
+                  <option value="Gritty">Gritty</option>
+                  <option value="Whimsical">Whimsical</option>
+                  <option value="Epic">Epic</option>
+                  <option value="Intimate">Intimate</option>
+                  <option value="Satirical">Satirical</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <div class="form-group">
+                <label class="form-label">Target Rating</label>
+                <select class="form-select" id="movie-rating">
+                  <option value="G">G</option>
+                  <option value="PG">PG</option>
+                  <option value="PG-13" selected>PG-13</option>
+                  <option value="R">R</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Production Scale</label>
+                <select class="form-select" id="movie-scale" onchange="updateBudgetEstimate()">
+                  <option value="Micro">Micro ($50K-$500K)</option>
+                  <option value="Low">Low Budget ($500K-$5M)</option>
+                  <option value="Medium" selected>Medium ($5M-$30M)</option>
+                  <option value="High">High ($30M-$100M)</option>
+                  <option value="Blockbuster">Blockbuster ($100M+)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Release Season</label>
+                <select class="form-select" id="movie-season">
+                  <option value="Winter">Winter (Awards Season)</option>
+                  <option value="Spring">Spring</option>
+                  <option value="Summer" selected>Summer (Blockbuster Season)</option>
+                  <option value="Fall">Fall</option>
+                  <option value="Holiday">Holiday</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estimated Budget</label>
+                <div id="budget-estimate" style="font-size:24px; font-weight:700; color:#4ade80; font-family:'JetBrains Mono',monospace;">$10,000,000</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Script Writing -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Screenplay Development</div>
+            <span class="card-badge badge-purple">CREATIVE</span>
+          </div>
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label">Character Depth</label>
+              <input type="range" id="script-chars" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Shallow</span><span>Deep</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plot Complexity</label>
+              <input type="range" id="script-plot" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Simple</span><span>Complex</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dialogue Quality</label>
+              <input type="range" id="script-dialogue" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Basic</span><span>Sharp</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Emotional Beats</label>
+              <input type="range" id="script-emotion" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Cold</span><span>Intense</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Originality</label>
+              <input type="range" id="script-originality" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Familiar</span><span>Groundbreaking</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pacing</label>
+              <input type="range" id="script-pacing" min="1" max="10" value="5" style="width:100%">
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted);">
+                <span>Slow</span><span>Fast</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <label class="form-label">Script Quality Score</label>
+            <div style="font-size:32px; font-weight:700; color:var(--accent-gold); font-family:'JetBrains Mono',monospace;" id="script-score">50</div>
+            <div class="progress-bar" style="height:8px;">
+              <div class="progress-fill progress-gold" id="script-progress" style="width:50%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Talent Selection -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Cast & Crew</div>
+            <span class="card-badge badge-blue">HIRING</span>
+          </div>
+          <div class="grid-3">
+            <div>
+              <label class="form-label">Lead Actor</label>
+              <select class="form-select" id="cast-lead"></select>
+            </div>
+            <div>
+              <label class="form-label">Director</label>
+              <select class="form-select" id="cast-director"></select>
+            </div>
+            <div>
+              <label class="form-label">Composer</label>
+              <select class="form-select" id="cast-composer"></select>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:12px;">
+            <div>
+              <label class="form-label">VFX Quality</label>
+              <select class="form-select" id="vfx-quality">
+                <option value="Cheap">Cheap (saves money, looks bad)</option>
+                <option value="Standard" selected>Standard</option>
+                <option value="Premium">Premium (expensive, looks great)</option>
+                <option value="Elite">Elite (cutting edge)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Release Strategy</label>
+              <select class="form-select" id="release-strategy">
+                <option value="Wide">Wide Theatrical</option>
+                <option value="Limited">Limited Release</option>
+                <option value="Streaming">Streaming Exclusive</option>
+                <option value="Festival">Festival Launch</option>
+                <option value="Hybrid">Hybrid Release</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn btn-red btn-lg" onclick="greenlight()">&#127916; GREENLIGHT PRODUCTION</button>
+        </div>
+      </div>
+
+      <!-- Production Tab -->
+      <div class="tab-content" id="tab-production">
+        <div id="production-content">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#9881;</div>
+            <div class="empty-state-text">No movies in production</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Film Library Tab -->
+      <div class="tab-content" id="tab-library">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Film Library</div>
+        </div>
+        <div class="grid-3" id="library-grid">
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state-icon">&#127902;</div>
+            <div class="empty-state-text">No completed movies yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actors Tab -->
+      <div class="tab-content" id="tab-actors">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Available Actors</div>
+        </div>
+        <div class="grid-3" id="actors-grid"></div>
+      </div>
+
+      <!-- Directors Tab -->
+      <div class="tab-content" id="tab-directors">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Available Directors</div>
+        </div>
+        <div class="grid-3" id="directors-grid"></div>
+      </div>
+
+      <!-- Composers Tab -->
+      <div class="tab-content" id="tab-composers">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Available Composers</div>
+        </div>
+        <div class="grid-3" id="composers-grid"></div>
+      </div>
+
+      <!-- Marketing Tab -->
+      <div class="tab-content" id="tab-marketing">
+        <div id="marketing-content">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#128226;</div>
+            <div class="empty-state-text">No movies ready for marketing</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Finance Tab -->
+      <div class="tab-content" id="tab-finance">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Financial Overview</div>
+            <span class="card-badge badge-green">LIVE</span>
+          </div>
+          <div id="finance-content"></div>
+        </div>
+      </div>
+
+      <!-- Rivals Tab -->
+      <div class="tab-content" id="tab-rivals">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Rival Studios</div>
+        </div>
+        <div id="rivals-grid" class="grid-2"></div>
+      </div>
+
+      <!-- Franchise Tab -->
+      <div class="tab-content" id="tab-franchise">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Franchise Management</div>
+        </div>
+        <div id="franchise-content">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#127917;</div>
+            <div class="empty-state-text">Complete successful movies to start franchises</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Awards Tab -->
+      <div class="tab-content" id="tab-awards">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Awards & Recognition</div>
+        </div>
+        <div id="awards-content">
+          <div class="grid-3" id="awards-display"></div>
+        </div>
+      </div>
+
+      <!-- Skills Tab -->
+      <div class="tab-content" id="tab-skills">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Producer Skill Tree</div>
+          <span class="card-badge badge-purple">SP: <span id="skill-points">0</span></span>
+        </div>
+        <div id="skills-content"></div>
+      </div>
+
+      <!-- Tech Tab -->
+      <div class="tab-content" id="tab-tech">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Technology Lab</div>
+        </div>
+        <div id="tech-content"></div>
+      </div>
+
+      <!-- Streaming Tab -->
+      <div class="tab-content" id="tab-streaming">
+        <div class="card-header" style="margin-bottom:16px;">
+          <div class="card-title">Streaming Platform</div>
+        </div>
+        <div id="streaming-content">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#128250;</div>
+            <div class="empty-state-text">Unlock streaming in the 2010s era</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Ticker -->
+    <div class="news-ticker">
+      <span class="ticker-label">BREAKING</span>
+      <span class="ticker-text" id="ticker-text">Welcome to Empire Pictures. Your journey to cinematic greatness begins now.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== HALL OF FAME ==================== -->
+<div id="hall-of-fame" class="screen" style="justify-content:center; align-items:center;">
+  <div style="text-align:center; max-width:600px;">
+    <div style="font-size:64px; margin-bottom:20px;">&#127942;</div>
+    <h2 style="font-family:'Playfair Display',serif; font-size:32px; margin-bottom:12px;">Hall of Fame</h2>
+    <p style="color:var(--text-muted); margin-bottom:30px;">Complete a career to be immortalized here.</p>
+    <div id="hall-of-fame-content"></div>
+    <button class="btn" onclick="showScreen('main-menu')" style="margin-top:20px;">Back to Menu</button>
+  </div>
+</div>
+
+<!-- ==================== SETTINGS ==================== -->
+<div id="settings-screen" class="screen" style="justify-content:center; align-items:center;">
+  <div style="max-width:500px; width:90%;">
+    <h2 style="font-family:'Playfair Display',serif; font-size:32px; margin-bottom:30px; text-align:center;">Settings</h2>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Studio Name</label>
+        <input type="text" class="form-input" id="setting-studio-name" placeholder="Empire Pictures" value="Empire Pictures">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Difficulty</label>
+        <select class="form-select" id="setting-difficulty">
+          <option value="Easy">Easy (More money, forgiving critics)</option>
+          <option value="Normal" selected>Normal</option>
+          <option value="Hard">Hard (Tough market, harsh critics)</option>
+          <option value="Mogul">Mogul (Realistic simulation)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Auto-Save</label>
+        <select class="form-select" id="setting-autosave">
+          <option value="off">Off</option>
+          <option value="on" selected>On (Every 10 weeks)</option>
+        </select>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <button class="btn btn-red" onclick="showScreen('main-menu')">Back to Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL ==================== -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<!-- ==================== NOTIFICATION CONTAINER ==================== -->
+<div id="notif-container" style="position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:8px;"></div>
+
+<script>
+// ============================
+// EMPIRE PICTURES - CORE ENGINE
+// ============================
+
+const GENRES = ['Action','Drama','Horror','Sci-Fi','Fantasy','Comedy','Thriller','Mystery','Romance','Crime','War','Animation','Adventure','Musical','Documentary'];
+const SUBGENRES = {
+  'Action': ['Superhero','Martial Arts','Military','Heist','Spy'],
+  'Drama': ['Political','Family','Legal','Historical','Biographical'],
+  'Horror': ['Psychological Horror','Slasher','Supernatural','Zombie','Body Horror'],
+  'Sci-Fi': ['Cyberpunk','Space Opera','Time Travel','Post-Apocalyptic','Hard Sci-Fi'],
+  'Fantasy': ['Dark Fantasy','Epic Fantasy','Urban Fantasy','Fairy Tale','Mythological'],
+  'Comedy': ['Romantic Comedy','Dark Comedy','Slapstick','Satire','Parody'],
+  'Thriller': ['Political Thriller','Psychological Thriller','Legal Thriller','Tech Thriller','Conspiracy'],
+  'Mystery': ['Noir','Whodunit','Cozy Mystery','Detective','True Crime'],
+  'Romance': ['Period Romance','Contemporary','Tragic Romance','Romantic Drama','Fantasy Romance'],
+  'Crime': ['Heist','Gangster','Drug Trade','Serial Killer','Organized Crime'],
+  'War': ['WW2','Vietnam','Modern Warfare','Civil War','Anti-War'],
+  'Animation': ['Family','Adult Animation','Anime-Style','Stop-Motion','CGI'],
+  'Adventure': ['Treasure Hunt','Survival','Exploration','Pirate','Jungle'],
+  'Musical': ['Broadway Adaptation','Original Musical','Jukebox','Rock Musical','Dance'],
+  'Documentary': ['True Crime','Nature','Political','Music','Social']
+};
+
+const FIRST_NAMES = ['James','Sarah','Michael','Emma','David','Olivia','Robert','Sophia','William','Isabella','Richard','Mia','Thomas','Charlotte','Daniel','Amelia','Christopher','Harper','Matthew','Evelyn','Anthony','Luna','Mark','Chloe','Steven','Grace','Kevin','Lily','Brian','Zoe','Jason','Nora','Ryan','Elena','Eric','Stella','Alex','Violet','Sam','Clara','Nathan','Diana','Peter','Rose','George','Maya','Frank','Ada','Victor','Iris','Leo','Nina','Oscar','Vera','Max','Tessa','Felix','Ingrid','Hugo','Lena','Klaus','Petra','Hans','Greta','Yuki','Akira','Raj','Priya','Chen','Lin','Omar','Layla','Carlos','Sofia','Diego','Valentina','Andre','Monique','Jean','Marie','Lars','Astrid','Erik','Freya','Kai','Hana','Ravi','Siri'];
+const LAST_NAMES = ['Anderson','Baker','Clark','Davis','Evans','Foster','Garcia','Harris','Irving','Johnson','King','Lee','Martinez','Nelson','Ortiz','Parker','Quinn','Roberts','Smith','Taylor','Underwood','Vance','Williams','Young','Zhang','Monroe','Sterling','Blackwood','Silverstone','Goldwyn','Lancaster','Hartwell','Crawford','Fairbanks','Valentino','Bergman','Hepburn','Eastwood','Redford','Newman','Streep','Coppola','Kurosawa','Kubrick','Hitchcock','Fellini','Truffaut','Almodovar','Campion','Miyazaki','Del Toro','Fincher','Nolan','Villeneuve','Stone','Cross','Reeves','Hart','Chase','Bell','Rivera','Rhodes','Blake','Hayes','Pierce','Fox','Knight','Price','Bass','Chambers','Roth','Banks','Dunn','Wolf','Frost','Marsh','Wells','Reid','Nash','Cole','Hunt','Grant'];
+
+const RIVAL_STUDIOS = [
+  { name:'Titan Films', style:'Aggressive', color:'#e63946', personality:'Blockbuster-focused, always competing on budget', money:50000000, rep:60, movies:[], strategy:'commercial' },
+  { name:'Lumiere Cinema', style:'Prestige', color:'#f4a261', personality:'Award-chasing arthouse studio', money:20000000, rep:75, movies:[], strategy:'prestige' },
+  { name:'Nova Studios', style:'Commercial', color:'#2a9d8f', personality:'Safe bets, franchise-heavy', money:80000000, rep:50, movies:[], strategy:'franchise' },
+  { name:'Midnight Pictures', style:'Indie', color:'#e76f51', personality:'Low-budget cult classics', money:5000000, rep:40, movies:[], strategy:'indie' },
+  { name:'Apex Entertainment', style:'Risky', color:'#264653', personality:'High-risk, high-reward gambles', money:35000000, rep:55, movies:[], strategy:'risky' },
+  { name:'Golden Gate Films', style:'Balanced', color:'#d4a373', personality:'Diversified portfolio approach', money:40000000, rep:58, movies:[], strategy:'balanced' }
+];
+
+const NEWS_TEMPLATES = [
+  "{{rival}} announces a ${{budget}}M {{genre}} epic for next summer.",
+  "Critics are buzzing about the upcoming awards season.",
+  "Box office trends show {{genre}} movies dominating this quarter.",
+  "{{rival}} steals promising director from the indie circuit.",
+  "Controversy erupts as {{rival}} faces accusations of creative theft.",
+  "New camera technology promises to revolutionize filmmaking.",
+  "A surprise indie hit shakes up the box office charts.",
+  "{{rival}} reportedly planning a massive franchise universe.",
+  "Film festival season approaches — who will take home the top prize?",
+  "Streaming platforms report record subscriber growth this quarter.",
+  "Veteran actor announces retirement after 40-year career.",
+  "{{genre}} films see unexpected surge in international markets.",
+  "Studio lot fire delays multiple productions across Hollywood.",
+  "Young director's debut breaks Sundance records.",
+  "{{rival}} acquires streaming rights for ${{budget}}M deal."
+];
+
+const PRODUCTION_EVENTS = [
+  { text: "Lead actor injured on set — 2 week delay.", effect: 'delay', severity: 2 },
+  { text: "Weather delays outdoor shooting.", effect: 'delay', severity: 1 },
+  { text: "Script leaked online — hype increased but spoilers spread.", effect: 'hype', severity: 1 },
+  { text: "Creative differences between director and lead actor.", effect: 'quality', severity: -1 },
+  { text: "Budget overrun on VFX sequences.", effect: 'budget', severity: 1 },
+  { text: "Surprise chemistry between leads — critics will love this.", effect: 'quality', severity: 2 },
+  { text: "Paparazzi swarm the set — free publicity!", effect: 'hype', severity: 2 },
+  { text: "Director demands expensive reshoots.", effect: 'budget', severity: 2 },
+  { text: "Test screening gets standing ovation!", effect: 'quality', severity: 3 },
+  { text: "Lead actor goes to rehab — production paused.", effect: 'delay', severity: 3 },
+  { text: "Set catches fire — insurance covers most damages.", effect: 'budget', severity: 1 },
+  { text: "Composer delivers an unforgettable score.", effect: 'quality', severity: 2 },
+  { text: "Stunt goes viral on social media.", effect: 'hype', severity: 3 },
+  { text: "Actor improvises brilliant scene.", effect: 'quality', severity: 1 },
+  { text: "Union dispute threatens shutdown.", effect: 'delay', severity: 2 }
+];
+
+const AWARD_SHOWS = [
+  { name: 'Academy Awards', prestige: 100, icon: '&#127942;', categories: ['Best Picture','Best Director','Best Actor','Best Score','Best VFX'] },
+  { name: 'Golden Globes', prestige: 80, icon: '&#127760;', categories: ['Best Drama','Best Comedy','Best Director','Best Actor'] },
+  { name: 'Cannes Film Festival', prestige: 90, icon: '&#127796;', categories: ['Palme d\'Or','Grand Prix','Best Director'] },
+  { name: 'Venice Film Festival', prestige: 85, icon: '&#129409;', categories: ['Golden Lion','Grand Jury Prize'] },
+  { name: 'Sundance', prestige: 70, icon: '&#9968;', categories: ['Grand Jury Prize','Audience Award'] },
+  { name: 'BAFTA', prestige: 75, icon: '&#127468;', categories: ['Best Film','Best Director','Best Actor'] }
+];
+
+const TECH_TREE = [
+  { id:'dolby', name:'Dolby Sound', cost:500000, era:'1980s', desc:'Enhanced audio mixing', effect:{quality:5}, unlocked:false, requires:[] },
+  { id:'steadicam', name:'Steadicam Mastery', cost:300000, era:'1980s', desc:'Smooth tracking shots', effect:{quality:3}, unlocked:false, requires:[] },
+  { id:'cgi_basic', name:'Basic CGI', cost:2000000, era:'1990s', desc:'Computer-generated imagery', effect:{vfx:10}, unlocked:false, requires:['dolby'] },
+  { id:'digital_edit', name:'Digital Editing', cost:1000000, era:'1990s', desc:'Non-linear editing suites', effect:{speed:5}, unlocked:false, requires:['steadicam'] },
+  { id:'cgi_advanced', name:'Advanced CGI', cost:8000000, era:'2000s', desc:'Photorealistic effects', effect:{vfx:20}, unlocked:false, requires:['cgi_basic'] },
+  { id:'mocap', name:'Motion Capture', cost:5000000, era:'2000s', desc:'Performance capture tech', effect:{quality:10,vfx:10}, unlocked:false, requires:['cgi_basic'] },
+  { id:'3d_cinema', name:'3D Cinema', cost:10000000, era:'2000s', desc:'Stereoscopic 3D', effect:{revenue:10}, unlocked:false, requires:['cgi_advanced'] },
+  { id:'imax', name:'IMAX Filming', cost:15000000, era:'2010s', desc:'Large format shooting', effect:{quality:8,revenue:15}, unlocked:false, requires:['3d_cinema'] },
+  { id:'virtual_prod', name:'Virtual Production', cost:20000000, era:'2020s', desc:'LED volume stages', effect:{quality:15,speed:10}, unlocked:false, requires:['mocap','imax'] },
+  { id:'ai_vfx', name:'AI-Assisted VFX', cost:30000000, era:'2030s', desc:'Neural rendering', effect:{vfx:30,speed:15}, unlocked:false, requires:['virtual_prod'] }
+];
+
+const SKILL_TREES = {
+  producer: [
+    { id:'negotiation1', name:'Basic Negotiation', cost:1, desc:'-10% talent costs', effect:'talentDiscount', value:0.1, unlocked:false, requires:[] },
+    { id:'negotiation2', name:'Power Negotiation', cost:2, desc:'-20% talent costs', effect:'talentDiscount', value:0.1, unlocked:false, requires:['negotiation1'] },
+    { id:'budgeting1', name:'Budget Control', cost:1, desc:'-10% production overruns', effect:'budgetControl', value:0.1, unlocked:false, requires:[] },
+    { id:'budgeting2', name:'Financial Mastery', cost:3, desc:'-25% production overruns', effect:'budgetControl', value:0.15, unlocked:false, requires:['budgeting1'] },
+    { id:'leadership1', name:'Team Leader', cost:2, desc:'+5% crew morale', effect:'morale', value:5, unlocked:false, requires:[] },
+    { id:'leadership2', name:'Visionary Leader', cost:3, desc:'+15% crew morale', effect:'morale', value:10, unlocked:false, requires:['leadership1'] }
+  ],
+  creative: [
+    { id:'story1', name:'Story Sense', cost:1, desc:'+5 script quality', effect:'scriptBonus', value:5, unlocked:false, requires:[] },
+    { id:'story2', name:'Master Storyteller', cost:3, desc:'+15 script quality', effect:'scriptBonus', value:10, unlocked:false, requires:['story1'] },
+    { id:'vision1', name:'Creative Vision', cost:2, desc:'+5% critic score', effect:'criticBonus', value:5, unlocked:false, requires:[] },
+    { id:'vision2', name:'Auteur Eye', cost:3, desc:'+10% critic score', effect:'criticBonus', value:5, unlocked:false, requires:['vision1'] },
+    { id:'scouting1', name:'Talent Scout', cost:1, desc:'Discover better actors', effect:'talentPool', value:1, unlocked:false, requires:[] },
+    { id:'scouting2', name:'Star Maker', cost:3, desc:'Discover A-list potential', effect:'talentPool', value:2, unlocked:false, requires:['scouting1'] }
+  ],
+  business: [
+    { id:'marketing1', name:'Marketing Basics', cost:1, desc:'+10% marketing effect', effect:'marketingBonus', value:10, unlocked:false, requires:[] },
+    { id:'marketing2', name:'Viral Marketing', cost:2, desc:'+25% marketing effect', effect:'marketingBonus', value:15, unlocked:false, requires:['marketing1'] },
+    { id:'expansion1', name:'Studio Expansion', cost:2, desc:'Unlock studio upgrades', effect:'studioLevel', value:1, unlocked:false, requires:[] },
+    { id:'expansion2', name:'Empire Builder', cost:4, desc:'Unlock mega studio', effect:'studioLevel', value:1, unlocked:false, requires:['expansion1'] },
+    { id:'risk1', name:'Risk Assessment', cost:1, desc:'-10% scandal chance', effect:'scandalReduce', value:10, unlocked:false, requires:[] },
+    { id:'risk2', name:'Crisis Manager', cost:3, desc:'-25% scandal damage', effect:'scandalReduce', value:15, unlocked:false, requires:['risk1'] }
+  ]
+};
+
+const STUDIO_LEVELS = [
+  { name:'Garage Studio', capacity:1, costToUpgrade:500000 },
+  { name:'Small Office', capacity:2, costToUpgrade:2000000 },
+  { name:'Warehouse Studio', capacity:3, costToUpgrade:10000000 },
+  { name:'Studio Lot', capacity:5, costToUpgrade:50000000 },
+  { name:'Mega Studio', capacity:8, costToUpgrade:200000000 },
+  { name:'Global Empire', capacity:12, costToUpgrade:null }
+];
+
+// ============================
+// GAME STATE
+// ============================
+let G = {
+  studioName: 'Empire Pictures',
+  money: 250000,
+  reputation: 0,
+  fans: 0,
+  week: 1,
+  year: 1982,
+  era: '1980s',
+  studioLevel: 0,
+  totalMovies: 0,
+  totalRevenue: 0,
+  totalProfit: 0,
+  skillPoints: 0,
+  awards: [],
+  movies: [],
+  completedMovies: [],
+  inProduction: [],
+  actors: [],
+  directors: [],
+  composers: [],
+  franchises: [],
+  newsLog: [],
+  financialHistory: [],
+  scandalActive: false,
+  streamingUnlocked: false,
+  streamingSubs: 0,
+  streamingContent: [],
+  difficulty: 'Normal',
+  merchRevenue: 0,
+  techUnlocked: [],
+  skillsUnlocked: [],
+  weeklyIncome: 0,
+  weeklyExpense: 0,
+  rivalStudios: JSON.parse(JSON.stringify(RIVAL_STUDIOS)),
+  autoSaveCounter: 0
+};
+
+// ============================
+// INITIALIZATION
+// ============================
+function initGame() {
+  G.actors = generateActors(40);
+  G.directors = generateDirectors(15);
+  G.composers = generateComposers(10);
+  updateAllUI();
+  generateNews();
+  populateTalentDropdowns();
+  renderTechTree();
+  renderSkillTree();
+  renderRivals();
+  renderFinance();
+  renderAwards();
+}
+
+function generateName() {
+  return FIRST_NAMES[Math.floor(Math.random()*FIRST_NAMES.length)] + ' ' + LAST_NAMES[Math.floor(Math.random()*LAST_NAMES.length)];
+}
+
+function rnd(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function generateActors(count) {
+  let actors = [];
+  for (let i=0; i<count; i++) {
+    const age = rnd(18,55);
+    actors.push({
+      id: 'actor_'+i,
+      name: generateName(),
+      age,
+      charisma: rnd(20,95),
+      range: rnd(20,90),
+      popularity: rnd(5,80),
+      awardRep: rnd(0,60),
+      boxOfficeDraw: rnd(10,80),
+      workEthic: rnd(30,100),
+      scandalChance: rnd(1,30),
+      salary: 0,
+      chemistry: rnd(30,90),
+      moviesCount: rnd(0,15),
+      relationship: 50,
+      available: true
+    });
+    actors[i].salary = Math.round((actors[i].popularity * 5000 + actors[i].boxOfficeDraw * 3000 + rnd(10000,100000)));
+  }
+  return actors.sort((a,b) => b.popularity - a.popularity);
+}
+
+function generateDirectors(count) {
+  let dirs = [];
+  for (let i=0; i<count; i++) {
+    dirs.push({
+      id: 'dir_'+i,
+      name: generateName(),
+      age: rnd(28,65),
+      vision: rnd(30,95),
+      speed: rnd(30,90),
+      discipline: rnd(30,90),
+      innovation: rnd(20,90),
+      awardPrestige: rnd(0,70),
+      budgetControl: rnd(30,90),
+      salary: 0,
+      style: ['Visionary','Methodical','Chaotic Genius','Commercial','Artistic','Experimental'][rnd(0,5)],
+      available: true
+    });
+    dirs[i].salary = Math.round((dirs[i].vision * 4000 + dirs[i].awardPrestige * 3000 + rnd(50000,200000)));
+  }
+  return dirs.sort((a,b) => b.vision - a.vision);
+}
+
+function generateComposers(count) {
+  let comps = [];
+  const styles = ['Orchestral','Synthwave','Minimalist','Experimental','Epic','Jazz','Dark Ambient'];
+  for (let i=0; i<count; i++) {
+    comps.push({
+      id: 'comp_'+i,
+      name: generateName(),
+      talent: rnd(30,95),
+      style: styles[rnd(0,styles.length-1)],
+      fame: rnd(5,70),
+      salary: 0,
+      available: true
+    });
+    comps[i].salary = Math.round((comps[i].talent * 2000 + comps[i].fame * 1500 + rnd(20000,80000)));
+  }
+  return comps.sort((a,b) => b.talent - a.talent);
+}
+
+// ============================
+// SCREEN / TAB MANAGEMENT
+// ============================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+tabId).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.nav-btn[data-tab="${tabId}"]`)?.classList.add('active');
+}
+
+// ============================
+// START GAME
+// ============================
+function startCareerMode() {
+  G.studioName = document.getElementById('setting-studio-name')?.value || 'Empire Pictures';
+  G.difficulty = document.getElementById('setting-difficulty')?.value || 'Normal';
+  if (G.difficulty === 'Easy') { G.money = 500000; }
+  else if (G.difficulty === 'Hard') { G.money = 150000; }
+  else if (G.difficulty === 'Mogul') { G.money = 100000; }
+  initGame();
+  showScreen('game-screen');
+  notify('Career Started', `Welcome to ${G.studioName}. You have $${formatMoney(G.money)} to begin your empire.`, 'success');
+}
+
+function startSandboxMode() {
+  G.money = 100000000;
+  G.reputation = 50;
+  G.studioLevel = 3;
+  G.studioName = document.getElementById('setting-studio-name')?.value || 'Empire Pictures';
+  initGame();
+  showScreen('game-screen');
+  notify('Sandbox Mode', 'Unlimited resources. Build your dream studio.', 'info');
+}
+
+// ============================
+// UI UPDATES
+// ============================
+function formatMoney(n) {
+  if (n >= 1000000000) return (n/1000000000).toFixed(1)+'B';
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(0)+'K';
+  return n.toFixed(0);
+}
+
+function updateAllUI() {
+  document.getElementById('money-display').textContent = '$'+formatMoney(G.money);
+  document.getElementById('rep-display').textContent = G.reputation;
+  document.getElementById('fans-display').textContent = formatMoney(G.fans);
+  document.getElementById('week-display').textContent = G.week;
+  document.getElementById('year-display').textContent = G.year;
+  document.getElementById('movies-count').textContent = G.completedMovies.length;
+  document.getElementById('studio-name-display').textContent = G.studioName;
+  document.getElementById('era-display').textContent = G.era + ' ERA';
+
+  // Dashboard stats
+  const dashStats = document.getElementById('dash-stats');
+  dashStats.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card-value" style="color:#4ade80">$${formatMoney(G.money)}</div>
+      <div class="stat-card-label">Treasury</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value" style="color:var(--accent-blue)">${G.reputation}</div>
+      <div class="stat-card-label">Reputation</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value" style="color:var(--accent-gold)">${G.awards.length}</div>
+      <div class="stat-card-label">Awards Won</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value" style="color:var(--accent-purple)">${STUDIO_LEVELS[G.studioLevel].name}</div>
+      <div class="stat-card-label">Studio Level</div>
+    </div>
+  `;
+
+  // Active productions
+  const prodDiv = document.getElementById('active-productions');
+  if (G.inProduction.length === 0) {
+    prodDiv.innerHTML = `<div class="empty-state"><div class="empty-state-icon">&#127916;</div><div class="empty-state-text">No active productions</div><button class="btn btn-red btn-sm" onclick="showTab('new-movie')">NEW MOVIE</button></div>`;
+  } else {
+    prodDiv.innerHTML = G.inProduction.map(m => `
+      <div style="padding:12px 0; border-bottom:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:600;">${m.title}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${m.genre} | Week ${m.productionWeek}/${m.totalWeeks}</div>
+          </div>
+          <span class="card-badge ${m.phase === 'Shooting' ? 'badge-red' : m.phase === 'Post-Production' ? 'badge-purple' : 'badge-blue'}">${m.phase}</span>
+        </div>
+        <div class="progress-bar" style="margin-top:8px;">
+          <div class="progress-fill progress-blue" style="width:${(m.productionWeek/m.totalWeeks)*100}%"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderLibrary();
+  renderProductionTab();
+  renderMarketingTab();
+}
+
+// ============================
+// SUBGENRE & BUDGET
+// ============================
+function updateSubgenres() {
+  const genre = document.getElementById('movie-genre').value;
+  const sel = document.getElementById('movie-subgenre');
+  sel.innerHTML = '<option value="">Select subgenre...</option>';
+  if (SUBGENRES[genre]) {
+    SUBGENRES[genre].forEach(sg => {
+      sel.innerHTML += `<option value="${sg}">${sg}</option>`;
+    });
+  }
+  updateBudgetEstimate();
+}
+
+function updateBudgetEstimate() {
+  const scale = document.getElementById('movie-scale').value;
+  const budgets = { 'Micro': rnd(50,500)*1000, 'Low': rnd(500,5000)*1000, 'Medium': rnd(5000,30000)*1000, 'High': rnd(30000,100000)*1000, 'Blockbuster': rnd(100000,300000)*1000 };
+  const est = budgets[scale] || 10000000;
+  document.getElementById('budget-estimate').textContent = '$'+formatMoney(est);
+  document.getElementById('budget-estimate').dataset.value = est;
+}
+
+// Script quality calculation
+document.querySelectorAll('#tab-new-movie input[type="range"]').forEach(slider => {
+  slider.addEventListener('input', updateScriptScore);
+});
+
+function updateScriptScore() {
+  const chars = parseInt(document.getElementById('script-chars').value);
+  const plot = parseInt(document.getElementById('script-plot').value);
+  const dialogue = parseInt(document.getElementById('script-dialogue').value);
+  const emotion = parseInt(document.getElementById('script-emotion').value);
+  const originality = parseInt(document.getElementById('script-originality').value);
+  const pacing = parseInt(document.getElementById('script-pacing').value);
+  const score = Math.round((chars + plot + dialogue + emotion + originality + pacing) / 6 * 10);
+  document.getElementById('script-score').textContent = score;
+  document.getElementById('script-progress').style.width = score + '%';
+}
+
+// ============================
+// TALENT DROPDOWNS
+// ============================
+function populateTalentDropdowns() {
+  const leadSel = document.getElementById('cast-lead');
+  const dirSel = document.getElementById('cast-director');
+  const compSel = document.getElementById('cast-composer');
+
+  leadSel.innerHTML = '<option value="">Select lead actor...</option>';
+  G.actors.filter(a => a.available).forEach(a => {
+    leadSel.innerHTML += `<option value="${a.id}">${a.name} (Pop: ${a.popularity} | $${formatMoney(a.salary)})</option>`;
+  });
+
+  dirSel.innerHTML = '<option value="">Select director...</option>';
+  G.directors.filter(d => d.available).forEach(d => {
+    dirSel.innerHTML += `<option value="${d.id}">${d.name} (Vision: ${d.vision} | $${formatMoney(d.salary)})</option>`;
+  });
+
+  compSel.innerHTML = '<option value="">Select composer...</option>';
+  G.composers.filter(c => c.available).forEach(c => {
+    compSel.innerHTML += `<option value="${c.id}">${c.name} (${c.style} | $${formatMoney(c.salary)})</option>`;
+  });
+}
+
+// ============================
+// GREENLIGHT A MOVIE
+// ============================
+function greenlight() {
+  const title = document.getElementById('movie-title').value.trim();
+  const genre = document.getElementById('movie-genre').value;
+  const subgenre = document.getElementById('movie-subgenre').value;
+  const tone = document.getElementById('movie-tone').value;
+  const rating = document.getElementById('movie-rating').value;
+  const scale = document.getElementById('movie-scale').value;
+  const season = document.getElementById('movie-season').value;
+  const leadId = document.getElementById('cast-lead').value;
+  const dirId = document.getElementById('cast-director').value;
+  const compId = document.getElementById('cast-composer').value;
+  const vfx = document.getElementById('vfx-quality').value;
+  const releaseStrat = document.getElementById('release-strategy').value;
+
+  if (!title) { notify('Error', 'Enter a movie title.', 'error'); return; }
+  if (!genre) { notify('Error', 'Select a genre.', 'error'); return; }
+  if (!leadId) { notify('Error', 'Cast a lead actor.', 'error'); return; }
+  if (!dirId) { notify('Error', 'Hire a director.', 'error'); return; }
+
+  if (G.inProduction.length >= STUDIO_LEVELS[G.studioLevel].capacity) {
+    notify('Error', `Studio at capacity! Max ${STUDIO_LEVELS[G.studioLevel].capacity} simultaneous productions.`, 'error');
+    return;
+  }
+
+  const budget = parseInt(document.getElementById('budget-estimate').dataset.value) || 10000000;
+  const actor = G.actors.find(a => a.id === leadId);
+  const director = G.directors.find(d => d.id === dirId);
+  const composer = compId ? G.composers.find(c => c.id === compId) : null;
+
+  const totalCost = budget + (actor?.salary||0) + (director?.salary||0) + (composer?.salary||0);
+
+  if (totalCost > G.money) {
+    notify('Error', `Not enough money! Need $${formatMoney(totalCost)}, have $${formatMoney(G.money)}.`, 'error');
+    return;
+  }
+
+  // Check for actor rejection
+  if (actor && actor.popularity > 70 && G.reputation < 30 && Math.random() < 0.3) {
+    notify('Rejected!', `${actor.name} doesn't want to work with an unknown studio.`, 'error');
+    return;
+  }
+
+  const scriptScore = parseInt(document.getElementById('script-score').textContent);
+  const vfxMultiplier = { 'Cheap':0.5, 'Standard':1, 'Premium':1.5, 'Elite':2 }[vfx];
+  const weeksMult = { 'Micro':8, 'Low':12, 'Medium':20, 'High':28, 'Blockbuster':36 }[scale];
+
+  const movie = {
+    id: 'movie_'+Date.now(),
+    title, genre, subgenre, tone, rating, scale, season,
+    budget, totalCost,
+    actor: actor ? {...actor} : null,
+    director: director ? {...director} : null,
+    composer: composer ? {...composer} : null,
+    vfxQuality: vfx,
+    vfxMultiplier,
+    releaseStrategy: releaseStrat,
+    scriptScore,
+    productionWeek: 0,
+    totalWeeks: weeksMult,
+    phase: 'Pre-Production',
+    quality: 0,
+    hype: rnd(5,20),
+    events: [],
+    marketing: { tv:0, trailer:0, billboard:0, social:0, premiere:0, viral:0, comiccon:0, festival:0 },
+    marketingSpend: 0,
+    yearStarted: G.year,
+    completed: false,
+    released: false,
+    criticScore: 0,
+    audienceScore: 0,
+    boxOffice: { opening:0, domestic:0, international:0, worldwide:0 },
+    profit: 0,
+    awardsNominations: [],
+    awardsWon: [],
+    isFranchise: false,
+    franchiseId: null,
+    sequelNumber: 0
+  };
+
+  G.money -= totalCost;
+  if (actor) actor.available = false;
+  if (director) director.available = false;
+  if (composer) composer.available = false;
+
+  G.inProduction.push(movie);
+
+  document.getElementById('movie-title').value = '';
+  updateScriptScore();
+  populateTalentDropdowns();
+  updateAllUI();
+
+  notify('Greenlit!', `"${title}" is now in production! Budget: $${formatMoney(totalCost)}`, 'success');
+  addNews(`${G.studioName} greenlights "${title}", a new ${genre} film.`);
+  showTab('production');
+}
+
+// ============================
+// PRODUCTION SIMULATION
+// ============================
+function advanceWeek() {
+  G.week++;
+  if (G.week > 52) {
+    G.week = 1;
+    G.year++;
+    yearEnd();
+  }
+
+  updateEra();
+
+  // Process productions
+  G.inProduction.forEach(movie => {
+    movie.productionWeek++;
+
+    // Phase transitions
+    const pct = movie.productionWeek / movie.totalWeeks;
+    if (pct < 0.15) movie.phase = 'Pre-Production';
+    else if (pct < 0.6) movie.phase = 'Shooting';
+    else if (pct < 0.85) movie.phase = 'Post-Production';
+    else movie.phase = 'Final Cut';
+
+    // Random events
+    if (Math.random() < 0.12) {
+      const evt = PRODUCTION_EVENTS[rnd(0, PRODUCTION_EVENTS.length-1)];
+      movie.events.push({ week: movie.productionWeek, ...evt });
+
+      if (evt.effect === 'delay') movie.totalWeeks += evt.severity;
+      if (evt.effect === 'budget') { const overrun = movie.budget * 0.05 * evt.severity; G.money -= overrun; movie.totalCost += overrun; }
+      if (evt.effect === 'quality') movie.quality += evt.severity * 3;
+      if (evt.effect === 'hype') movie.hype += evt.severity * 5;
+
+      notify('Production Event', `"${movie.title}": ${evt.text}`, evt.severity > 0 ? 'info' : 'error');
+    }
+
+    // Completion
+    if (movie.productionWeek >= movie.totalWeeks) {
+      completeMovie(movie);
+    }
+  });
+
+  // Remove completed from production
+  G.inProduction = G.inProduction.filter(m => !m.completed);
+
+  // Rival activity
+  if (Math.random() < 0.08) {
+    rivalAction();
+  }
+
+  // Random news
+  if (Math.random() < 0.1) {
+    generateNews();
+  }
+
+  // Scandal chance
+  if (Math.random() < 0.02) {
+    triggerScandal();
+  }
+
+  // Streaming income
+  if (G.streamingUnlocked) {
+    G.money += G.streamingSubs * 5;
+  }
+
+  // Autosave
+  G.autoSaveCounter++;
+  if (G.autoSaveCounter >= 10 && document.getElementById('setting-autosave')?.value === 'on') {
+    saveGame();
+    G.autoSaveCounter = 0;
+  }
+
+  updateAllUI();
+}
+
+function updateEra() {
+  if (G.year < 1990) G.era = '1980s';
+  else if (G.year < 2000) G.era = '1990s';
+  else if (G.year < 2010) G.era = '2000s';
+  else if (G.year < 2020) { G.era = '2010s'; G.streamingUnlocked = true; }
+  else if (G.year < 2030) G.era = '2020s';
+  else G.era = '2030s';
+}
+
+function completeMovie(movie) {
+  movie.completed = true;
+  movie.phase = 'Completed';
+
+  // Calculate quality
+  const scriptQ = movie.scriptScore;
+  const actorQ = movie.actor ? (movie.actor.charisma + movie.actor.range) / 2 : 30;
+  const directorQ = movie.director ? (movie.director.vision + movie.director.discipline) / 2 : 30;
+  const composerQ = movie.composer ? movie.composer.talent : 30;
+  const vfxQ = movie.vfxMultiplier * 30;
+  const eventBonus = movie.quality;
+
+  movie.quality = clamp(Math.round((scriptQ * 0.3 + actorQ * 0.25 + directorQ * 0.25 + composerQ * 0.1 + vfxQ * 0.1 + eventBonus) * (G.difficulty === 'Easy' ? 1.1 : G.difficulty === 'Hard' ? 0.9 : G.difficulty === 'Mogul' ? 0.85 : 1)), 5, 100);
+
+  // Critic & audience scores
+  movie.criticScore = clamp(movie.quality + rnd(-15,15) + (movie.scriptScore > 70 ? 10 : 0), 5, 100);
+  movie.audienceScore = clamp(movie.quality + rnd(-10,20) + (movie.actor ? Math.floor(movie.actor.charisma/10) : 0), 5, 100);
+
+  // Skill bonuses
+  G.skillsUnlocked.forEach(sId => {
+    for (const tree of Object.values(SKILL_TREES)) {
+      const skill = tree.find(s => s.id === sId);
+      if (skill && skill.effect === 'criticBonus') movie.criticScore = clamp(movie.criticScore + skill.value, 5, 100);
+      if (skill && skill.effect === 'scriptBonus') movie.quality = clamp(movie.quality + skill.value, 5, 100);
+    }
+  });
+
+  // Box office calculation
+  const scaleMult = { 'Micro':0.3, 'Low':0.8, 'Medium':2, 'High':5, 'Blockbuster':12 }[movie.scale];
+  const hypeEffect = movie.hype / 50;
+  const qualEffect = movie.quality / 50;
+  const actorDraw = movie.actor ? movie.actor.boxOfficeDraw / 50 : 0.5;
+  const seasonMult = { 'Summer':1.4, 'Holiday':1.3, 'Winter':1.1, 'Fall':1.0, 'Spring':0.9 }[movie.season];
+  const releaseMult = { 'Wide':1.0, 'Limited':0.4, 'Streaming':0.2, 'Festival':0.3, 'Hybrid':0.7 }[movie.releaseStrategy];
+  const repMult = 1 + G.reputation / 200;
+  const marketMult = 1 + Object.values(movie.marketing).reduce((a,b)=>a+b,0) / 500;
+
+  const baseRevenue = movie.budget * scaleMult * hypeEffect * qualEffect * actorDraw * seasonMult * releaseMult * repMult * marketMult;
+
+  movie.boxOffice.opening = Math.round(baseRevenue * rnd(15,35)/100);
+  movie.boxOffice.domestic = Math.round(baseRevenue * rnd(35,55)/100);
+  movie.boxOffice.international = Math.round(baseRevenue * rnd(40,70)/100);
+  movie.boxOffice.worldwide = movie.boxOffice.domestic + movie.boxOffice.international;
+  movie.profit = movie.boxOffice.worldwide - movie.totalCost - movie.marketingSpend;
+
+  // Streaming revenue
+  if (movie.releaseStrategy === 'Streaming' && G.streamingUnlocked) {
+    const streamRev = movie.quality * 50000 + movie.audienceScore * 30000;
+    movie.boxOffice.worldwide += streamRev;
+    movie.profit += streamRev;
+    G.streamingSubs += Math.round(movie.quality * 100);
+  }
+
+  G.money += movie.boxOffice.worldwide;
+  G.totalRevenue += movie.boxOffice.worldwide;
+  G.totalProfit += movie.profit;
+  G.totalMovies++;
+
+  // Reputation change
+  if (movie.criticScore > 80) G.reputation = clamp(G.reputation + rnd(3,8), 0, 100);
+  else if (movie.criticScore > 60) G.reputation = clamp(G.reputation + rnd(1,3), 0, 100);
+  else if (movie.criticScore < 30) G.reputation = clamp(G.reputation - rnd(2,5), 0, 100);
+
+  // Fan growth
+  G.fans += Math.round(movie.audienceScore * 500 + movie.boxOffice.worldwide / 100000);
+
+  // Skill points
+  G.skillPoints += movie.criticScore > 70 ? 2 : 1;
+
+  // Release talent
+  if (movie.actor) { const a = G.actors.find(x=>x.id===movie.actor.id); if(a) { a.available = true; a.moviesCount++; a.popularity = clamp(a.popularity + (movie.profit > 0 ? rnd(1,5) : rnd(-3,1)), 0, 100); a.awardRep = clamp(a.awardRep + (movie.criticScore > 75 ? rnd(2,5) : 0), 0, 100); } }
+  if (movie.director) { const d = G.directors.find(x=>x.id===movie.director.id); if(d) { d.available = true; d.awardPrestige = clamp(d.awardPrestige + (movie.criticScore > 75 ? rnd(2,5) : 0), 0, 100); } }
+  if (movie.composer) { const c = G.composers.find(x=>x.id===movie.composer.id); if(c) { c.available = true; } }
+
+  G.completedMovies.push(movie);
+  populateTalentDropdowns();
+
+  // Merch revenue for big movies
+  if (movie.scale === 'Blockbuster' || movie.scale === 'High') {
+    const merchRev = Math.round(movie.audienceScore * movie.boxOffice.worldwide * 0.0001);
+    G.merchRevenue += merchRev;
+    G.money += merchRev;
+  }
+
+  // Generate result news
+  if (movie.profit > 0) {
+    addNews(`"${movie.title}" is a hit! Grossing $${formatMoney(movie.boxOffice.worldwide)} worldwide.`);
+  } else {
+    addNews(`"${movie.title}" bombs at the box office. ${G.studioName} takes a loss.`);
+  }
+
+  notify('Movie Complete!', `"${movie.title}" has been released!\nCritic: ${movie.criticScore}/100 | Audience: ${movie.audienceScore}/100\nBox Office: $${formatMoney(movie.boxOffice.worldwide)}`, movie.profit > 0 ? 'success' : 'error');
+
+  showMovieResultModal(movie);
+}
+
+// ============================
+// MOVIE RESULT MODAL
+// ============================
+function showMovieResultModal(movie) {
+  const modal = document.getElementById('modal-body');
+  const profitColor = movie.profit > 0 ? '#4ade80' : 'var(--accent-red)';
+  const profitLabel = movie.profit > 0 ? 'PROFIT' : 'LOSS';
+
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:12px; color:var(--accent-blue); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;">${movie.genre} | ${movie.year || G.year}</div>
+      <div style="font-family:'Playfair Display',serif; font-size:32px; font-weight:700; margin-bottom:8px;">${movie.title}</div>
+      <div style="color:var(--text-muted); font-size:13px;">${movie.tone} tone | ${movie.rating} rated | ${movie.releaseStrategy} release</div>
+    </div>
+    <div class="grid-3" style="margin-bottom:20px;">
+      <div class="stat-card">
+        <div class="stat-card-value" style="color:var(--accent-gold)">${movie.criticScore}</div>
+        <div class="stat-card-label">Critic Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" style="color:var(--accent-blue)">${movie.audienceScore}</div>
+        <div class="stat-card-label">Audience Score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value" style="color:${profitColor}">$${formatMoney(Math.abs(movie.profit))}</div>
+        <div class="stat-card-label">${profitLabel}</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:12px; font-weight:700; letter-spacing:1px; color:var(--text-muted); margin-bottom:12px;">BOX OFFICE</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <span style="color:var(--text-muted)">Opening Weekend</span>
+        <span style="font-weight:600; font-family:'JetBrains Mono',monospace; color:#4ade80;">$${formatMoney(movie.boxOffice.opening)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <span style="color:var(--text-muted)">Domestic</span>
+        <span style="font-weight:600; font-family:'JetBrains Mono',monospace;">$${formatMoney(movie.boxOffice.domestic)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <span style="color:var(--text-muted)">International</span>
+        <span style="font-weight:600; font-family:'JetBrains Mono',monospace;">$${formatMoney(movie.boxOffice.international)}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); padding-top:8px;">
+        <span style="font-weight:700;">Worldwide Total</span>
+        <span style="font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--accent-gold); font-size:18px;">$${formatMoney(movie.boxOffice.worldwide)}</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="font-size:12px; font-weight:700; letter-spacing:1px; color:var(--text-muted); margin-bottom:12px;">PRODUCTION</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Budget</span><span>$${formatMoney(movie.budget)}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Total Cost</span><span>$${formatMoney(movie.totalCost)}</span></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Quality Score</span><span>${movie.quality}/100</span></div>
+      ${movie.actor ? `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Lead Actor</span><span>${movie.actor.name}</span></div>` : ''}
+      ${movie.director ? `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Director</span><span>${movie.director.name}</span></div>` : ''}
+      ${movie.composer ? `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="color:var(--text-muted)">Composer</span><span>${movie.composer.name}</span></div>` : ''}
+    </div>
+    ${movie.events.length > 0 ? `
+    <div class="card">
+      <div style="font-size:12px; font-weight:700; letter-spacing:1px; color:var(--text-muted); margin-bottom:12px;">PRODUCTION EVENTS</div>
+      ${movie.events.map(e => `<div style="font-size:12px; color:var(--text-light); margin-bottom:6px;">&#8226; ${e.text}</div>`).join('')}
+    </div>` : ''}
+    <div style="text-align:center; margin-top:20px;">
+      ${movie.criticScore > 60 && !movie.isFranchise ? `<button class="btn btn-gold btn-sm" onclick="startFranchise('${movie.id}')" style="margin-right:8px;">Start Franchise</button>` : ''}
+      <button class="btn btn-red" onclick="closeModal()">Continue</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ============================
+// FRANCHISE SYSTEM
+// ============================
+function startFranchise(movieId) {
+  const movie = G.completedMovies.find(m => m.id === movieId);
+  if (!movie) return;
+
+  const franchise = {
+    id: 'franchise_'+Date.now(),
+    name: movie.title + ' Universe',
+    originalMovie: movie.id,
+    movies: [movie.id],
+    fanLoyalty: movie.audienceScore,
+    brandFatigue: 0,
+    loreConsistency: 100,
+    merchandiseRevenue: 0
+  };
+
+  movie.isFranchise = true;
+  movie.franchiseId = franchise.id;
+  G.franchises.push(franchise);
+  closeModal();
+  notify('Franchise Created!', `The "${franchise.name}" franchise has been established!`, 'success');
+  renderFranchises();
+}
+
+function renderFranchises() {
+  const container = document.getElementById('franchise-content');
+  if (G.franchises.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#127917;</div><div class="empty-state-text">Complete successful movies to start franchises</div></div>';
+    return;
+  }
+  container.innerHTML = G.franchises.map(f => {
+    const movies = f.movies.map(mid => G.completedMovies.find(m => m.id === mid)).filter(Boolean);
+    return `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">${f.name}</div>
+          <span class="card-badge badge-gold">${movies.length} FILMS</span>
+        </div>
+        <div class="grid-3">
+          <div><div style="font-size:11px; color:var(--text-muted);">Fan Loyalty</div><div style="font-weight:700; color:var(--accent-blue);">${f.fanLoyalty}%</div></div>
+          <div><div style="font-size:11px; color:var(--text-muted);">Brand Fatigue</div><div style="font-weight:700; color:${f.brandFatigue > 50 ? 'var(--accent-red)' : '#4ade80'};">${f.brandFatigue}%</div></div>
+          <div><div style="font-size:11px; color:var(--text-muted);">Lore Score</div><div style="font-weight:700; color:var(--accent-gold);">${f.loreConsistency}%</div></div>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button class="btn btn-blue btn-sm" onclick="planSequel('${f.id}')">Plan Sequel</button>
+          <button class="btn btn-purple btn-sm" onclick="planSpinoff('${f.id}')">Spin-off</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function planSequel(franchiseId) {
+  const f = G.franchises.find(x => x.id === franchiseId);
+  if (!f) return;
+  const orig = G.completedMovies.find(m => m.id === f.originalMovie);
+  if (!orig) return;
+
+  f.brandFatigue += 10;
+  f.fanLoyalty = clamp(f.fanLoyalty - 5, 0, 100);
+
+  document.getElementById('movie-title').value = orig.title + ' ' + (f.movies.length + 1);
+  document.getElementById('movie-genre').value = orig.genre;
+  updateSubgenres();
+  showTab('new-movie');
+  notify('Sequel Planning', `Planning sequel for "${f.name}". Fill in the details and greenlight!`, 'info');
+}
+
+function planSpinoff(franchiseId) {
+  const f = G.franchises.find(x => x.id === franchiseId);
+  if (!f) return;
+  document.getElementById('movie-title').value = f.name.replace(' Universe','') + ': Origins';
+  showTab('new-movie');
+  notify('Spin-off Planning', `Planning spin-off for "${f.name}".`, 'info');
+}
+
+// ============================
+// MARKETING SYSTEM
+// ============================
+function renderMarketingTab() {
+  const container = document.getElementById('marketing-content');
+  const marketable = [...G.inProduction.filter(m => m.productionWeek / m.totalWeeks > 0.3), ...G.completedMovies.filter(m => !m.released)];
+
+  if (marketable.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128226;</div><div class="empty-state-text">No movies ready for marketing</div></div>';
+    return;
+  }
+
+  container.innerHTML = marketable.map(movie => `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-title">${movie.title}</div>
+        <span class="card-badge badge-gold">HYPE: ${movie.hype}</span>
+      </div>
+      <div class="progress-bar" style="height:8px; margin-bottom:16px;">
+        <div class="progress-fill progress-gold" style="width:${Math.min(movie.hype,100)}%"></div>
+      </div>
+      <div class="grid-4">
+        ${marketingOption(movie, 'tv', 'TV Spots', 50000)}
+        ${marketingOption(movie, 'trailer', 'Trailer Campaign', 100000)}
+        ${marketingOption(movie, 'billboard', 'Billboards', 75000)}
+        ${marketingOption(movie, 'social', 'Social Media', 30000)}
+        ${marketingOption(movie, 'premiere', 'Red Carpet Premiere', 200000)}
+        ${marketingOption(movie, 'viral', 'Viral Campaign', 60000)}
+        ${marketingOption(movie, 'comiccon', 'Comic-Con Panel', 150000)}
+        ${marketingOption(movie, 'festival', 'Festival Screening', 120000)}
+      </div>
+    </div>
+  `).join('');
+}
+
+function marketingOption(movie, key, label, cost) {
+  const current = movie.marketing[key] || 0;
+  return `
+    <div style="text-align:center; padding:8px;">
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">${label}</div>
+      <div style="font-size:16px; font-weight:700; color:${current > 0 ? '#4ade80' : 'var(--text-muted)'}; margin-bottom:6px;">${current}%</div>
+      <button class="btn btn-sm ${current > 0 ? 'btn-blue' : ''}" onclick="buyMarketing('${movie.id}','${key}',${cost})" ${G.money < cost ? 'disabled' : ''}>
+        $${formatMoney(cost)}
+      </button>
+    </div>
+  `;
+}
+
+function buyMarketing(movieId, key, cost) {
+  const movie = G.inProduction.find(m => m.id === movieId) || G.completedMovies.find(m => m.id === movieId);
+  if (!movie || G.money < cost) return;
+
+  G.money -= cost;
+  movie.marketing[key] = clamp((movie.marketing[key]||0) + rnd(15,30), 0, 100);
+  movie.marketingSpend += cost;
+  movie.hype = clamp(movie.hype + rnd(5,15), 0, 100);
+
+  updateAllUI();
+  notify('Marketing', `${key.charAt(0).toUpperCase()+key.slice(1)} campaign launched for "${movie.title}"!`, 'success');
+}
+
+// ============================
+// RENDER TABS
+// ============================
+function renderProductionTab() {
+  const container = document.getElementById('production-content');
+  if (G.inProduction.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#9881;</div><div class="empty-state-text">No movies in production</div><button class="btn btn-red btn-sm" onclick="showTab(\'new-movie\')">START NEW MOVIE</button></div>';
+    return;
+  }
+
+  container.innerHTML = G.inProduction.map(m => `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-title">${m.title}</div>
+        <span class="card-badge ${m.phase === 'Shooting' ? 'badge-red' : m.phase === 'Post-Production' ? 'badge-purple' : m.phase === 'Final Cut' ? 'badge-gold' : 'badge-blue'}">${m.phase}</span>
+      </div>
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">${m.genre} | ${m.tone} | ${m.scale} scale | Week ${m.productionWeek}/${m.totalWeeks}</div>
+      <div class="progress-bar" style="height:10px; margin-bottom:16px;">
+        <div class="progress-fill progress-red" style="width:${(m.productionWeek/m.totalWeeks)*100}%"></div>
+      </div>
+      <div class="grid-4">
+        <div><div style="font-size:10px; color:var(--text-muted);">Budget</div><div style="font-weight:600;">$${formatMoney(m.totalCost)}</div></div>
+        <div><div style="font-size:10px; color:var(--text-muted);">Director</div><div style="font-weight:600;">${m.director?.name || 'N/A'}</div></div>
+        <div><div style="font-size:10px; color:var(--text-muted);">Lead</div><div style="font-weight:600;">${m.actor?.name || 'N/A'}</div></div>
+        <div><div style="font-size:10px; color:var(--text-muted);">Hype</div><div style="font-weight:600; color:var(--accent-gold);">${m.hype}</div></div>
+      </div>
+      ${m.events.length > 0 ? `
+        <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:12px;">
+          <div style="font-size:10px; font-weight:700; color:var(--text-muted); letter-spacing:1px; margin-bottom:8px;">RECENT EVENTS</div>
+          ${m.events.slice(-3).map(e => `<div style="font-size:12px; color:var(--text-light); margin-bottom:4px;">&#8226; Week ${e.week}: ${e.text}</div>`).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function renderLibrary() {
+  const grid = document.getElementById('library-grid');
+  if (G.completedMovies.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">&#127902;</div><div class="empty-state-text">No completed movies yet</div></div>';
+    return;
+  }
+
+  grid.innerHTML = G.completedMovies.map(m => `
+    <div class="movie-card" onclick='showMovieResultModal(G.completedMovies.find(x=>x.id==="${m.id}"))'>
+      <div class="movie-card-genre">${m.genre} ${m.subgenre ? '/ '+m.subgenre : ''}</div>
+      <div class="movie-card-title">${m.title}</div>
+      <div class="movie-card-stats">
+        <span>&#9733; ${m.criticScore}</span>
+        <span>&#128100; ${m.audienceScore}</span>
+        <span style="color:${m.profit > 0 ? '#4ade80' : 'var(--accent-red)'}">$${formatMoney(Math.abs(m.profit))}</span>
+      </div>
+      ${m.awardsWon.length > 0 ? `<div style="margin-top:6px; font-size:11px; color:var(--accent-gold);">&#127942; ${m.awardsWon.length} Award(s)</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderActors() {
+  const grid = document.getElementById('actors-grid');
+  grid.innerHTML = G.actors.map(a => {
+    const colors = ['#e63946','#457b9d','#2a9d8f','#e76f51','#6d6875','#b5838d','#264653','#f4a261'];
+    const color = colors[a.name.charCodeAt(0) % colors.length];
+    return `
+      <div class="talent-card" onclick="showActorModal('${a.id}')">
+        <div class="talent-avatar" style="background:${color}20; color:${color};">${a.name.charAt(0)}</div>
+        <div class="talent-name">${a.name}</div>
+        <div class="talent-type">${a.available ? 'Available' : 'In Production'} | Age ${a.age}</div>
+        <div style="margin-top:10px;">
+          <div class="stat-bar-container"><span class="stat-label">Charisma</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.charisma}%; background:var(--accent-gold);"></div></div><span class="stat-value">${a.charisma}</span></div>
+          <div class="stat-bar-container"><span class="stat-label">Popularity</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.popularity}%; background:var(--accent-blue);"></div></div><span class="stat-value">${a.popularity}</span></div>
+          <div class="stat-bar-container"><span class="stat-label">Box Office</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.boxOfficeDraw}%; background:#4ade80;"></div></div><span class="stat-value">${a.boxOfficeDraw}</span></div>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--accent-gold); font-family:'JetBrains Mono',monospace;">$${formatMoney(a.salary)}/film</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function showActorModal(actorId) {
+  const a = G.actors.find(x => x.id === actorId);
+  if (!a) return;
+  const modal = document.getElementById('modal-body');
+  modal.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-title">${a.name}</div>
+    <div style="color:var(--text-muted); margin-bottom:20px;">Age ${a.age} | ${a.available ? 'Available' : 'In Production'} | ${a.moviesCount} films</div>
+    <div class="stat-bar-container"><span class="stat-label">Charisma</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.charisma}%; background:var(--accent-gold);"></div></div><span class="stat-value">${a.charisma}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Range</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.range}%; background:var(--accent-blue);"></div></div><span class="stat-value">${a.range}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Popularity</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.popularity}%; background:var(--accent-purple);"></div></div><span class="stat-value">${a.popularity}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Box Office</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.boxOfficeDraw}%; background:#4ade80;"></div></div><span class="stat-value">${a.boxOfficeDraw}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Work Ethic</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.workEthic}%;"></div></div><span class="stat-value">${a.workEthic}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Award Rep</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.awardRep}%; background:var(--accent-gold);"></div></div><span class="stat-value">${a.awardRep}</span></div>
+    <div class="stat-bar-container"><span class="stat-label">Chemistry</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${a.chemistry}%;"></div></div><span class="stat-value">${a.chemistry}</span></div>
+    <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--text-muted);">Salary</span>
+        <span style="color:var(--accent-gold); font-weight:700;">$${formatMoney(a.salary)}/film</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:6px;">
+        <span style="color:var(--text-muted);">Scandal Risk</span>
+        <span style="color:${a.scandalChance > 20 ? 'var(--accent-red)' : '#4ade80'}; font-weight:700;">${a.scandalChance}%</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:6px;">
+        <span style="color:var(--text-muted);">Relationship</span>
+        <span style="font-weight:700;">${a.relationship}/100</span>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function renderDirectors() {
+  const grid = document.getElementById('directors-grid');
+  grid.innerHTML = G.directors.map(d => `
+    <div class="talent-card">
+      <div class="talent-name">${d.name}</div>
+      <div class="talent-type">${d.style} | Age ${d.age} | ${d.available ? 'Available' : 'Busy'}</div>
+      <div style="margin-top:10px;">
+        <div class="stat-bar-container"><span class="stat-label">Vision</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.vision}%; background:var(--accent-purple);"></div></div><span class="stat-value">${d.vision}</span></div>
+        <div class="stat-bar-container"><span class="stat-label">Speed</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.speed}%;"></div></div><span class="stat-value">${d.speed}</span></div>
+        <div class="stat-bar-container"><span class="stat-label">Innovation</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.innovation}%; background:var(--accent-blue);"></div></div><span class="stat-value">${d.innovation}</span></div>
+        <div class="stat-bar-container"><span class="stat-label">Award Rep</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${d.awardPrestige}%; background:var(--accent-gold);"></div></div><span class="stat-value">${d.awardPrestige}</span></div>
+      </div>
+      <div style="margin-top:8px; font-size:12px; color:var(--accent-gold); font-family:'JetBrains Mono',monospace;">$${formatMoney(d.salary)}/film</div>
+    </div>
+  `).join('');
+}
+
+function renderComposers() {
+  const grid = document.getElementById('composers-grid');
+  grid.innerHTML = G.composers.map(c => `
+    <div class="talent-card">
+      <div class="talent-name">${c.name}</div>
+      <div class="talent-type">${c.style} | ${c.available ? 'Available' : 'Busy'}</div>
+      <div style="margin-top:10px;">
+        <div class="stat-bar-container"><span class="stat-label">Talent</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${c.talent}%; background:var(--accent-purple);"></div></div><span class="stat-value">${c.talent}</span></div>
+        <div class="stat-bar-container"><span class="stat-label">Fame</span><div class="stat-bar"><div class="stat-bar-fill" style="width:${c.fame}%; background:var(--accent-gold);"></div></div><span class="stat-value">${c.fame}</span></div>
+      </div>
+      <div style="margin-top:8px; font-size:12px; color:var(--accent-gold); font-family:'JetBrains Mono',monospace;">$${formatMoney(c.salary)}/film</div>
+    </div>
+  `).join('');
+}
+
+// ============================
+// RIVALS
+// ============================
+function renderRivals() {
+  const grid = document.getElementById('rivals-grid');
+  grid.innerHTML = G.rivalStudios.map(r => `
+    <div class="rival-card">
+      <div class="rival-logo" style="background:${r.color}20; color:${r.color};">${r.name.charAt(0)}</div>
+      <div class="rival-info">
+        <div class="rival-name">${r.name}</div>
+        <div class="rival-style">${r.style} | ${r.personality}</div>
+        <div style="margin-top:8px; display:flex; gap:16px; font-size:12px;">
+          <span style="color:var(--text-muted);">Money: <span style="color:#4ade80;">$${formatMoney(r.money)}</span></span>
+          <span style="color:var(--text-muted);">Rep: <span style="color:var(--accent-blue);">${r.rep}</span></span>
+          <span style="color:var(--text-muted);">Films: <span style="color:var(--text-light);">${r.movies.length}</span></span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function rivalAction() {
+  const rival = G.rivalStudios[rnd(0, G.rivalStudios.length-1)];
+  const genres = GENRES;
+  const genre = genres[rnd(0,genres.length-1)];
+  const budget = rnd(5,200);
+  const quality = rnd(30,90);
+
+  const rivalMovie = {
+    title: generateRivalMovieTitle(),
+    genre, budget: budget * 1000000,
+    criticScore: quality,
+    audienceScore: quality + rnd(-15,15),
+    boxOffice: quality * budget * rnd(5000,20000)
+  };
+
+  rival.movies.push(rivalMovie);
+  rival.money += rivalMovie.boxOffice - rivalMovie.budget;
+  if (quality > 70) rival.rep = clamp(rival.rep + rnd(1,3), 0, 100);
+
+  addNews(`${rival.name} releases "${rivalMovie.title}", a ${genre} film with a $${budget}M budget.`);
+}
+
+function generateRivalMovieTitle() {
+  const adj = ['Dark','Silent','Eternal','Final','Crimson','Silver','Iron','Golden','Last','Rising','Midnight','Shadow','Broken','Fallen','Savage'];
+  const nouns = ['Dawn','Night','Empire','Storm','Legacy','Protocol','Horizon','Reckoning','Abyss','Frontier','Thunder','Crown','Requiem','Cipher','Dominion'];
+  return adj[rnd(0,adj.length-1)] + ' ' + nouns[rnd(0,nouns.length-1)];
+}
+
+// ============================
+// FINANCE
+// ============================
+function renderFinance() {
+  const container = document.getElementById('finance-content');
+  container.innerHTML = `
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="stat-card"><div class="stat-card-value" style="color:#4ade80;">$${formatMoney(G.money)}</div><div class="stat-card-label">Current Balance</div></div>
+      <div class="stat-card"><div class="stat-card-value" style="color:var(--accent-gold);">$${formatMoney(G.totalRevenue)}</div><div class="stat-card-label">Total Revenue</div></div>
+      <div class="stat-card"><div class="stat-card-value" style="color:${G.totalProfit >= 0 ? '#4ade80' : 'var(--accent-red)'};">$${formatMoney(Math.abs(G.totalProfit))}</div><div class="stat-card-label">Total ${G.totalProfit >= 0 ? 'Profit' : 'Loss'}</div></div>
+      <div class="stat-card"><div class="stat-card-value" style="color:var(--accent-purple);">$${formatMoney(G.merchRevenue)}</div><div class="stat-card-label">Merch Revenue</div></div>
+    </div>
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">STUDIO UPGRADE</div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700;">${STUDIO_LEVELS[G.studioLevel].name}</div>
+          <div style="font-size:12px; color:var(--text-muted);">Capacity: ${STUDIO_LEVELS[G.studioLevel].capacity} simultaneous productions</div>
+        </div>
+        ${STUDIO_LEVELS[G.studioLevel].costToUpgrade ? `
+          <button class="btn btn-gold btn-sm" onclick="upgradeStudio()" ${G.money < STUDIO_LEVELS[G.studioLevel].costToUpgrade ? 'disabled' : ''}>
+            Upgrade ($${formatMoney(STUDIO_LEVELS[G.studioLevel].costToUpgrade)})
+          </button>
+        ` : '<span class="card-badge badge-gold">MAX LEVEL</span>'}
+      </div>
+    </div>
+    ${G.completedMovies.length > 0 ? `
+      <div style="font-size:12px; color:var(--text-muted); margin-top:20px; margin-bottom:8px;">TOP EARNING FILMS</div>
+      <table class="data-table">
+        <thead><tr><th>Title</th><th>Genre</th><th>Budget</th><th>Box Office</th><th>Profit</th><th>Critic</th></tr></thead>
+        <tbody>
+          ${[...G.completedMovies].sort((a,b) => b.boxOffice.worldwide - a.boxOffice.worldwide).slice(0,10).map(m => `
+            <tr>
+              <td style="font-weight:600;">${m.title}</td>
+              <td>${m.genre}</td>
+              <td>$${formatMoney(m.totalCost)}</td>
+              <td style="color:var(--accent-gold);">$${formatMoney(m.boxOffice.worldwide)}</td>
+              <td style="color:${m.profit > 0 ? '#4ade80' : 'var(--accent-red)'};">$${formatMoney(Math.abs(m.profit))}</td>
+              <td>${m.criticScore}/100</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    ` : ''}
+  `;
+}
+
+function upgradeStudio() {
+  const cost = STUDIO_LEVELS[G.studioLevel].costToUpgrade;
+  if (!cost || G.money < cost) return;
+  G.money -= cost;
+  G.studioLevel++;
+  G.reputation = clamp(G.reputation + 5, 0, 100);
+  notify('Studio Upgraded!', `Welcome to your new ${STUDIO_LEVELS[G.studioLevel].name}! Capacity: ${STUDIO_LEVELS[G.studioLevel].capacity} productions.`, 'success');
+  addNews(`${G.studioName} upgrades to a ${STUDIO_LEVELS[G.studioLevel].name}!`);
+  updateAllUI();
+  renderFinance();
+}
+
+// ============================
+// AWARDS
+// ============================
+function renderAwards() {
+  const container = document.getElementById('awards-display');
+  container.innerHTML = AWARD_SHOWS.map(show => `
+    <div class="card" style="text-align:center;">
+      <div style="font-size:36px; margin-bottom:8px;">${show.icon}</div>
+      <div style="font-family:'Playfair Display',serif; font-size:16px; font-weight:700; margin-bottom:4px;">${show.name}</div>
+      <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Prestige: ${show.prestige}</div>
+      <div style="font-size:12px; color:var(--accent-gold);">
+        ${G.awards.filter(a => a.show === show.name).length > 0 ?
+          G.awards.filter(a => a.show === show.name).map(a => `<div>&#127942; ${a.category} — "${a.movie}"</div>`).join('') :
+          '<div style="color:var(--text-muted);">No wins yet</div>'
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function yearEnd() {
+  // Age actors
+  G.actors.forEach(a => {
+    a.age++;
+    if (a.age > 60) a.popularity = clamp(a.popularity - rnd(1,3), 0, 100);
+  });
+  G.directors.forEach(d => d.age++);
+
+  // Award ceremony
+  if (G.completedMovies.length > 0) {
+    const yearMovies = G.completedMovies.filter(m => m.yearStarted === G.year - 1 || m.yearStarted === G.year);
+    if (yearMovies.length > 0) {
+      const bestMovie = yearMovies.sort((a,b) => b.criticScore - a.criticScore)[0];
+      AWARD_SHOWS.forEach(show => {
+        if (bestMovie.criticScore > 65 + rnd(0,20)) {
+          const category = show.categories[rnd(0, show.categories.length-1)];
+          if (Math.random() < 0.3 + (bestMovie.criticScore / 300)) {
+            const award = { show: show.name, category, movie: bestMovie.title, year: G.year };
+            G.awards.push(award);
+            bestMovie.awardsWon.push(award);
+            G.reputation = clamp(G.reputation + Math.round(show.prestige / 10), 0, 100);
+            G.skillPoints += 2;
+            notify('Award Won!', `"${bestMovie.title}" wins ${category} at the ${show.name}!`, 'success');
+            addNews(`${G.studioName}'s "${bestMovie.title}" takes home ${category} at the ${show.name}!`);
+          }
+        }
+      });
+    }
+  }
+
+  // Generate fresh talent
+  if (G.actors.length < 60) {
+    G.actors.push(...generateActors(5));
+  }
+  if (G.directors.length < 20) {
+    G.directors.push(...generateDirectors(3));
+  }
+  if (G.composers.length < 15) {
+    G.composers.push(...generateComposers(2));
+  }
+
+  populateTalentDropdowns();
+  renderAwards();
+  renderFinance();
+  renderActors();
+  renderDirectors();
+  renderComposers();
+
+  addNews(`Year ${G.year} begins. ${G.studioName} has a reputation score of ${G.reputation}.`);
+}
+
+// ============================
+// SKILL TREE
+// ============================
+function renderSkillTree() {
+  const container = document.getElementById('skills-content');
+  document.getElementById('skill-points').textContent = G.skillPoints;
+
+  let html = '';
+  for (const [treeName, skills] of Object.entries(SKILL_TREES)) {
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div class="card-title">${treeName.charAt(0).toUpperCase()+treeName.slice(1)} Skills</div>
+      </div>
+      <div class="grid-3">`;
+    skills.forEach(skill => {
+      const isUnlocked = G.skillsUnlocked.includes(skill.id);
+      const canUnlock = !isUnlocked && G.skillPoints >= skill.cost && skill.requires.every(r => G.skillsUnlocked.includes(r));
+      html += `
+        <div class="skill-node ${isUnlocked ? 'unlocked' : canUnlock ? '' : 'locked'}" onclick="${canUnlock ? `unlockSkill('${treeName}','${skill.id}')` : ''}">
+          <div class="skill-node-name">${skill.name}</div>
+          <div style="font-size:10px; color:var(--text-muted); margin:4px 0;">${skill.desc}</div>
+          <div class="skill-node-cost">${isUnlocked ? '&#10003; Unlocked' : skill.cost + ' SP'}</div>
+        </div>`;
+    });
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
+}
+
+function unlockSkill(treeName, skillId) {
+  const skill = SKILL_TREES[treeName].find(s => s.id === skillId);
+  if (!skill || G.skillPoints < skill.cost || G.skillsUnlocked.includes(skillId)) return;
+  if (!skill.requires.every(r => G.skillsUnlocked.includes(r))) return;
+
+  G.skillPoints -= skill.cost;
+  G.skillsUnlocked.push(skillId);
+  notify('Skill Unlocked!', `${skill.name}: ${skill.desc}`, 'success');
+  renderSkillTree();
+}
+
+// ============================
+// TECH TREE
+// ============================
+function renderTechTree() {
+  const container = document.getElementById('tech-content');
+  container.innerHTML = `<div class="grid-3">${TECH_TREE.map(tech => {
+    const isUnlocked = G.techUnlocked.includes(tech.id);
+    const eraOrder = ['1980s','1990s','2000s','2010s','2020s','2030s'];
+    const eraAvail = eraOrder.indexOf(G.era) >= eraOrder.indexOf(tech.era);
+    const canUnlock = !isUnlocked && eraAvail && G.money >= tech.cost && tech.requires.every(r => G.techUnlocked.includes(r));
+
+    return `
+      <div class="card" style="text-align:center; ${isUnlocked ? 'border-color:#4ade80;' : !eraAvail ? 'opacity:0.4;' : ''}">
+        <div style="font-size:14px; font-weight:700; margin-bottom:4px;">${tech.name}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">${tech.desc}</div>
+        <div style="font-size:10px; color:var(--accent-purple); margin-bottom:8px;">Era: ${tech.era}</div>
+        <div style="font-size:12px; color:var(--accent-gold); margin-bottom:8px;">$${formatMoney(tech.cost)}</div>
+        ${isUnlocked ? '<span class="card-badge badge-green">UNLOCKED</span>' :
+          canUnlock ? `<button class="btn btn-blue btn-sm" onclick="unlockTech('${tech.id}')">Research</button>` :
+          `<span style="font-size:10px; color:var(--text-muted);">${!eraAvail ? 'Future era' : 'Requirements not met'}</span>`}
+      </div>`;
+  }).join('')}</div>`;
+}
+
+function unlockTech(techId) {
+  const tech = TECH_TREE.find(t => t.id === techId);
+  if (!tech || G.money < tech.cost || G.techUnlocked.includes(techId)) return;
+  if (!tech.requires.every(r => G.techUnlocked.includes(r))) return;
+
+  G.money -= tech.cost;
+  G.techUnlocked.push(techId);
+  notify('Tech Unlocked!', `${tech.name}: ${tech.desc}`, 'success');
+  addNews(`${G.studioName} invests in ${tech.name} technology.`);
+  updateAllUI();
+  renderTechTree();
+}
+
+// ============================
+// STREAMING
+// ============================
+function renderStreaming() {
+  const container = document.getElementById('streaming-content');
+  if (!G.streamingUnlocked) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128250;</div><div class="empty-state-text">Unlock streaming in the 2010s era</div></div>';
+    return;
+  }
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header"><div class="card-title">${G.studioName}+</div><span class="card-badge badge-blue">STREAMING</span></div>
+      <div class="grid-3">
+        <div class="stat-card"><div class="stat-card-value" style="color:var(--accent-blue);">${formatMoney(G.streamingSubs)}</div><div class="stat-card-label">Subscribers</div></div>
+        <div class="stat-card"><div class="stat-card-value" style="color:#4ade80;">$${formatMoney(G.streamingSubs * 5)}</div><div class="stat-card-label">Weekly Income</div></div>
+        <div class="stat-card"><div class="stat-card-value" style="color:var(--accent-purple);">${G.completedMovies.filter(m => m.releaseStrategy === 'Streaming').length}</div><div class="stat-card-label">Exclusives</div></div>
+      </div>
+      <p style="color:var(--text-muted); font-size:13px; margin-top:16px;">Release movies as "Streaming Exclusive" to grow your subscriber base. Each movie's quality directly impacts subscriber growth.</p>
+    </div>
+  `;
+}
+
+// ============================
+// SCANDAL SYSTEM
+// ============================
+function triggerScandal() {
+  const scandals = [
+    { text: 'Lead actor from your latest film arrested for DUI.', repCost: 5, moneyCost: 100000 },
+    { text: 'Director accused of creative theft — lawsuit pending.', repCost: 8, moneyCost: 500000 },
+    { text: 'Leaked emails reveal studio mismanagement.', repCost: 10, moneyCost: 0 },
+    { text: 'Actor scandal goes viral — stocks plummet.', repCost: 12, moneyCost: 300000 },
+    { text: 'On-set harassment allegations surface.', repCost: 15, moneyCost: 1000000 },
+    { text: 'Financial audit reveals accounting irregularities.', repCost: 7, moneyCost: 750000 }
+  ];
+
+  const scandal = scandals[rnd(0, scandals.length-1)];
+
+  let reducedRep = scandal.repCost;
+  let reducedMoney = scandal.moneyCost;
+  G.skillsUnlocked.forEach(sId => {
+    for (const tree of Object.values(SKILL_TREES)) {
+      const skill = tree.find(s => s.id === sId);
+      if (skill && skill.effect === 'scandalReduce') {
+        reducedRep = Math.round(reducedRep * (1 - skill.value/100));
+        reducedMoney = Math.round(reducedMoney * (1 - skill.value/100));
+      }
+    }
+  });
+
+  G.reputation = clamp(G.reputation - reducedRep, 0, 100);
+  G.money -= reducedMoney;
+
+  notify('SCANDAL', scandal.text + ` (-${reducedRep} rep, -$${formatMoney(reducedMoney)})`, 'error');
+  addNews(`SCANDAL: ${scandal.text}`);
+}
+
+// ============================
+// NEWS SYSTEM
+// ============================
+function generateNews() {
+  const template = NEWS_TEMPLATES[rnd(0, NEWS_TEMPLATES.length-1)];
+  const rival = G.rivalStudios[rnd(0, G.rivalStudios.length-1)].name;
+  const genre = GENRES[rnd(0, GENRES.length-1)];
+  const budget = rnd(20, 300);
+  const news = template.replace('{{rival}}', rival).replace('{{genre}}', genre).replace('{{budget}}', budget);
+  addNews(news);
+}
+
+function addNews(text) {
+  G.newsLog.unshift({ text, week: G.week, year: G.year });
+  if (G.newsLog.length > 50) G.newsLog.pop();
+
+  // Update ticker
+  document.getElementById('ticker-text').textContent = text;
+
+  // Update news feed
+  const feed = document.getElementById('news-feed');
+  if (feed) {
+    feed.innerHTML = G.newsLog.slice(0, 8).map(n => `
+      <div style="padding:8px 0; border-bottom:1px solid rgba(42,53,80,0.5); font-size:12px;">
+        <span style="color:var(--text-muted); font-size:10px;">Wk ${n.week}, ${n.year}</span><br>
+        <span style="color:var(--text-light);">${n.text}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ============================
+// NOTIFICATIONS
+// ============================
+function notify(title, text, type='info') {
+  const container = document.getElementById('notif-container');
+  const div = document.createElement('div');
+  div.className = `notification ${type}`;
+  div.innerHTML = `<div class="notif-title">${title}</div><div class="notif-text">${text}</div>`;
+  container.appendChild(div);
+  setTimeout(() => { div.style.opacity = '0'; div.style.transform = 'translateX(100px)'; div.style.transition = 'all 0.5s'; setTimeout(() => div.remove(), 500); }, 5000);
+}
+
+// ============================
+// SAVE / LOAD
+// ============================
+function saveGame() {
+  try {
+    localStorage.setItem('empirePictures_save', JSON.stringify(G));
+    notify('Game Saved', 'Your progress has been saved.', 'success');
+  } catch(e) {
+    notify('Save Failed', 'Could not save game.', 'error');
+  }
+}
+
+function loadGame() {
+  try {
+    const data = localStorage.getItem('empirePictures_save');
+    if (data) {
+      G = JSON.parse(data);
+      updateAllUI();
+      populateTalentDropdowns();
+      renderTechTree();
+      renderSkillTree();
+      renderRivals();
+      renderFinance();
+      renderAwards();
+      renderFranchises();
+      if (G.streamingUnlocked) renderStreaming();
+      notify('Game Loaded', 'Your saved game has been restored.', 'success');
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ============================
+// TAB LAZY RENDERING
+// ============================
+const originalShowTab = showTab;
+showTab = function(tabId) {
+  originalShowTab(tabId);
+  if (tabId === 'actors') renderActors();
+  if (tabId === 'directors') renderDirectors();
+  if (tabId === 'composers') renderComposers();
+  if (tabId === 'finance') renderFinance();
+  if (tabId === 'rivals') renderRivals();
+  if (tabId === 'awards') renderAwards();
+  if (tabId === 'skills') renderSkillTree();
+  if (tabId === 'tech') renderTechTree();
+  if (tabId === 'streaming') renderStreaming();
+  if (tabId === 'franchise') renderFranchises();
+  if (tabId === 'new-movie') { updateBudgetEstimate(); populateTalentDropdowns(); }
+};
+
+// ============================
+// KEYBOARD SHORTCUTS
+// ============================
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    if (document.getElementById('game-screen').classList.contains('active')) {
+      advanceWeek();
+    }
+  }
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
+
+// Film grain animation
+setInterval(() => {
+  const grain = document.getElementById('film-grain');
+  grain.style.opacity = (0.02 + Math.random() * 0.03).toFixed(3);
+}, 100);
+
+// Check for saved game on load
+window.addEventListener('load', () => {
+  updateBudgetEstimate();
+});
+</script>
+</body>
 </html>
