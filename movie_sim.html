@@ -343,6 +343,72 @@ html, body {
 .skill-node.unlocked { border-color:#4ade80; background:rgba(74,222,128,.05); }
 .skill-node.locked { opacity:.5; }
 
+/* Calendar */
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-header { font-size:10px; color:var(--text-muted); text-align:center; padding:6px; font-weight:700; letter-spacing:1px; }
+.cal-day { background:var(--bg-card); border:1px solid var(--border); border-radius:4px; min-height:60px; padding:4px 6px; font-size:10px; cursor:pointer; transition:all .2s; }
+.cal-day:hover { border-color:var(--accent-blue); }
+.cal-day.today { border-color:var(--accent-gold); background:rgba(245,197,24,.08); }
+.cal-day-num { font-weight:700; margin-bottom:2px; }
+.cal-event { font-size:8px; padding:2px 4px; border-radius:3px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-event.release { background:rgba(215,38,56,.3); color:var(--accent-red); }
+.cal-event.interview { background:rgba(0,194,255,.2); color:var(--accent-blue); }
+.cal-event.ceremony { background:rgba(245,197,24,.2); color:var(--accent-gold); }
+.cal-event.trailer { background:rgba(139,92,246,.2); color:var(--accent-purple); }
+
+/* IMDB style */
+.imdb-movie-row { display:flex; gap:16px; padding:16px; border-bottom:1px solid var(--border); align-items:flex-start; transition:background .2s; }
+.imdb-movie-row:hover { background:var(--bg-hover); }
+.imdb-rank { font-size:20px; font-weight:700; color:var(--text-muted); min-width:40px; text-align:center; padding-top:4px; }
+.imdb-poster { width:60px; height:85px; border-radius:4px; background:var(--bg-card); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+.imdb-poster img { width:100%; height:100%; object-fit:cover; }
+.imdb-info { flex:1; }
+.imdb-title { font-weight:700; font-size:15px; margin-bottom:4px; }
+.imdb-meta { font-size:11px; color:var(--text-muted); margin-bottom:4px; }
+.imdb-rating { display:inline-flex; align-items:center; gap:4px; background:rgba(245,197,24,.15); padding:2px 8px; border-radius:4px; }
+.imdb-star { color:var(--accent-gold); }
+
+/* Poster upload */
+.poster-upload-zone { width:200px; height:300px; border:2px dashed var(--border); border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all .3s; background:var(--bg-card); }
+.poster-upload-zone:hover { border-color:var(--accent-blue); background:var(--bg-hover); }
+.poster-upload-zone.has-image { border-style:solid; border-color:var(--accent-gold); padding:0; overflow:hidden; }
+.poster-upload-zone img { width:100%; height:100%; object-fit:cover; }
+
+/* Save slots */
+.save-slot { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px; cursor:pointer; transition:all .3s; }
+.save-slot:hover { border-color:var(--accent-blue); }
+.save-slot.occupied { border-color:var(--accent-gold); }
+.save-slot-title { font-weight:700; font-size:14px; margin-bottom:4px; }
+.save-slot-meta { font-size:11px; color:var(--text-muted); }
+
+/* SVG icons inline */
+.icon { width:18px; height:18px; display:inline-block; vertical-align:middle; fill:currentColor; }
+.icon-lg { width:32px; height:32px; }
+.icon-xl { width:48px; height:48px; }
+
+/* Trailer editor */
+.trailer-timeline { display:flex; gap:2px; background:var(--secondary); border:1px solid var(--border); border-radius:8px; padding:12px; overflow-x:auto; align-items:end; min-height:80px; }
+.trailer-beat { width:30px; border-radius:3px 3px 0 0; cursor:pointer; transition:all .2s; min-height:20px; }
+.trailer-beat:hover { opacity:.8; }
+.trailer-beat.selected { box-shadow:0 0 8px rgba(245,197,24,.5); }
+
+/* Rhythm game */
+.rhythm-lane { position:relative; height:300px; width:60px; background:rgba(0,0,0,.3); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.rhythm-note { position:absolute; width:50px; height:20px; left:5px; border-radius:4px; transition:top 0.05s linear; }
+.rhythm-hit-zone { position:absolute; bottom:20px; left:0; width:100%; height:30px; border:2px solid var(--accent-gold); border-radius:4px; background:rgba(245,197,24,.1); }
+.rhythm-score-flash { position:absolute; font-size:16px; font-weight:700; animation:fadeIn .3s ease; pointer-events:none; }
+
+/* QTE */
+.qte-circle { width:120px; height:120px; border-radius:50%; border:4px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:900; transition:all .15s; cursor:pointer; }
+.qte-circle.active { border-color:var(--accent-red); animation:pulse .5s infinite; box-shadow:0 0 30px rgba(215,38,56,.4); }
+.qte-circle.success { border-color:#4ade80; background:rgba(74,222,128,.15); }
+.qte-circle.fail { border-color:var(--accent-red); background:rgba(215,38,56,.15); }
+
+/* TV Show */
+.episode-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:6px; }
+.episode-block { height:40px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; cursor:pointer; transition:all .2s; border:1px solid transparent; }
+.episode-block:hover { transform:scale(1.05); }
+
 @media(max-width:1200px) { .grid-4{grid-template-columns:repeat(3,1fr)} }
 @media(max-width:900px) { .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} .sidebar{width:200px;min-width:200px} .menu-logo{font-size:48px} }
 </style>
@@ -357,7 +423,7 @@ html, body {
     <div class="menu-logo">EMPIRE PICTURES</div>
     <div class="menu-subtitle">A Cinematic Empire Simulation</div>
     <div class="menu-buttons">
-      <button class="menu-btn primary-btn" onclick="startCareerMode()">Career Mode</button>
+      <button class="menu-btn primary-btn" onclick="showScreen('save-select')">Career Mode</button>
       <button class="menu-btn" onclick="startSandboxMode()">Sandbox Mode</button>
       <button class="menu-btn" onclick="showScreen('settings-screen')">Settings</button>
     </div>
@@ -388,6 +454,12 @@ html, body {
       <button class="nav-btn" onclick="showTab('awards')" data-tab="awards"><span class="nav-icon">&#127942;</span> Awards</button>
       <button class="nav-btn" onclick="showTab('skills')" data-tab="skills"><span class="nav-icon">&#9733;</span> Skill Tree</button>
       <button class="nav-btn" onclick="showTab('tech')" data-tab="tech"><span class="nav-icon">&#128300;</span> Tech Lab</button>
+      <div class="nav-section">Media</div>
+      <button class="nav-btn" onclick="showTab('imdb')" data-tab="imdb"><span class="nav-icon">&#9733;</span> IMDB</button>
+      <button class="nav-btn" onclick="showTab('calendar')" data-tab="calendar"><span class="nav-icon">&#9638;</span> Calendar</button>
+      <button class="nav-btn" onclick="showTab('tvshows')" data-tab="tvshows"><span class="nav-icon">&#9641;</span> TV Shows</button>
+      <button class="nav-btn" onclick="showTab('trailers')" data-tab="trailers"><span class="nav-icon">&#9654;</span> Trailers</button>
+      <button class="nav-btn" onclick="showTab('posters')" data-tab="posters"><span class="nav-icon">&#9635;</span> Posters</button>
     </div>
     <div class="sidebar-stats">
       <div class="stat-row"><span>Week</span><span id="week-display">1</span></div>
@@ -406,7 +478,7 @@ html, body {
         <div class="top-bar-stat">Rep: <span id="rep-display" style="color:var(--accent-blue)">0</span></div>
         <div class="top-bar-stat">Fans: <span id="fans-display" style="color:var(--accent-purple)">0</span></div>
         <button class="top-bar-btn" onclick="advanceWeek()">&#9654; NEXT WEEK</button>
-        <button class="top-bar-btn" style="background:var(--accent-purple)" onclick="saveGame()">SAVE</button>
+        <button class="top-bar-btn" style="background:var(--accent-purple)" onclick="saveToSlot(G.saveSlot||0)">SAVE</button>
         <button class="top-bar-btn" style="background:var(--border)" onclick="showScreen('main-menu')">MENU</button>
       </div>
     </div>
@@ -474,8 +546,57 @@ html, body {
       <div class="tab-content" id="tab-awards"><div class="card-header" style="margin-bottom:16px"><div class="card-title">Awards</div></div><div class="grid-3" id="awards-display"></div></div>
       <div class="tab-content" id="tab-skills"><div class="card-header" style="margin-bottom:16px"><div class="card-title">Skill Tree</div><span class="card-badge badge-purple">SP: <span id="skill-points">0</span></span></div><div id="skills-content"></div></div>
       <div class="tab-content" id="tab-tech"><div class="card-header" style="margin-bottom:16px"><div class="card-title">Tech Lab</div></div><div id="tech-content"></div></div>
+
+      <!-- IMDB -->
+      <div class="tab-content" id="tab-imdb">
+        <div class="card-header" style="margin-bottom:16px"><div class="card-title" style="color:var(--accent-gold);">IMDB — Internet Movie Database</div></div>
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+            <select class="form-select" id="imdb-sort" onchange="renderIMDB()" style="width:200px;"><option value="rating">Top Rated</option><option value="boxoffice">Highest Grossing</option><option value="recent">Most Recent</option></select>
+            <input type="text" class="form-input" id="imdb-search" placeholder="Search movies..." oninput="renderIMDB()" style="flex:1;">
+          </div>
+        </div>
+        <div id="imdb-list"></div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="tab-content" id="tab-calendar">
+        <div class="card-header" style="margin-bottom:16px"><div class="card-title">Studio Calendar</div></div>
+        <div id="calendar-content"></div>
+      </div>
+
+      <!-- TV Shows -->
+      <div class="tab-content" id="tab-tvshows">
+        <div class="card-header" style="margin-bottom:16px">
+          <div class="card-title">TV Show Productions</div>
+          <button class="btn btn-blue btn-sm" onclick="openNewTVShow()">+ NEW TV SHOW</button>
+        </div>
+        <div id="tvshows-content"><div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9641;</div><div class="empty-state-text">No TV shows in development</div></div></div>
+      </div>
+
+      <!-- Trailers -->
+      <div class="tab-content" id="tab-trailers">
+        <div class="card-header" style="margin-bottom:16px"><div class="card-title">Trailer Workshop</div></div>
+        <div id="trailers-content"><div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9654;</div><div class="empty-state-text">Complete a movie to create trailers</div></div></div>
+      </div>
+
+      <!-- Posters -->
+      <div class="tab-content" id="tab-posters">
+        <div class="card-header" style="margin-bottom:16px"><div class="card-title">Poster Studio</div></div>
+        <div id="posters-content"><div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9635;</div><div class="empty-state-text">Create posters for your movies</div></div></div>
+      </div>
     </div>
     <div class="news-ticker"><span class="ticker-label">BREAKING</span><span class="ticker-text" id="ticker-text">Welcome to Empire Pictures.</span></div>
+  </div>
+</div>
+
+<!-- SAVE SLOT SELECT -->
+<div id="save-select" class="screen" style="justify-content:center;align-items:center;">
+  <div style="max-width:700px;width:90%;">
+    <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:32px;margin-bottom:8px;text-align:center;">Select Save Slot</h2>
+    <p style="text-align:center;color:var(--text-muted);margin-bottom:24px;">Choose a slot to load or start a new career</p>
+    <div class="grid-3" id="save-slots-grid"></div>
+    <div style="text-align:center;margin-top:20px;"><button class="btn" onclick="showScreen('main-menu')">Back</button></div>
   </div>
 </div>
 
@@ -1739,7 +1860,916 @@ document.addEventListener('keydown',e=>{if(e.key===' '&&!['INPUT','TEXTAREA','SE
 // Film grain
 setInterval(()=>{document.getElementById('film-grain').style.opacity=(0.02+Math.random()*0.03).toFixed(3)},100);
 
-window.addEventListener('load',()=>updateBudgetEstimate());
+window.addEventListener('load',()=>{updateBudgetEstimate();renderSaveSlots();});
+
+// ============================
+// SAVE SLOT SYSTEM
+// ============================
+function renderSaveSlots(){
+  var grid=document.getElementById('save-slots-grid');
+  if(!grid)return;
+  var html='';
+  for(var i=0;i<3;i++){
+    var data=null;
+    try{var raw=localStorage.getItem('empire_slot_'+i);if(raw)data=JSON.parse(raw);}catch(e){}
+    if(data){
+      html+='<div class="save-slot occupied" onclick="loadSlot('+i+')">'
+        +'<div class="save-slot-title">'+data.studioName+'</div>'
+        +'<div class="save-slot-meta">Year '+data.year+' | Week '+data.week+'</div>'
+        +'<div class="save-slot-meta">$'+formatMoney(data.money)+' | Rep: '+data.reputation+'</div>'
+        +'<div class="save-slot-meta">'+data.completedMovies.length+' movies | '+(data.tvShows?data.tvShows.length:0)+' TV shows</div>'
+        +'<div style="margin-top:8px;display:flex;gap:6px;">'
+        +'<button class="btn btn-blue btn-sm" onclick="event.stopPropagation();loadSlot('+i+')">Load</button>'
+        +'<button class="btn btn-sm" style="border-color:var(--accent-red);color:var(--accent-red);" onclick="event.stopPropagation();deleteSlot('+i+')">Delete</button>'
+        +'</div></div>';
+    } else {
+      html+='<div class="save-slot" onclick="newGameInSlot('+i+')">'
+        +'<div class="save-slot-title" style="color:var(--text-muted);">Empty Slot '+(i+1)+'</div>'
+        +'<div class="save-slot-meta">Click to start new career</div></div>';
+    }
+  }
+  grid.innerHTML=html;
+}
+
+function newGameInSlot(slot){
+  G.saveSlot=slot;
+  startCareerMode();
+}
+
+function loadSlot(slot){
+  try{
+    var raw=localStorage.getItem('empire_slot_'+slot);
+    if(raw){
+      G=JSON.parse(raw);
+      G.saveSlot=slot;
+      if(!G.tvShows)G.tvShows=[];
+      if(!G.calendarEvents)G.calendarEvents=[];
+      if(!G.passiveIncome)G.passiveIncome=[];
+      if(!G.posters)G.posters={};
+      if(!G.trailers)G.trailers=[];
+      initGameFromLoad();
+      showScreen('game-screen');
+      notify('Loaded','Slot '+(slot+1)+' loaded.','success');
+    }
+  }catch(e){notify('Error','Load failed.','error');}
+}
+
+function deleteSlot(slot){
+  localStorage.removeItem('empire_slot_'+slot);
+  renderSaveSlots();
+  notify('Deleted','Slot '+(slot+1)+' cleared.','info');
+}
+
+function saveToSlot(slot){
+  try{
+    G.saveSlot=slot;
+    localStorage.setItem('empire_slot_'+slot,JSON.stringify(G));
+    notify('Saved','Slot '+(slot+1)+' saved.','success');
+  }catch(e){notify('Error','Save failed.','error');}
+}
+
+function saveGame(){saveToSlot(G.saveSlot||0);}
+
+function initGameFromLoad(){
+  updateAllUI();
+  populateTalentDropdowns();
+}
+
+// ============================
+// CHEAPER TALENT - add budget actors/directors/composers
+// ============================
+var BUDGET_ACTORS=['Dusty Miller','Rosa Chen','Jake Novak','Tina Voss','Eli Park','Mona Reyes','Cal Bishop','Yara Osman','Dex Flynn','Lila Hart'];
+var BUDGET_DIRECTORS=['Sam Russo','Nadia Obi','Pete Lark','Ana Cruz','Milo Sato'];
+var BUDGET_COMPOSERS=['Finn Gray','Ivy Cho','Bud Noel','Kay West','Luz Perez'];
+
+function addBudgetTalent(){
+  BUDGET_ACTORS.forEach(function(name,i){
+    if(!G.actors.find(function(a){return a.name===name;})){
+      G.actors.push({id:'ba_'+i,name:name,age:rnd(20,35),charisma:rnd(15,45),range:rnd(15,50),popularity:rnd(1,20),awardRep:rnd(0,10),boxOfficeDraw:rnd(5,25),workEthic:rnd(40,90),scandalChance:rnd(1,10),chemistry:rnd(30,70),moviesCount:rnd(0,3),relationship:50,available:true,salary:rnd(5000,50000)});
+    }
+  });
+  BUDGET_DIRECTORS.forEach(function(name,i){
+    if(!G.directors.find(function(d){return d.name===name;})){
+      G.directors.push({id:'bd_'+i,name:name,age:rnd(24,40),vision:rnd(20,50),speed:rnd(40,80),discipline:rnd(30,70),innovation:rnd(20,60),awardPrestige:rnd(0,15),budgetControl:rnd(50,90),style:'Indie',available:true,salary:rnd(10000,80000)});
+    }
+  });
+  BUDGET_COMPOSERS.forEach(function(name,i){
+    if(!G.composers.find(function(c){return c.name===name;})){
+      G.composers.push({id:'bc_'+i,name:name,talent:rnd(20,50),style:['Minimalist','Synthwave','Dark Ambient'][i%3],fame:rnd(1,15),available:true,salary:rnd(5000,30000)});
+    }
+  });
+}
+
+// ============================
+// PASSIVE INCOME / ONGOING REVENUE
+// ============================
+function processPassiveIncome(){
+  var totalPassive=0;
+  G.completedMovies.forEach(function(m){
+    if(!m.hypeRemaining&&m.hypeRemaining!==0) m.hypeRemaining=m.audienceScore;
+    if(m.hypeRemaining>0){
+      var weeklyRev=Math.round(m.hypeRemaining*m.boxOffice.worldwide*0.0002);
+      if(m.criticScore<40) m.hypeRemaining-=rnd(3,8);
+      else if(m.criticScore<60) m.hypeRemaining-=rnd(1,4);
+      else m.hypeRemaining-=rnd(0,2);
+      m.hypeRemaining=Math.max(0,m.hypeRemaining);
+      totalPassive+=weeklyRev;
+    }
+  });
+  // TV show passive
+  if(G.tvShows){
+    G.tvShows.forEach(function(tv){
+      if(tv.airing&&tv.viewership>0){
+        var rev=Math.round(tv.viewership*tv.quality*50);
+        totalPassive+=rev;
+        tv.viewership=Math.max(0,tv.viewership-rnd(0,tv.quality>60?500:2000));
+      }
+    });
+  }
+  G.money+=totalPassive;
+  G.weeklyPassiveIncome=totalPassive;
+}
+
+// ============================
+// IMDB TAB
+// ============================
+function renderIMDB(){
+  var container=document.getElementById('imdb-list');
+  if(!container)return;
+  var movies=G.completedMovies.slice();
+  var search=(document.getElementById('imdb-search')||{}).value||'';
+  var sort=(document.getElementById('imdb-sort')||{}).value||'rating';
+
+  if(search){
+    var s=search.toLowerCase();
+    movies=movies.filter(function(m){return m.title.toLowerCase().indexOf(s)>=0||m.genre.toLowerCase().indexOf(s)>=0;});
+  }
+
+  if(sort==='rating') movies.sort(function(a,b){return b.criticScore-a.criticScore;});
+  else if(sort==='boxoffice') movies.sort(function(a,b){return b.boxOffice.worldwide-a.boxOffice.worldwide;});
+  else movies.sort(function(a,b){return(b.yearStarted||0)-(a.yearStarted||0);});
+
+  // Add rival movies
+  var allMovies=movies.map(function(m){return{title:m.title,genre:m.genre,year:m.yearStarted||G.year,critic:m.criticScore,audience:m.audienceScore,box:m.boxOffice.worldwide,studio:G.studioName,yours:true,poster:G.posters?G.posters[m.id]:null,id:m.id};});
+  G.rivalStudios.forEach(function(r){
+    r.movies.forEach(function(rm){
+      allMovies.push({title:rm.title,genre:rm.genre,year:G.year,critic:rm.criticScore,audience:rm.audienceScore||rnd(30,80),box:rm.boxOffice||rm.criticScore*rnd(500000,2000000),studio:r.name,yours:false,poster:null});
+    });
+  });
+
+  if(sort==='rating') allMovies.sort(function(a,b){return b.critic-a.critic;});
+  else if(sort==='boxoffice') allMovies.sort(function(a,b){return b.box-a.box;});
+
+  if(allMovies.length===0){
+    container.innerHTML='<div class="empty-state"><div class="empty-state-text">No movies in the database yet</div></div>';
+    return;
+  }
+
+  container.innerHTML=allMovies.slice(0,50).map(function(m,i){
+    var rating=Math.round(m.critic/10*10)/10;
+    return '<div class="imdb-movie-row">'
+      +'<div class="imdb-rank">'+(i+1)+'</div>'
+      +'<div class="imdb-poster">'+(m.poster?'<img src="'+m.poster+'" alt="poster">':'<svg width="40" height="50" viewBox="0 0 40 50"><rect width="40" height="50" rx="3" fill="#2a3550"/><rect x="8" y="8" width="24" height="16" rx="2" fill="#3a4560"/><rect x="8" y="28" width="18" height="3" rx="1" fill="#3a4560"/><rect x="8" y="34" width="12" height="3" rx="1" fill="#3a4560"/></svg>')+'</div>'
+      +'<div class="imdb-info">'
+      +'<div class="imdb-title">'+(m.yours?'<span style="color:var(--accent-gold);">':'')+''+m.title+(m.yours?'</span>':'')+'</div>'
+      +'<div class="imdb-meta">'+m.year+' | '+m.genre+' | '+m.studio+'</div>'
+      +'<div style="display:flex;gap:12px;align-items:center;">'
+      +'<div class="imdb-rating"><span class="imdb-star">&#9733;</span> <strong>'+rating.toFixed(1)+'</strong>/10</div>'
+      +'<span style="font-size:11px;color:var(--text-muted);">Audience: '+m.audience+'%</span>'
+      +'<span style="font-size:11px;color:#4ade80;">$'+formatMoney(m.box)+'</span>'
+      +'</div></div></div>';
+  }).join('');
+}
+
+// ============================
+// CALENDAR
+// ============================
+function renderCalendar(){
+  var container=document.getElementById('calendar-content');
+  if(!container)return;
+  if(!G.calendarEvents)G.calendarEvents=[];
+
+  // Auto-generate events
+  var events=G.calendarEvents.slice();
+  G.completedMovies.forEach(function(m){
+    if(!m.released) events.push({week:G.week+rnd(1,4),type:'release',text:'"'+m.title+'" Release'});
+  });
+  // Awards ceremonies at week 8-12
+  if(G.week<12) events.push({week:10,type:'ceremony',text:'Awards Season'});
+  if(G.week<20) events.push({week:18,type:'ceremony',text:'Cannes Film Festival'});
+  if(G.week<35) events.push({week:30,type:'interview',text:'Press Junket Window'});
+  if(G.week<48) events.push({week:45,type:'ceremony',text:'Golden Globes Season'});
+
+  var html='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div style="font-weight:700;font-size:16px;">Year '+G.year+' — Week '+G.week+'/52</div></div>';
+  html+='<div class="calendar-grid">';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){html+='<div class="cal-header">'+d+'</div>';});
+
+  for(var w=Math.max(1,G.week-3);w<=Math.min(52,G.week+24);w++){
+    var isToday=w===G.week;
+    var dayEvents=events.filter(function(e){return e.week===w;});
+    html+='<div class="cal-day'+(isToday?' today':'')+'">';
+    html+='<div class="cal-day-num" style="'+(isToday?'color:var(--accent-gold);':'')+'">W'+w+'</div>';
+    dayEvents.forEach(function(ev){
+      html+='<div class="cal-event '+ev.type+'">'+ev.text+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // Upcoming events list
+  html+='<div class="card" style="margin-top:16px;"><div class="card-header"><div class="card-title">Upcoming Events</div></div>';
+  var upcoming=events.filter(function(e){return e.week>=G.week;}).sort(function(a,b){return a.week-b.week;}).slice(0,8);
+  if(upcoming.length===0) html+='<div style="color:var(--text-muted);font-size:13px;">No upcoming events</div>';
+  else upcoming.forEach(function(ev){
+    html+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">'
+      +'<span><span class="cal-event '+ev.type+'" style="display:inline-block;">'+ev.type.toUpperCase()+'</span> '+ev.text+'</span>'
+      +'<span style="color:var(--text-muted);font-size:12px;">Week '+ev.week+'</span></div>';
+  });
+  html+='</div>';
+
+  // Schedule interview button
+  html+='<div style="margin-top:16px;display:flex;gap:8px;">';
+  html+='<button class="btn btn-blue btn-sm" onclick="scheduleInterview()">Schedule Interview</button>';
+  html+='<button class="btn btn-purple btn-sm" onclick="scheduleTrailerDrop()">Schedule Trailer Drop</button>';
+  html+='</div>';
+
+  container.innerHTML=html;
+}
+
+function scheduleInterview(){
+  if(!G.calendarEvents)G.calendarEvents=[];
+  var w=G.week+rnd(1,6);
+  G.calendarEvents.push({week:w,type:'interview',text:'Press Interview'});
+  G.reputation=clamp(G.reputation+rnd(1,3),0,100);
+  G.money-=50000;
+  notify('Scheduled','Interview set for week '+w+'. +Rep!','success');
+  renderCalendar();
+}
+
+function scheduleTrailerDrop(){
+  if(!G.calendarEvents)G.calendarEvents=[];
+  if(G.completedMovies.length===0){notify('Error','No movies to promote.','error');return;}
+  var w=G.week+rnd(1,4);
+  G.calendarEvents.push({week:w,type:'trailer',text:'Trailer Drop'});
+  G.completedMovies.forEach(function(m){if(m.hypeRemaining>0)m.hypeRemaining+=10;});
+  G.money-=100000;
+  notify('Scheduled','Trailer drop week '+w+'. Hype boosted!','success');
+  renderCalendar();
+}
+
+// ============================
+// TV SHOWS
+// ============================
+function openNewTVShow(){
+  var modal=document.getElementById('modal-body');
+  modal.innerHTML='<button class="modal-close" onclick="closeModal()">&times;</button>'
+    +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:700;margin-bottom:20px;">Create TV Show</div>'
+    +'<div class="form-group"><label class="form-label" for="tv-title">Show Title</label><input type="text" class="form-input" id="tv-title" placeholder="Enter show title..."></div>'
+    +'<div class="grid-2">'
+    +'<div class="form-group"><label class="form-label" for="tv-genre">Genre</label><select class="form-select" id="tv-genre"><option>Drama</option><option>Comedy</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Crime</option><option>Fantasy</option><option>Documentary</option></select></div>'
+    +'<div class="form-group"><label class="form-label" for="tv-episodes">Episodes per Season</label><select class="form-select" id="tv-episodes"><option value="6">6 (Limited)</option><option value="8" selected>8 (Standard)</option><option value="10">10 (Full)</option><option value="13">13 (Network)</option><option value="22">22 (Broadcast)</option></select></div>'
+    +'</div>'
+    +'<div class="grid-2">'
+    +'<div class="form-group"><label class="form-label" for="tv-budget">Budget Per Episode</label><select class="form-select" id="tv-budget"><option value="500000">$500K (Basic Cable)</option><option value="2000000" selected>$2M (Premium)</option><option value="5000000">$5M (Prestige)</option><option value="15000000">$15M (Blockbuster)</option></select></div>'
+    +'<div class="form-group"><label class="form-label" for="tv-platform">Platform</label><select class="form-select" id="tv-platform"><option>Network TV</option><option>Cable</option><option>Streaming</option><option>Premium Cable</option></select></div>'
+    +'</div>'
+    +'<div class="form-group"><label class="form-label" for="tv-lead-select">Showrunner (Director)</label><select class="form-select" id="tv-lead-select"></select></div>'
+    +'<div style="text-align:center;margin-top:20px;"><button class="btn btn-red btn-lg" onclick="createTVShow()">GREENLIGHT SHOW</button></div>';
+
+  var dirSel=document.getElementById('tv-lead-select');
+  dirSel.innerHTML='<option value="">Select showrunner...</option>';
+  G.directors.filter(function(d){return d.available;}).forEach(function(d){
+    dirSel.innerHTML+='<option value="'+d.id+'">'+d.name+' (Vision:'+d.vision+' | $'+formatMoney(d.salary)+')</option>';
+  });
+
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function createTVShow(){
+  var title=document.getElementById('tv-title').value.trim();
+  var genre=document.getElementById('tv-genre').value;
+  var episodes=parseInt(document.getElementById('tv-episodes').value);
+  var budgetPerEp=parseInt(document.getElementById('tv-budget').value);
+  var platform=document.getElementById('tv-platform').value;
+  var dirId=document.getElementById('tv-lead-select').value;
+
+  if(!title){notify('Error','Enter a show title.','error');return;}
+  if(!dirId){notify('Error','Select a showrunner.','error');return;}
+
+  var totalBudget=budgetPerEp*episodes;
+  var director=G.directors.find(function(d){return d.id===dirId;});
+  var totalCost=totalBudget+(director?director.salary*2:0);
+
+  if(totalCost>G.money){notify('Error','Not enough money! Need $'+formatMoney(totalCost)+'.','error');return;}
+
+  if(!G.tvShows)G.tvShows=[];
+
+  var show={
+    id:'tv_'+Date.now(),
+    title:title,
+    genre:genre,
+    episodes:episodes,
+    budgetPerEp:budgetPerEp,
+    totalBudget:totalBudget,
+    platform:platform,
+    showrunner:director?{name:director.name,vision:director.vision}:null,
+    seasons:[],
+    currentSeason:1,
+    quality:0,
+    viewership:0,
+    criticScore:0,
+    audienceScore:0,
+    airing:false,
+    cancelled:false,
+    weeksInProd:0,
+    totalWeeks:episodes*2,
+    phase:'Writing',
+    episodesCompleted:0
+  };
+
+  G.money-=totalCost;
+  if(director)director.available=false;
+  G.tvShows.push(show);
+
+  closeModal();
+  notify('Greenlit!','"'+title+'" is now in development! '+episodes+' episodes, $'+formatMoney(totalCost)+' total.','success');
+  addNews(G.studioName+' greenlights TV series "'+title+'" for '+platform+'.');
+  renderTVShows();
+}
+
+function renderTVShows(){
+  var container=document.getElementById('tvshows-content');
+  if(!container)return;
+  if(!G.tvShows||G.tvShows.length===0){
+    container.innerHTML='<div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9641;</div><div class="empty-state-text">No TV shows in development</div></div>';
+    return;
+  }
+
+  container.innerHTML=G.tvShows.map(function(tv){
+    var pct=tv.totalWeeks>0?Math.round(tv.weeksInProd/tv.totalWeeks*100):0;
+    var statusColor=tv.cancelled?'var(--accent-red)':tv.airing?'#4ade80':tv.phase==='Complete'?'var(--accent-gold)':'var(--accent-blue)';
+    var status=tv.cancelled?'CANCELLED':tv.airing?'AIRING':tv.phase;
+
+    var html='<div class="card" style="margin-bottom:16px;">'
+      +'<div class="card-header"><div class="card-title">'+tv.title+'</div><span class="card-badge" style="background:'+statusColor+'22;color:'+statusColor+';">'+status+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">'+tv.genre+' | '+tv.platform+' | S'+tv.currentSeason+' | '+tv.episodes+' episodes | $'+formatMoney(tv.budgetPerEp)+'/ep</div>';
+
+    if(!tv.airing&&!tv.cancelled&&tv.phase!=='Complete'){
+      html+='<div class="progress-bar" style="height:8px;margin-bottom:8px;"><div class="progress-fill progress-blue" style="width:'+pct+'%;"></div></div>'
+        +'<div style="font-size:11px;color:var(--text-muted);">Episode '+tv.episodesCompleted+'/'+tv.episodes+' — '+tv.phase+'</div>';
+    }
+
+    if(tv.airing){
+      html+='<div class="grid-3" style="margin-top:12px;">'
+        +'<div style="text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--accent-gold);">'+tv.criticScore+'</div><div style="font-size:10px;color:var(--text-muted);">Critic Score</div></div>'
+        +'<div style="text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--accent-blue);">'+tv.audienceScore+'</div><div style="font-size:10px;color:var(--text-muted);">Audience</div></div>'
+        +'<div style="text-align:center;"><div style="font-size:18px;font-weight:700;color:#4ade80;">'+formatMoney(tv.viewership)+'</div><div style="font-size:10px;color:var(--text-muted);">Viewers</div></div>'
+        +'</div>';
+    }
+
+    if(tv.airing&&!tv.cancelled){
+      html+='<div style="margin-top:12px;display:flex;gap:8px;">'
+        +'<button class="btn btn-blue btn-sm" onclick="renewShow(\''+tv.id+'\')">Renew Season '+(tv.currentSeason+1)+'</button>'
+        +'<button class="btn btn-sm" style="border-color:var(--accent-red);color:var(--accent-red);" onclick="cancelShow(\''+tv.id+'\')">Cancel</button>'
+        +'</div>';
+    }
+
+    // Episode grid
+    if(tv.episodesCompleted>0||tv.airing){
+      html+='<div style="margin-top:12px;"><div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;letter-spacing:1px;">EPISODES</div><div class="episode-grid">';
+      for(var e=0;e<tv.episodes;e++){
+        var done=e<tv.episodesCompleted;
+        var colors=['#e63946','#457b9d','#2a9d8f','#e76f51','#6d6875','#264653'];
+        html+='<div class="episode-block" style="background:'+(done?colors[e%colors.length]+'40':'var(--bg-card)')+';border-color:'+(done?colors[e%colors.length]:'var(--border)')+';">E'+(e+1)+'</div>';
+      }
+      html+='</div></div>';
+    }
+
+    html+='</div>';
+    return html;
+  }).join('');
+}
+
+function processTVShows(){
+  if(!G.tvShows)return;
+  G.tvShows.forEach(function(tv){
+    if(tv.cancelled||tv.airing)return;
+    tv.weeksInProd++;
+
+    var epInterval=Math.max(2,Math.floor(tv.totalWeeks/tv.episodes));
+    if(tv.weeksInProd%epInterval===0&&tv.episodesCompleted<tv.episodes){
+      tv.episodesCompleted++;
+      if(tv.weeksInProd<tv.totalWeeks*0.3) tv.phase='Writing';
+      else if(tv.weeksInProd<tv.totalWeeks*0.7) tv.phase='Filming';
+      else tv.phase='Post-Production';
+
+      // Random event
+      if(Math.random()<0.15){
+        var evts=['Actor drama delays episode!','Script rewrite needed.','Brilliant guest star appearance!','Set piece goes viral online.','Showrunner creative dispute.'];
+        var evt=evts[rnd(0,evts.length-1)];
+        tv.quality+=evt.indexOf('Brilliant')>=0||evt.indexOf('viral')>=0?rnd(3,8):-rnd(1,5);
+        notify('TV Production','"'+tv.title+'": '+evt,evt.indexOf('Brilliant')>=0?'success':'info');
+      }
+    }
+
+    if(tv.episodesCompleted>=tv.episodes){
+      // Show complete — air it
+      tv.airing=true;
+      tv.phase='Complete';
+      var showrunnerBonus=tv.showrunner?tv.showrunner.vision/5:0;
+      tv.quality=clamp(Math.round(50+tv.budgetPerEp/500000+showrunnerBonus+rnd(-10,15)),10,100);
+      tv.criticScore=clamp(tv.quality+rnd(-10,10),5,100);
+      tv.audienceScore=clamp(tv.quality+rnd(-5,15),5,100);
+      tv.viewership=Math.round(tv.audienceScore*10000+tv.budgetPerEp/10);
+      tv.seasons.push({season:tv.currentSeason,quality:tv.quality,criticScore:tv.criticScore});
+
+      G.reputation=clamp(G.reputation+Math.round(tv.criticScore/20),0,100);
+      G.fans+=tv.viewership;
+
+      notify('TV Show Premiere!','"'+tv.title+'" Season '+tv.currentSeason+' is now airing! Critics: '+tv.criticScore+'/100','success');
+      addNews('"'+tv.title+'" premieres on '+tv.platform+' to '+formatMoney(tv.viewership)+' viewers.');
+    }
+  });
+}
+
+function renewShow(tvId){
+  var tv=G.tvShows.find(function(t){return t.id===tvId;});
+  if(!tv)return;
+  var cost=tv.totalBudget;
+  if(G.money<cost){notify('Error','Need $'+formatMoney(cost)+' to renew.','error');return;}
+  G.money-=cost;
+  tv.currentSeason++;
+  tv.airing=false;
+  tv.phase='Writing';
+  tv.weeksInProd=0;
+  tv.episodesCompleted=0;
+  tv.quality=0;
+  notify('Renewed!','"'+tv.title+'" Season '+tv.currentSeason+' greenlit!','success');
+  addNews(G.studioName+' renews "'+tv.title+'" for Season '+tv.currentSeason+'.');
+  renderTVShows();
+}
+
+function cancelShow(tvId){
+  var tv=G.tvShows.find(function(t){return t.id===tvId;});
+  if(!tv)return;
+  tv.cancelled=true;
+  tv.airing=false;
+  if(tv.showrunner){
+    var d=G.directors.find(function(x){return x.name===tv.showrunner.name;});
+    if(d)d.available=true;
+  }
+  notify('Cancelled','"'+tv.title+'" has been cancelled.','error');
+  addNews(G.studioName+' cancels "'+tv.title+'" after '+tv.seasons.length+' season(s).');
+  renderTVShows();
+}
+
+// ============================
+// TRAILER WORKSHOP
+// ============================
+function renderTrailers(){
+  var container=document.getElementById('trailers-content');
+  if(!container)return;
+  var moviesForTrailer=G.completedMovies.filter(function(m){return!m.released||m.hypeRemaining>0;});
+
+  if(moviesForTrailer.length===0){
+    container.innerHTML='<div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9654;</div><div class="empty-state-text">Complete a movie to create trailers & teasers</div></div>';
+    return;
+  }
+
+  var html='';
+  moviesForTrailer.forEach(function(m){
+    var hasTrailer=G.trailers&&G.trailers.find(function(t){return t.movieId===m.id&&t.type==='trailer';});
+    var hasTeaser=G.trailers&&G.trailers.find(function(t){return t.movieId===m.id&&t.type==='teaser';});
+
+    html+='<div class="card" style="margin-bottom:16px;">'
+      +'<div class="card-header"><div class="card-title">'+m.title+'</div><span class="card-badge badge-gold">HYPE: '+(m.hypeRemaining||0)+'</span></div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">'+m.genre+' | Critic: '+m.criticScore+' | Audience: '+m.audienceScore+'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+
+    if(!hasTeaser){
+      html+='<button class="btn btn-purple btn-sm" onclick="createTrailer(\''+m.id+'\',\'teaser\')">Create Teaser ($75K)</button>';
+    } else {
+      html+='<span class="card-badge badge-purple" style="padding:6px 12px;">Teaser: '+hasTeaser.quality+'/100</span>';
+    }
+
+    if(!hasTrailer){
+      html+='<button class="btn btn-red btn-sm" onclick="createTrailer(\''+m.id+'\',\'trailer\')">Create Full Trailer ($200K)</button>';
+    } else {
+      html+='<span class="card-badge badge-red" style="padding:6px 12px;">Trailer: '+hasTrailer.quality+'/100</span>';
+    }
+
+    html+='<button class="btn btn-blue btn-sm" onclick="createTrailer(\''+m.id+'\',\'bts\')">Behind The Scenes ($50K)</button>';
+    html+='</div></div>';
+  });
+
+  container.innerHTML=html;
+}
+
+function createTrailer(movieId, type){
+  var costs={teaser:75000,trailer:200000,bts:50000};
+  var cost=costs[type]||100000;
+  if(G.money<cost){notify('Error','Need $'+formatMoney(cost)+'.','error');return;}
+
+  var m=G.completedMovies.find(function(x){return x.id===movieId;});
+  if(!m)return;
+
+  // Launch trailer editing minigame
+  G.money-=cost;
+  if(!G.trailers)G.trailers=[];
+
+  var quality=0;
+  var label=type==='teaser'?'Teaser':type==='trailer'?'Full Trailer':'Behind The Scenes';
+
+  // Trailer beat selection minigame
+  launchTrailerMinigame(m,type,label);
+}
+
+function launchTrailerMinigame(movie,type,label){
+  var beats=[];
+  var beatNames=type==='teaser'?
+    ['Mystery Shot','Character Glimpse','Title Flash','Stinger']:
+    type==='trailer'?
+    ['Opening Hook','World Building','Character Intro','Rising Tension','Plot Tease','Action Peak','Emotional Beat','Title Card','Release Date']:
+    ['Director Interview','On-Set Footage','Actor Prep','Stunt Work','VFX Breakdown'];
+
+  beatNames.forEach(function(name,i){
+    beats.push({name:name,intensity:rnd(2,8),selected:false,color:['#e63946','#457b9d','#2a9d8f','#e76f51','#6d6875','#264653','#f4a261','#8B5CF6','#00C2FF'][i%9]});
+  });
+
+  var container=document.getElementById('minigame-container');
+  container.innerHTML='<div class="minigame-fullscreen">'
+    +'<div class="minigame-header"><div><div class="minigame-title">'+label+': "'+movie.title+'"</div>'
+    +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Set intensity for each beat to craft the perfect '+type+'</div></div>'
+    +'<div class="minigame-phase badge-red card-badge">EDITING</div></div>'
+    +'<div class="minigame-body" style="display:flex;flex-direction:column;align-items:center;">'
+    +'<div style="font-size:13px;color:var(--text-light);margin-bottom:16px;">Adjust each beat\'s intensity. Balance suspense and reveals!</div>'
+    +'<div class="trailer-timeline" style="align-items:end;height:200px;justify-content:center;" id="trailer-beats">'
+    +beats.map(function(b,i){
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">'
+        +'<div style="font-size:9px;color:var(--text-muted);">'+b.intensity+'</div>'
+        +'<div class="trailer-beat" style="background:'+b.color+';height:'+(b.intensity*20)+'px;width:40px;" id="tbeat-'+i+'" onclick="cycleTrailerBeat('+i+')"></div>'
+        +'<div style="font-size:8px;color:var(--text-muted);max-width:50px;text-align:center;">'+b.name+'</div></div>';
+    }).join('')
+    +'</div>'
+    +'<div class="card" style="margin-top:20px;max-width:400px;width:100%;text-align:center;">'
+    +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">TRAILER QUALITY</div>'
+    +'<div style="font-size:28px;font-weight:700;color:var(--accent-gold);" id="trailer-score">'+calcTrailerScore(beats)+'</div>'
+    +'</div>'
+    +'<button class="btn btn-red btn-lg" style="margin-top:20px;" onclick="finishTrailer()">FINALIZE '+label.toUpperCase()+'</button>'
+    +'</div></div>';
+
+  window._trailerBeats=beats;
+  window._trailerMovie=movie;
+  window._trailerType=type;
+}
+
+function cycleTrailerBeat(idx){
+  var beats=window._trailerBeats;
+  beats[idx].intensity=(beats[idx].intensity%10)+1;
+  var el=document.getElementById('tbeat-'+idx);
+  if(el){
+    el.style.height=(beats[idx].intensity*20)+'px';
+    el.previousElementSibling.textContent=beats[idx].intensity;
+  }
+  var scoreEl=document.getElementById('trailer-score');
+  if(scoreEl)scoreEl.textContent=calcTrailerScore(beats);
+}
+
+function calcTrailerScore(beats){
+  // Good trailers build up then peak then resolve
+  var total=0;
+  var hasRise=false,hasPeak=false;
+  for(var i=1;i<beats.length;i++){
+    if(beats[i].intensity>beats[i-1].intensity)hasRise=true;
+    if(beats[i].intensity>=8)hasPeak=true;
+    total+=beats[i].intensity;
+  }
+  var avg=total/beats.length;
+  var score=Math.round(avg*8+(hasRise?15:0)+(hasPeak?10:0));
+  return clamp(score,10,100);
+}
+
+function finishTrailer(){
+  var quality=calcTrailerScore(window._trailerBeats);
+  var movie=window._trailerMovie;
+  var type=window._trailerType;
+
+  G.trailers.push({movieId:movie.id,type:type,quality:quality});
+
+  // Boost hype
+  var hypeBoost=Math.round(quality/5);
+  if(movie.hypeRemaining!==undefined) movie.hypeRemaining+=hypeBoost;
+  movie.hype=(movie.hype||0)+hypeBoost;
+
+  document.getElementById('minigame-container').innerHTML='';
+  notify(type==='teaser'?'Teaser Released!':'Trailer Released!','Quality: '+quality+'/100. Hype +'+hypeBoost+'!','success');
+  addNews(G.studioName+' drops '+(type==='teaser'?'teaser':'trailer')+' for "'+movie.title+'".');
+  updateAllUI();
+}
+
+// ============================
+// POSTER STUDIO
+// ============================
+function renderPosters(){
+  var container=document.getElementById('posters-content');
+  if(!container)return;
+  if(!G.posters)G.posters={};
+
+  if(G.completedMovies.length===0){
+    container.innerHTML='<div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9635;</div><div class="empty-state-text">Complete movies to create posters</div></div>';
+    return;
+  }
+
+  var html='<div class="grid-3">';
+  G.completedMovies.forEach(function(m){
+    var poster=G.posters[m.id];
+    html+='<div class="card" style="text-align:center;">'
+      +'<div class="poster-upload-zone'+(poster?' has-image':'')+'" onclick="uploadPoster(\''+m.id+'\')" id="poster-zone-'+m.id+'">'
+      +(poster?'<img src="'+poster+'" alt="Poster for '+m.title+'">'
+        :'<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'
+        +'<div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Click to upload poster</div>')
+      +'</div>'
+      +'<div style="margin-top:8px;font-weight:700;font-size:13px;">'+m.title+'</div>'
+      +'<div style="font-size:11px;color:var(--text-muted);">'+m.genre+' | '+m.yearStarted+'</div>'
+      +(poster?'<button class="btn btn-sm" style="margin-top:8px;" onclick="event.stopPropagation();removePoster(\''+m.id+'\')">Remove</button>':'')
+      +'</div>';
+  });
+  html+='</div>';
+
+  container.innerHTML=html;
+}
+
+function uploadPoster(movieId){
+  var input=document.createElement('input');
+  input.type='file';
+  input.accept='image/*';
+  input.onchange=function(e){
+    var file=e.target.files[0];
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      if(!G.posters)G.posters={};
+      G.posters[movieId]=ev.target.result;
+      renderPosters();
+      notify('Poster Set!','Custom poster uploaded.','success');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+function removePoster(movieId){
+  if(G.posters)delete G.posters[movieId];
+  renderPosters();
+}
+
+// ============================
+// ENHANCED MINIGAMES
+// ============================
+
+// QTE (Quick Time Event) for action shooting scenes
+function launchQTEMinigame(callback){
+  var keys=['A','S','D','F','J','K','L'];
+  var sequence=[];
+  for(var i=0;i<8;i++) sequence.push(keys[rnd(0,keys.length-1)]);
+
+  var current=0;
+  var score=0;
+  var startTime=Date.now();
+
+  function renderQTE(){
+    var container=document.getElementById('minigame-container');
+    var elapsed=Date.now()-startTime;
+    var timeLeft=Math.max(0,15000-elapsed);
+
+    container.innerHTML='<div class="minigame-fullscreen" style="justify-content:center;align-items:center;">'
+      +'<div style="text-align:center;">'
+      +'<div style="font-size:14px;color:var(--text-muted);letter-spacing:2px;margin-bottom:8px;">QUICK TIME EVENT</div>'
+      +'<div style="font-size:12px;color:var(--accent-red);margin-bottom:24px;">Time: '+(timeLeft/1000).toFixed(1)+'s</div>'
+      +'<div style="display:flex;gap:12px;justify-content:center;margin-bottom:32px;">'
+      +sequence.map(function(k,i){
+        var state=i<current?'success':i===current?'active':'';
+        return '<div class="qte-circle '+state+'">'+k+'</div>';
+      }).join('')
+      +'</div>'
+      +'<div style="font-size:24px;font-weight:700;">Score: '+score+'/'+sequence.length+'</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:8px;">Press the keys shown above!</div>'
+      +'</div></div>';
+  }
+
+  function handleKey(e){
+    var key=e.key.toUpperCase();
+    if(current>=sequence.length)return;
+    if(key===sequence[current]){
+      score++;
+      current++;
+    } else {
+      current++;
+    }
+    if(current>=sequence.length||Date.now()-startTime>15000){
+      document.removeEventListener('keydown',handleKey);
+      clearInterval(timer);
+      document.getElementById('minigame-container').innerHTML='';
+      callback(Math.round(score/sequence.length*100));
+    } else {
+      renderQTE();
+    }
+  }
+
+  document.addEventListener('keydown',handleKey);
+  var timer=setInterval(function(){
+    if(Date.now()-startTime>15000){
+      document.removeEventListener('keydown',handleKey);
+      clearInterval(timer);
+      document.getElementById('minigame-container').innerHTML='';
+      callback(Math.round(score/sequence.length*100));
+    }
+    renderQTE();
+  },100);
+  renderQTE();
+}
+
+// Memory Match minigame for continuity checking in editing
+function launchMemoryMinigame(callback){
+  var symbols=['ACT1','ACT2','ACT3','SHOT','WIDE','CU','PAN','TILT'];
+  var cards=[];
+  symbols.forEach(function(s){cards.push({sym:s,flipped:false,matched:false});cards.push({sym:s,flipped:false,matched:false});});
+  // Shuffle
+  for(var i=cards.length-1;i>0;i--){var j=rnd(0,i);var t=cards[i];cards[i]=cards[j];cards[j]=t;}
+
+  var flippedIndices=[];
+  var matches=0;
+  var attempts=0;
+  var maxAttempts=20;
+
+  function renderMemory(){
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen" style="justify-content:center;align-items:center;">'
+      +'<div style="text-align:center;">'
+      +'<div style="font-size:14px;color:var(--text-muted);letter-spacing:2px;margin-bottom:8px;">CONTINUITY CHECK</div>'
+      +'<div style="font-size:12px;margin-bottom:16px;">Match shot types to check continuity. '+attempts+'/'+maxAttempts+' attempts</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,70px);gap:8px;justify-content:center;">'
+      +cards.map(function(c,i){
+        var show=c.flipped||c.matched;
+        return '<div style="width:70px;height:50px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;transition:all .3s;'
+          +(c.matched?'background:rgba(74,222,128,.2);border:1px solid #4ade80;color:#4ade80;'
+            :show?'background:var(--accent-blue);color:white;border:1px solid var(--accent-blue);'
+            :'background:var(--bg-card);border:1px solid var(--border);color:var(--text-muted);')
+          +'" onclick="memoryFlip('+i+')">'+(show?c.sym:'?')+'</div>';
+      }).join('')
+      +'</div>'
+      +'<div style="margin-top:16px;font-size:16px;font-weight:700;">Matches: '+matches+'/'+symbols.length+'</div>'
+      +'</div></div>';
+  }
+
+  window.memoryFlip=function(idx){
+    var c=cards[idx];
+    if(c.flipped||c.matched||flippedIndices.length>=2)return;
+    c.flipped=true;
+    flippedIndices.push(idx);
+
+    if(flippedIndices.length===2){
+      attempts++;
+      var a=cards[flippedIndices[0]],b=cards[flippedIndices[1]];
+      if(a.sym===b.sym){
+        a.matched=true;b.matched=true;
+        matches++;
+        flippedIndices=[];
+        renderMemory();
+        if(matches>=symbols.length){
+          setTimeout(function(){
+            document.getElementById('minigame-container').innerHTML='';
+            callback(clamp(Math.round(100-attempts*3),20,100));
+          },500);
+        }
+      } else {
+        renderMemory();
+        setTimeout(function(){
+          cards[flippedIndices[0]].flipped=false;
+          cards[flippedIndices[1]].flipped=false;
+          flippedIndices=[];
+          if(attempts>=maxAttempts){
+            document.getElementById('minigame-container').innerHTML='';
+            callback(clamp(Math.round(matches/symbols.length*60),10,60));
+          } else {
+            renderMemory();
+          }
+        },800);
+      }
+    } else {
+      renderMemory();
+    }
+  };
+  renderMemory();
+}
+
+// ============================
+// PATCH: advanceWeek to include new systems
+// ============================
+var _origAdvanceWeek=advanceWeek;
+advanceWeek=function(){
+  G.week++;
+  if(G.week>52){G.week=1;G.year++;yearEnd();}
+  updateEra();
+  processPassiveIncome();
+  processTVShows();
+  // Process calendar events
+  if(G.calendarEvents){
+    G.calendarEvents=G.calendarEvents.filter(function(e){
+      if(e.week===G.week){
+        if(e.type==='interview'){G.reputation=clamp(G.reputation+rnd(1,3),0,100);notify('Interview','Press interview conducted. +Rep!','info');}
+        if(e.type==='ceremony'){notify('Ceremony','Awards ceremony this week!','info');}
+        if(e.type==='trailer'){notify('Trailer','Trailer dropped! Hype boosted.','success');}
+        return false;
+      }
+      return e.week>G.week||(e.week<G.week&&G.week-e.week<10);
+    });
+  }
+  if(Math.random()<.08)rivalAction();
+  if(Math.random()<.1)generateNews();
+  if(Math.random()<.02)triggerScandal();
+  updateAllUI();
+};
+
+// Patch onTabShow for new tabs
+var _origOnTabShow=onTabShow;
+onTabShow=function(t){
+  try{
+    if(t==='actors')renderActors();
+    if(t==='directors')renderDirectors();
+    if(t==='composers')renderComposers();
+    if(t==='finance')renderFinance();
+    if(t==='rivals')renderRivals();
+    if(t==='awards')renderAwards();
+    if(t==='skills')renderSkillTree();
+    if(t==='tech')renderTechTree();
+    if(t==='franchise')renderFranchises();
+    if(t==='marketing')renderMarketingTab();
+    if(t==='new-movie'){updateBudgetEstimate();populateTalentDropdowns();}
+    if(t==='production')renderProductionTab();
+    if(t==='imdb')renderIMDB();
+    if(t==='calendar')renderCalendar();
+    if(t==='tvshows')renderTVShows();
+    if(t==='trailers')renderTrailers();
+    if(t==='posters')renderPosters();
+  }catch(e){console.error('Tab render error:',t,e);}
+};
+
+// Patch initGame to add budget talent and new state
+var _origInitGame=initGame;
+initGame=function(){
+  G.actors=generateActors(40);
+  G.directors=generateDirectors(15);
+  G.composers=generateComposers(10);
+  if(!G.tvShows)G.tvShows=[];
+  if(!G.calendarEvents)G.calendarEvents=[];
+  if(!G.passiveIncome)G.passiveIncome=[];
+  if(!G.posters)G.posters={};
+  if(!G.trailers)G.trailers=[];
+  if(!G.saveSlot&&G.saveSlot!==0)G.saveSlot=0;
+  addBudgetTalent();
+  updateAllUI();
+  generateNews();
+  populateTalentDropdowns();
+  renderTechTree();
+  renderSkillTree();
+  renderRivals();
+  renderFinance();
+  renderAwards();
+};
+
+// Patch updateAllUI to show passive income
+var _origUpdateAllUI=updateAllUI;
+updateAllUI=function(){
+  document.getElementById('money-display').textContent='$'+formatMoney(G.money);
+  document.getElementById('rep-display').textContent=G.reputation;
+  document.getElementById('fans-display').textContent=formatMoney(G.fans);
+  document.getElementById('week-display').textContent=G.week;
+  document.getElementById('year-display').textContent=G.year;
+  document.getElementById('movies-count').textContent=G.completedMovies.length+(G.tvShows?'+'+G.tvShows.length+'tv':'');
+  document.getElementById('studio-name-display').textContent=G.studioName;
+  document.getElementById('era-display').textContent=G.era+' ERA';
+
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-card"><div class="stat-card-value" style="color:#4ade80">$'+formatMoney(G.money)+'</div><div class="stat-card-label">Treasury</div></div>'
+    +'<div class="stat-card"><div class="stat-card-value" style="color:var(--accent-blue)">'+G.reputation+'</div><div class="stat-card-label">Reputation</div></div>'
+    +'<div class="stat-card"><div class="stat-card-value" style="color:var(--accent-gold)">'+G.awards.length+'</div><div class="stat-card-label">Awards</div></div>'
+    +'<div class="stat-card"><div class="stat-card-value" style="color:var(--accent-purple)">$'+formatMoney(G.weeklyPassiveIncome||0)+'</div><div class="stat-card-label">Weekly Income</div></div>';
+
+  var prodDiv=document.getElementById('active-productions');
+  var prodHtml='';
+  if(G.currentMovie) prodHtml+='<div style="padding:8px 0;border-bottom:1px solid var(--border);"><div style="font-weight:600;">'+G.currentMovie.title+'</div><div style="font-size:11px;color:var(--accent-gold);">In Production Pipeline</div></div>';
+  if(G.tvShows){
+    G.tvShows.filter(function(t){return!t.cancelled&&!t.airing;}).forEach(function(tv){
+      prodHtml+='<div style="padding:8px 0;border-bottom:1px solid var(--border);"><div style="font-weight:600;">'+tv.title+' <span style="font-size:10px;color:var(--accent-blue);">TV</span></div><div style="font-size:11px;color:var(--text-muted);">S'+tv.currentSeason+' — '+tv.phase+' (Ep '+tv.episodesCompleted+'/'+tv.episodes+')</div></div>';
+    });
+  }
+  if(!prodHtml){
+    prodDiv.innerHTML='<div class="empty-state"><div class="empty-state-icon" style="font-size:48px;opacity:.5;">&#9881;</div><div class="empty-state-text">No active productions</div><button class="btn btn-red btn-sm" onclick="showTab(\'new-movie\')">NEW MOVIE</button></div>';
+  } else {
+    prodDiv.innerHTML=prodHtml;
+  }
+  renderLibrary();
+};
 </script>
 </body>
 </html>
