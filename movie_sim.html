@@ -411,6 +411,31 @@ html, body {
 
 @media(max-width:1200px) { .grid-4{grid-template-columns:repeat(3,1fr)} }
 @media(max-width:900px) { .grid-3,.grid-4{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} .sidebar{width:200px;min-width:200px} .menu-logo{font-size:48px} }
+
+/* V3 - Character Creation */
+.char-section { margin-bottom:20px; }
+.bg-choice-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:8px; }
+
+/* V3 - Enhanced Skill Tree */
+.skill-branch { position:relative; padding:20px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; margin-bottom:16px; }
+.skill-branch-title { font-family:'Playfair Display',Georgia,serif; font-size:18px; font-weight:700; margin-bottom:4px; }
+.skill-branch-desc { font-size:11px; color:var(--text-muted); margin-bottom:16px; }
+.skill-tier { display:flex; gap:8px; margin-bottom:8px; align-items:center; flex-wrap:wrap; }
+.skill-tier-label { font-size:9px; color:var(--text-muted); letter-spacing:1px; width:50px; text-align:right; flex-shrink:0; }
+.skill-node-v2 { flex:1; min-width:120px; padding:10px; background:var(--primary); border:1px solid var(--border); border-radius:6px; cursor:pointer; transition:all .3s; text-align:center; }
+.skill-node-v2:hover { border-color:var(--accent-purple); transform:translateY(-2px); }
+.skill-node-v2.unlocked { border-color:#4ade80; background:rgba(74,222,128,.05); }
+.skill-node-v2.available { border-color:var(--accent-gold); box-shadow:0 0 12px rgba(245,197,24,.15); }
+.skill-node-v2.locked { opacity:.35; cursor:not-allowed; }
+
+/* V3 - Interview */
+.interview-option { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px; cursor:pointer; transition:all .3s; margin-bottom:8px; }
+.interview-option:hover { border-color:var(--accent-blue); background:var(--bg-hover); transform:translateX(4px); }
+.interview-mood { display:inline-block; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:700; letter-spacing:1px; }
+
+/* V3 - Negotiation */
+.nego-bar { height:20px; background:var(--primary); border-radius:10px; overflow:hidden; margin:12px 0; }
+.nego-fill { height:100%; border-radius:10px; transition:width .5s ease; }
 </style>
 </head>
 <body>
@@ -609,6 +634,37 @@ html, body {
       <div class="form-group"><label class="form-label" for="setting-difficulty">Difficulty</label><select class="form-select" id="setting-difficulty"><option value="Easy">Easy</option><option value="Normal" selected>Normal</option><option value="Hard">Hard</option><option value="Mogul">Mogul</option></select></div>
     </div>
     <div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="showScreen('main-menu')">Back</button></div>
+  </div>
+</div>
+
+<!-- CHARACTER CREATION -->
+<div id="char-create" class="screen" style="justify-content:center;align-items:center;background:radial-gradient(ellipse at 50% 80%,#1a2540 0%,var(--primary) 70%);">
+  <div style="max-width:650px;width:90%;max-height:90vh;overflow-y:auto;">
+    <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:36px;margin-bottom:4px;text-align:center;background:linear-gradient(135deg,var(--accent-gold),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Create Your Producer</h2>
+    <p style="text-align:center;color:var(--text-muted);margin-bottom:24px;font-size:13px;">Every empire starts with a visionary</p>
+    <div class="card">
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label" for="producer-name">Producer Name</label><input type="text" class="form-input" id="producer-name" placeholder="Your name..."></div>
+        <div class="form-group"><label class="form-label" for="studio-name-input">Studio Name</label><input type="text" class="form-input" id="studio-name-input" placeholder="Empire Pictures" value="Empire Pictures"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label" for="start-era">Starting Era</label><select class="form-select" id="start-era"><option value="1982">1982 - Golden Age</option><option value="1995">1995 - Rise of CGI</option><option value="2005">2005 - Franchise Era</option><option value="2015">2015 - Streaming Wars</option></select></div>
+        <div class="form-group"><label class="form-label" for="start-budget">Starting Budget</label><select class="form-select" id="start-budget"><option value="5000000">$5M - Scrappy Indie</option><option value="10000000" selected>$10M - Standard</option><option value="25000000">$25M - Well-Funded</option><option value="50000000">$50M - Studio Heir</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label" for="cc-difficulty">Difficulty</label><select class="form-select" id="cc-difficulty"><option value="Easy">Easy - Higher revenue, fewer scandals</option><option value="Normal" selected>Normal - Balanced</option><option value="Hard">Hard - Lower revenue, aggressive rivals</option><option value="Mogul">Mogul - Cutthroat, minimal funds</option></select></div>
+      <div class="form-group">
+        <span class="form-label">Producer Background</span>
+        <div class="bg-choice-grid" id="bg-choices">
+          <div class="script-card selected" onclick="selectBG(this,0)"><div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg></div><div class="script-card-name">Film School Grad</div><div class="script-card-desc">+1 SP, start with Talent Scout</div></div>
+          <div class="script-card" onclick="selectBG(this,1)"><div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--accent-blue)" stroke-width="1.5"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></div><div class="script-card-name">Business Mogul</div><div class="script-card-desc">+20% money, start with Negotiation</div></div>
+          <div class="script-card" onclick="selectBG(this,2)"><div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--accent-purple)" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div><div class="script-card-name">Former Actor</div><div class="script-card-desc">+10 Rep, better actor chemistry</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px;display:flex;gap:12px;justify-content:center;">
+      <button class="btn" onclick="showScreen('save-select')">Back</button>
+      <button class="btn btn-red btn-lg" onclick="startFromCharCreate()">BEGIN YOUR EMPIRE</button>
+    </div>
   </div>
 </div>
 
@@ -2770,6 +2826,688 @@ updateAllUI=function(){
   }
   renderLibrary();
 };
+
+// ============================================================
+// V3 OVERHAUL — Cinematic Expansion
+// ============================================================
+
+// --- 1. REPLACE SIDEBAR EMOJI ICONS WITH SVGs ---
+(function(){
+var S={
+  dashboard:'<svg viewBox="0 0 18 18" width="18" height="18"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".5"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".5"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".3"/></svg>',
+  'new-movie':'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="16" height="11" rx="2"/><path d="M1 7h16M5 4v3M9 4v3M13 4v3"/><path d="M9 10l3 2-3 2z" fill="currentColor" stroke="none"/></svg>',
+  production:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><circle cx="9" cy="9" r="2"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2"/></svg>',
+  library:'<svg viewBox="0 0 18 18" width="18" height="18" fill="currentColor"><rect x="1" y="3" width="4" height="12" rx="1"/><rect x="7" y="1" width="4" height="16" rx="1" opacity=".7"/><rect x="13" y="4" width="4" height="10" rx="1" opacity=".5"/></svg>',
+  actors:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="5" r="3.5"/><path d="M2.5 17a6.5 6.5 0 0113 0"/></svg>',
+  directors:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14l5-5 3 3 6-6"/><path d="M12 6h4v4"/></svg>',
+  composers:'<svg viewBox="0 0 18 18" width="18" height="18" fill="currentColor"><path d="M13 2v9a3 3 0 11-2-2.8V4L5 5.5v7a3 3 0 11-2-2.8V3z" opacity=".8"/></svg>',
+  marketing:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12V6l7-3v15l-7-3z"/><path d="M9 5c3 0 6 1.5 7 4-1 2.5-4 4-7 4"/></svg>',
+  finance:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 1v16M5 4h6a2 2 0 010 4H6M5 8h7a2 2 0 010 4H5"/></svg>',
+  rivals:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2l4 6-4 6M13 2l-4 6 4 6"/></svg>',
+  franchise:'<svg viewBox="0 0 18 18" width="18" height="18" fill="currentColor"><circle cx="9" cy="3" r="2"/><circle cx="3" cy="13" r="2" opacity=".6"/><circle cx="15" cy="13" r="2" opacity=".6"/><path d="M9 5v4M5.5 12L8 9M12.5 12L10 9" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>',
+  awards:'<svg viewBox="0 0 18 18" width="18" height="18" fill="currentColor"><path d="M9 1l2.2 4.5 5 .7-3.6 3.5.85 5L9 12.5 4.55 14.7l.85-5L1.8 6.2l5-.7z" opacity=".9"/></svg>',
+  skills:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="3" r="2"/><circle cx="4" cy="10" r="2"/><circle cx="14" cy="10" r="2"/><circle cx="9" cy="15" r="2"/><path d="M7 4.5L5.5 8M11 4.5l1.5 3.5M6 11.5l2 2M12 11.5l-2 2"/></svg>',
+  tech:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 2v4l-3 2v4l3 2v2M11 2v4l3 2v4l-3 2v2"/><circle cx="9" cy="9" r="2" fill="currentColor"/></svg>',
+  imdb:'<svg viewBox="0 0 18 18" width="18" height="18"><rect x="1" y="3" width="16" height="12" rx="2" fill="var(--accent-gold)" opacity=".15"/><text x="9" y="11.5" text-anchor="middle" font-size="6" font-weight="900" fill="var(--accent-gold)" font-family="sans-serif">IMDb</text></svg>',
+  calendar:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="14" height="13" rx="2"/><path d="M2 7h14M6 1v4M12 1v4"/><rect x="5" y="9" width="2" height="2" rx=".5" fill="currentColor" stroke="none"/><rect x="8" y="9" width="2" height="2" rx=".5" fill="currentColor" stroke="none" opacity=".5"/></svg>',
+  tvshows:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="14" height="10" rx="2"/><path d="M6 16h6M7 1l2 3M11 1l-2 3"/></svg>',
+  trailers:'<svg viewBox="0 0 18 18" width="18" height="18" fill="currentColor"><path d="M4 3a1 1 0 00-1 1v10a1 1 0 001.5.87l10-5a1 1 0 000-1.74l-10-5A1 1 0 004 3z"/></svg>',
+  posters:'<svg viewBox="0 0 18 18" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="14" height="16" rx="2"/><circle cx="7" cy="6" r="2"/><path d="M2 13l4-4 3 3 3-3 4 4"/></svg>'
+};
+document.querySelectorAll('.nav-btn').forEach(function(b){
+  var t=b.dataset.tab;
+  if(t&&S[t]){var ic=b.querySelector('.nav-icon');if(ic)ic.innerHTML=S[t];}
+});
+})();
+
+// --- 2. FIX SAVE SYSTEM (poster data URLs exceed localStorage) ---
+saveToSlot=function(slot){
+  try{
+    G.saveSlot=slot;
+    var d=JSON.parse(JSON.stringify(G));
+    delete d.posters;
+    localStorage.setItem('empire_slot_'+slot,JSON.stringify(d));
+    if(G.posters&&Object.keys(G.posters).length>0){
+      try{localStorage.setItem('empire_posters_'+slot,JSON.stringify(G.posters));}catch(e){}
+    }
+    notify('Saved','Slot '+(slot+1)+' saved.','success');
+  }catch(e){
+    try{
+      var d2=JSON.parse(JSON.stringify(G));
+      delete d2.posters;delete d2.newsLog;
+      localStorage.setItem('empire_slot_'+slot,JSON.stringify(d2));
+      notify('Saved','Slot '+(slot+1)+' saved (compact).','success');
+    }catch(e2){
+      notify('Error','Storage full. Delete a save slot.','error');
+    }
+  }
+};
+saveGame=function(){saveToSlot(G.saveSlot||0);};
+
+loadSlot=function(slot){
+  try{
+    var raw=localStorage.getItem('empire_slot_'+slot);
+    if(!raw){notify('Error','Empty slot.','error');return;}
+    G=JSON.parse(raw);
+    G.saveSlot=slot;
+    if(!G.tvShows)G.tvShows=[];
+    if(!G.calendarEvents)G.calendarEvents=[];
+    if(!G.passiveIncome)G.passiveIncome=[];
+    if(!G.trailers)G.trailers=[];
+    if(!G.producerName)G.producerName='Producer';
+    G.posters={};
+    try{var p=localStorage.getItem('empire_posters_'+slot);if(p)G.posters=JSON.parse(p);}catch(e){}
+    initGameFromLoad();
+    showScreen('game-screen');
+    notify('Loaded','Slot '+(slot+1)+' loaded.','success');
+  }catch(e){notify('Error','Load failed: '+e.message,'error');}
+};
+
+// --- 3. CHARACTER CREATION ---
+var _selectedBG=0;
+window.selectBG=function(el,idx){
+  _selectedBG=idx;
+  document.querySelectorAll('#bg-choices .script-card').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected');
+};
+
+window.startFromCharCreate=function(){
+  var name=(document.getElementById('producer-name').value||'').trim()||'Producer';
+  var studio=(document.getElementById('studio-name-input').value||'').trim()||'Empire Pictures';
+  var era=parseInt(document.getElementById('start-era').value)||1982;
+  var budget=parseInt(document.getElementById('start-budget').value)||10000000;
+  var diff=document.getElementById('cc-difficulty').value||'Normal';
+
+  G.producerName=name;
+  G.studioName=studio;
+  G.year=era;
+  G.money=budget;
+  G.difficulty=diff;
+
+  if(diff==='Easy')G.money=Math.round(budget*1.5);
+  if(diff==='Mogul')G.money=Math.round(budget*0.4);
+
+  if(_selectedBG===0){G.skillsUnlocked.push('scouting1');G.skillPoints+=1;}
+  else if(_selectedBG===1){G.money=Math.round(G.money*1.2);G.skillsUnlocked.push('negotiation1');}
+  else if(_selectedBG===2){G.reputation=10;}
+
+  updateEra();
+  initGame();
+  showScreen('game-screen');
+  notify('Welcome, '+name,'Your empire at '+studio+' begins. Budget: $'+formatMoney(G.money),'success');
+};
+
+newGameInSlot=function(slot){
+  G={studioName:'Empire Pictures',money:10000000,reputation:0,fans:0,week:1,year:1982,era:'1980s',studioLevel:0,totalMovies:0,totalRevenue:0,totalProfit:0,skillPoints:0,awards:[],completedMovies:[],inProduction:[],actors:[],directors:[],composers:[],franchises:[],newsLog:[],merchRevenue:0,techUnlocked:[],skillsUnlocked:[],rivalStudios:JSON.parse(JSON.stringify(RIVAL_STUDIOS)),difficulty:'Normal',currentMovie:null,tvShows:[],calendarEvents:[],passiveIncome:[],posters:{},trailers:[],saveSlot:slot,producerName:'Producer',weeklyPassiveIncome:0};
+  showScreen('char-create');
+};
+
+// --- 4. MONEY REBALANCE ---
+calculateFinalScores=function(m){
+  var scriptQ=m.scriptScore;
+  var actorQ=m.actor?(m.actor.charisma+m.actor.range)/2:30;
+  var dirQ=m.director?(m.director.vision+m.director.discipline)/2:30;
+  var compQ=m.composer?m.composer.talent:30;
+  var vfxQ=m.vfxMultiplier*25;
+  var shootQ=m.shootingScore||0;
+  var editQ=m.editingScore||0;
+  var soundQ=m.soundScore||50;
+  var colorQ=m.colorGrade?(m.colorGrade.effect.visual||0)*3:0;
+  var testQ=m.testScreeningScore||50;
+
+  m.quality=clamp(Math.round(
+    scriptQ*0.2+actorQ*0.15+dirQ*0.15+compQ*0.05+
+    vfxQ*0.05+shootQ*0.15+editQ*0.05+soundQ*0.1+colorQ*0.02+testQ*0.08
+  ),5,100);
+
+  m.criticScore=clamp(m.quality+rnd(-10,10)+(scriptQ>70?8:0)+(m.scriptData.criticFeel>20?5:0),5,100);
+  m.audienceScore=clamp(m.quality+rnd(-8,15)+(m.actor?Math.floor(m.actor.charisma/15):0)+(m.scriptData.massFeel>20?5:0),5,100);
+
+  var scaleMult={Micro:.5,Low:1,Medium:2.5,High:6,Blockbuster:15}[m.scale];
+  var qualEff=m.quality/50;
+  if(m.quality>=80)qualEff*=2.5;
+  else if(m.quality>=70)qualEff*=1.8;
+  else if(m.quality>=60)qualEff*=1.3;
+
+  var hypeEff=Math.max(0.3,m.hype/50);
+  var actorDraw=m.actor?m.actor.boxOfficeDraw/50:.5;
+  var seasonMult={Summer:1.4,Holiday:1.3,Winter:1.1,Fall:1,Spring:.9}[m.season];
+  var releaseMult={Wide:1,Limited:.4,Streaming:.3,Festival:.35,Hybrid:.7}[m.releaseStrategy];
+  var repMult=1+G.reputation/150;
+  var marketMult=1+Object.values(m.marketing).reduce(function(a,b){return a+b;},0)/400;
+
+  var baseRev=m.budget*scaleMult*qualEff*hypeEff*actorDraw*seasonMult*releaseMult*repMult*marketMult;
+
+  if(m.criticScore>=90)baseRev*=3.0;
+  else if(m.criticScore>=80)baseRev*=2.2;
+  else if(m.criticScore>=70)baseRev*=1.5;
+
+  m.boxOffice.opening=Math.round(baseRev*rnd(15,35)/100);
+  m.boxOffice.domestic=Math.round(baseRev*rnd(35,55)/100);
+  m.boxOffice.international=Math.round(baseRev*rnd(40,70)/100);
+  m.boxOffice.worldwide=m.boxOffice.domestic+m.boxOffice.international;
+  m.profit=m.boxOffice.worldwide-m.totalCost-m.marketingSpend;
+};
+
+// Enhanced passive income
+processPassiveIncome=function(){
+  var tot=0;
+  G.completedMovies.forEach(function(m){
+    if(!m.hypeRemaining&&m.hypeRemaining!==0)m.hypeRemaining=Math.round(m.audienceScore*1.5);
+    if(m.hypeRemaining>0){
+      var rev=Math.round(m.hypeRemaining*m.boxOffice.worldwide*0.0004);
+      if(m.criticScore>=80)m.hypeRemaining-=rnd(0,1);
+      else if(m.criticScore>=60)m.hypeRemaining-=rnd(0,3);
+      else if(m.criticScore>=40)m.hypeRemaining-=rnd(1,5);
+      else m.hypeRemaining-=rnd(3,8);
+      m.hypeRemaining=Math.max(0,m.hypeRemaining);
+      tot+=rev;
+    }
+  });
+  if(G.tvShows){G.tvShows.forEach(function(tv){
+    if(tv.airing&&tv.viewership>0){tot+=Math.round(tv.viewership*tv.quality*80);tv.viewership=Math.max(0,tv.viewership-rnd(0,tv.quality>60?300:1500));}
+  });}
+  if(G.franchises){G.franchises.forEach(function(f){if(f.fanLoyalty>30)tot+=Math.round(f.fanLoyalty*1000);});}
+  tot+=G.reputation*500+Math.round(G.fans/10);
+  G.money+=tot;
+  G.weeklyPassiveIncome=tot;
+};
+
+// --- 5. ENHANCED SKILL TREE ---
+SKILL_TREES={
+  producer:[
+    {id:'negotiation1',name:'Negotiation',cost:1,desc:'-10% talent costs',effect:'talentDiscount',value:.1,requires:[],tier:1},
+    {id:'negotiation2',name:'Power Broker',cost:2,desc:'-25% talent costs',effect:'talentDiscount',value:.15,requires:['negotiation1'],tier:2},
+    {id:'negotiation3',name:'Kingmaker',cost:4,desc:'-40% costs, A-list access',effect:'talentDiscount',value:.15,requires:['negotiation2'],tier:3},
+    {id:'budgeting1',name:'Budget Control',cost:1,desc:'-10% overruns',effect:'budgetControl',value:.1,requires:[],tier:1},
+    {id:'budgeting2',name:'Financial Wizard',cost:3,desc:'-25% overruns, +10% ROI',effect:'budgetControl',value:.15,requires:['budgeting1'],tier:2},
+    {id:'leadership1',name:'Team Leader',cost:1,desc:'+5% morale boost',effect:'morale',value:5,requires:[],tier:1},
+    {id:'leadership2',name:'Visionary Leader',cost:2,desc:'+15% morale, fewer scandals',effect:'morale',value:10,requires:['leadership1'],tier:2},
+    {id:'leadership3',name:'Legend',cost:5,desc:'All talent costs halved',effect:'morale',value:20,requires:['leadership2','negotiation3'],tier:4},
+    {id:'multitask1',name:'Multi-Project',cost:3,desc:'+1 simultaneous production',effect:'capacity',value:1,requires:['leadership1'],tier:2}
+  ],
+  creative:[
+    {id:'story1',name:'Story Sense',cost:1,desc:'+5 script quality',effect:'scriptBonus',value:5,requires:[],tier:1},
+    {id:'story2',name:'Master Storyteller',cost:2,desc:'+15 script quality',effect:'scriptBonus',value:10,requires:['story1'],tier:2},
+    {id:'story3',name:'Auteur Vision',cost:4,desc:'+25 script, unique endings',effect:'scriptBonus',value:10,requires:['story2'],tier:3},
+    {id:'vision1',name:'Creative Vision',cost:2,desc:'+5% critic score',effect:'criticBonus',value:5,requires:[],tier:1},
+    {id:'vision2',name:'Cinematic Eye',cost:3,desc:'+12% critic score',effect:'criticBonus',value:7,requires:['vision1'],tier:2},
+    {id:'scouting1',name:'Talent Scout',cost:1,desc:'Better actors in pool',effect:'talentPool',value:1,requires:[],tier:1},
+    {id:'scouting2',name:'Star Maker',cost:3,desc:'Develop unknowns into stars',effect:'talentPool',value:2,requires:['scouting1'],tier:2},
+    {id:'genre1',name:'Genre Specialist',cost:2,desc:'+10% quality for genre',effect:'genreBonus',value:10,requires:['story1'],tier:2},
+    {id:'genre2',name:'Genre Master',cost:4,desc:'+25% quality, dominance',effect:'genreBonus',value:15,requires:['genre1'],tier:3}
+  ],
+  business:[
+    {id:'marketing1',name:'Marketing Basics',cost:1,desc:'+10% marketing effect',effect:'marketingBonus',value:10,requires:[],tier:1},
+    {id:'marketing2',name:'Viral Marketing',cost:2,desc:'+25% marketing, social',effect:'marketingBonus',value:15,requires:['marketing1'],tier:2},
+    {id:'marketing3',name:'Cultural Phenomenon',cost:5,desc:'2x hype generation',effect:'marketingBonus',value:25,requires:['marketing2'],tier:3},
+    {id:'expansion1',name:'Studio Expansion',cost:2,desc:'Unlock upgrades',effect:'studioLevel',value:1,requires:[],tier:1},
+    {id:'expansion2',name:'Media Conglomerate',cost:4,desc:'TV empire, streaming',effect:'studioLevel',value:1,requires:['expansion1'],tier:2},
+    {id:'risk1',name:'Risk Assessment',cost:1,desc:'-10% scandal chance',effect:'scandalReduce',value:10,requires:[],tier:1},
+    {id:'risk2',name:'Crisis Management',cost:3,desc:'-30% scandal damage',effect:'scandalReduce',value:20,requires:['risk1'],tier:2},
+    {id:'merch1',name:'Merchandise Empire',cost:3,desc:'3x merch revenue',effect:'merchBonus',value:3,requires:['expansion1'],tier:2},
+    {id:'streaming1',name:'Streaming Pioneer',cost:4,desc:'Streaming 2x revenue',effect:'streamingBonus',value:2,requires:['expansion2'],tier:3}
+  ],
+  prestige:[
+    {id:'awards1',name:'Campaign Manager',cost:2,desc:'+15% nomination chance',effect:'awardChance',value:15,requires:[],tier:1},
+    {id:'awards2',name:'Awards Expert',cost:3,desc:'+30% win chance',effect:'awardChance',value:15,requires:['awards1'],tier:2},
+    {id:'awards3',name:'Academy Darling',cost:5,desc:'Auto-nom for 80+ films',effect:'awardChance',value:20,requires:['awards2'],tier:3},
+    {id:'festival1',name:'Festival Circuit',cost:2,desc:'Festival +20% revenue',effect:'festivalBonus',value:20,requires:[],tier:1},
+    {id:'festival2',name:'Cannes Royalty',cost:4,desc:'Auto-invite top festivals',effect:'festivalBonus',value:30,requires:['festival1'],tier:2},
+    {id:'legacy1',name:'Cultural Impact',cost:3,desc:'Movies generate rep forever',effect:'legacyBonus',value:1,requires:['awards1'],tier:2},
+    {id:'legacy2',name:'Cinematic Legend',cost:6,desc:'Your name IS cinema',effect:'legacyBonus',value:2,requires:['legacy1','awards3'],tier:4}
+  ]
+};
+
+renderSkillTree=function(){
+  document.getElementById('skill-points').textContent=G.skillPoints;
+  var html='';
+  var branchColors={producer:'var(--accent-red)',creative:'var(--accent-purple)',business:'var(--accent-blue)',prestige:'var(--accent-gold)'};
+  var branchDescs={producer:'Lead your studio to greatness',creative:'Master the art of filmmaking',business:'Build a media empire',prestige:'Chase awards and legacy'};
+  var branchIcons={
+    producer:'<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>',
+    creative:'<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg>',
+    business:'<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 20V10l4-4h10l4 4v10"/><rect x="8" y="14" width="8" height="6"/><path d="M12 2v6"/></svg>',
+    prestige:'<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 21h8M12 17v4"/><path d="M7 4h10l1 3H6z"/><rect x="6" y="7" width="12" height="10" rx="1"/></svg>'
+  };
+
+  for(var tn in SKILL_TREES){
+    var skills=SKILL_TREES[tn];
+    var color=branchColors[tn]||'var(--text-light)';
+    var tiers={};
+    skills.forEach(function(s){var t=s.tier||1;if(!tiers[t])tiers[t]=[];tiers[t].push(s);});
+
+    html+='<div class="skill-branch" style="border-left:3px solid '+color+';">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">'
+      +'<div style="color:'+color+';">'+branchIcons[tn]+'</div>'
+      +'<div><div class="skill-branch-title" style="color:'+color+';">'+tn.charAt(0).toUpperCase()+tn.slice(1)+'</div>'
+      +'<div class="skill-branch-desc">'+branchDescs[tn]+'</div></div></div>';
+
+    for(var t=1;t<=4;t++){
+      if(!tiers[t])continue;
+      html+='<div class="skill-tier">'
+        +'<div class="skill-tier-label" style="color:'+color+';">TIER '+['I','II','III','IV'][t-1]+'</div>';
+      tiers[t].forEach(function(s){
+        var u=G.skillsUnlocked.includes(s.id);
+        var can=!u&&G.skillPoints>=s.cost&&s.requires.every(function(r){return G.skillsUnlocked.includes(r);});
+        html+='<div class="skill-node-v2 '+(u?'unlocked':can?'available':'locked')+'" onclick="'+(can?"unlockSkill('"+tn+"','"+s.id+"')":'')+'">'
+          +'<div style="font-size:11px;font-weight:700;">'+s.name+'</div>'
+          +'<div style="font-size:9px;color:var(--text-muted);margin:3px 0;">'+s.desc+'</div>'
+          +'<div style="font-size:9px;color:'+(u?'#4ade80':'var(--accent-gold)')+';">'+(u?'UNLOCKED':s.cost+' SP')+'</div></div>';
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  document.getElementById('skills-content').innerHTML=html;
+};
+
+// --- 6. ENHANCED TECH TREE ---
+TECH_TREE=[
+  {id:'dolby',name:'Dolby Surround',cost:300000,era:'1980s',desc:'Immersive theater audio',effect:{quality:5},requires:[]},
+  {id:'steadicam',name:'Steadicam Rig',cost:200000,era:'1980s',desc:'Smooth tracking shots',effect:{quality:3},requires:[]},
+  {id:'anamorphic',name:'Anamorphic Lenses',cost:500000,era:'1980s',desc:'Widescreen cinematic look',effect:{quality:4},requires:['steadicam']},
+  {id:'practical_fx',name:'Practical FX Lab',cost:800000,era:'1980s',desc:'Animatronics & prosthetics',effect:{vfx:8,quality:3},requires:[]},
+  {id:'cgi_basic',name:'Basic CGI',cost:2000000,era:'1990s',desc:'Computer-generated imagery',effect:{vfx:10},requires:['practical_fx']},
+  {id:'digital_edit',name:'Digital Editing',cost:1000000,era:'1990s',desc:'Non-linear Avid editing',effect:{speed:5,quality:3},requires:['steadicam']},
+  {id:'surround_71',name:'7.1 Surround',cost:1500000,era:'1990s',desc:'Multi-channel audio',effect:{quality:5},requires:['dolby']},
+  {id:'cgi_advanced',name:'Photorealistic CGI',cost:8000000,era:'2000s',desc:'Seamless digital worlds',effect:{vfx:20},requires:['cgi_basic']},
+  {id:'mocap',name:'Motion Capture',cost:5000000,era:'2000s',desc:'Performance capture',effect:{quality:10,vfx:10},requires:['cgi_basic']},
+  {id:'digital_cinema',name:'Digital Cinema',cost:3000000,era:'2000s',desc:'RED & ARRI cameras',effect:{quality:8,speed:5},requires:['digital_edit']},
+  {id:'3d_stereo',name:'3D Stereoscopic',cost:6000000,era:'2000s',desc:'Premium 3D tickets',effect:{revenue:10},requires:['cgi_advanced']},
+  {id:'imax',name:'IMAX Filming',cost:15000000,era:'2010s',desc:'70mm large format',effect:{quality:8,revenue:15},requires:['digital_cinema']},
+  {id:'dolby_atmos',name:'Dolby Atmos',cost:5000000,era:'2010s',desc:'Spatial object audio',effect:{quality:8},requires:['surround_71']},
+  {id:'hdr_grade',name:'HDR Pipeline',cost:4000000,era:'2010s',desc:'High dynamic range color',effect:{quality:5},requires:['digital_cinema']},
+  {id:'virtual_prod',name:'Virtual Production',cost:20000000,era:'2020s',desc:'LED volume stages',effect:{quality:15,speed:10,vfx:10},requires:['mocap','imax']},
+  {id:'ai_script',name:'AI Script Analysis',cost:8000000,era:'2020s',desc:'ML audience prediction',effect:{quality:5,speed:8},requires:['digital_edit']},
+  {id:'deepfake',name:'Digital De-aging',cost:12000000,era:'2020s',desc:'Seamless age manipulation',effect:{vfx:15},requires:['cgi_advanced','mocap']},
+  {id:'ai_vfx',name:'Neural Rendering',cost:30000000,era:'2030s',desc:'AI-generated photorealism',effect:{vfx:30,speed:15},requires:['virtual_prod','deepfake']},
+  {id:'holographic',name:'Holographic Cinema',cost:50000000,era:'2030s',desc:'Full immersion theaters',effect:{quality:20,revenue:25},requires:['ai_vfx']}
+];
+
+renderTechTree=function(){
+  var eras=['1980s','1990s','2000s','2010s','2020s','2030s'];
+  var eraIdx=eras.indexOf(G.era);
+  var html='';
+  eras.forEach(function(era,i){
+    var items=TECH_TREE.filter(function(t){return t.era===era;});
+    if(!items.length)return;
+    var unlocked=i<=eraIdx;
+    html+='<div class="card" style="margin-bottom:16px;'+(unlocked?'':'opacity:.4;')+'">'
+      +'<div class="card-header"><div class="card-title" style="display:flex;align-items:center;gap:8px;">'
+      +'<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="'+(unlocked?'var(--accent-blue)':'var(--text-muted)')+'" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 2"/></svg>'
+      +' '+era+'</div>'
+      +(unlocked?'<span class="card-badge badge-green">AVAILABLE</span>':'<span class="card-badge" style="background:rgba(122,134,154,.2);color:var(--text-muted);">FUTURE</span>')
+      +'</div><div class="grid-3">';
+    items.forEach(function(t){
+      var u=G.techUnlocked.includes(t.id);
+      var avail=unlocked&&!u&&t.requires.every(function(r){return G.techUnlocked.includes(r);});
+      var canBuy=avail&&G.money>=t.cost;
+      html+='<div style="padding:14px;background:var(--primary);border-radius:8px;border:1px solid '+(u?'#4ade80':avail?'var(--accent-blue)':'var(--border)')+';text-align:center;">'
+        +'<div style="font-weight:700;font-size:12px;margin-bottom:3px;color:'+(u?'#4ade80':'var(--text-white)')+';">'+t.name+'</div>'
+        +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;min-height:24px;">'+t.desc+'</div>'
+        +'<div style="font-size:11px;color:var(--accent-gold);margin-bottom:6px;">$'+formatMoney(t.cost)+'</div>'
+        +'<div style="font-size:9px;color:var(--accent-blue);margin-bottom:6px;">'+Object.entries(t.effect).map(function(e){return e[0]+' +'+e[1];}).join(' | ')+'</div>';
+      if(u)html+='<span class="card-badge badge-green" style="padding:3px 8px;">RESEARCHED</span>';
+      else if(canBuy)html+='<button class="btn btn-blue btn-sm" onclick="unlockTech(\''+t.id+'\')">Research</button>';
+      else if(avail)html+='<span style="font-size:9px;color:var(--accent-red);">Need funds</span>';
+      else if(!unlocked)html+='<span style="font-size:9px;color:var(--text-muted);">Future era</span>';
+      else html+='<span style="font-size:9px;color:var(--text-muted);">Requires: '+t.requires.filter(function(r){return!G.techUnlocked.includes(r);}).map(function(r){var x=TECH_TREE.find(function(z){return z.id===r;});return x?x.name:r;}).join(', ')+'</span>';
+      html+='</div>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('tech-content').innerHTML=html;
+};
+
+// --- 7. INTERVIEW MINIGAME ---
+function launchInterviewMinigame(movie){
+  var questions=[
+    {q:'What inspired this project?',options:[
+      {text:'A deeply personal story from my childhood.',effect:{critic:8,mass:3,hype:5},mood:'thoughtful'},
+      {text:'We wanted to push the boundaries of cinema.',effect:{critic:5,mass:5,hype:8},mood:'confident'},
+      {text:'The box office potential was undeniable.',effect:{critic:-5,mass:10,hype:12},mood:'bold'},
+      {text:'It came to me in a dream.',effect:{critic:3,mass:2,hype:3},mood:'mysterious'}
+    ]},
+    {q:'How would you describe making this film?',options:[
+      {text:'Grueling but transformative. We bled for this.',effect:{critic:10,mass:2,hype:6},mood:'intense'},
+      {text:'The cast chemistry was electric from day one.',effect:{critic:4,mass:8,hype:7},mood:'warm'},
+      {text:'We had a blast. Wait for the gag reel.',effect:{critic:-2,mass:12,hype:10},mood:'funny'},
+      {text:'No comment on the on-set difficulties.',effect:{critic:-3,mass:-2,hype:15},mood:'mysterious'}
+    ]},
+    {q:'What should audiences take away?',options:[
+      {text:'A renewed sense of hope and wonder.',effect:{critic:5,mass:10,hype:5},mood:'warm'},
+      {text:'Questions. No easy answers here.',effect:{critic:12,mass:-3,hype:4},mood:'thoughtful'},
+      {text:'Pure adrenaline. We made this to entertain.',effect:{critic:-3,mass:15,hype:10},mood:'bold'},
+      {text:'That cinema is alive and well.',effect:{critic:8,mass:5,hype:6},mood:'confident'}
+    ]},
+    {q:'Any plans for a sequel?',options:[
+      {text:'Let\'s see how audiences respond first.',effect:{critic:5,mass:3,hype:3},mood:'thoughtful'},
+      {text:'We\'ve mapped out a trilogy!',effect:{critic:-5,mass:8,hype:15},mood:'bold'},
+      {text:'This story is complete. No sequel.',effect:{critic:10,mass:-5,hype:-2},mood:'confident'},
+      {text:'You\'ll have to wait and see...',effect:{critic:0,mass:5,hype:12},mood:'mysterious'}
+    ]},
+    {q:'What was the hardest scene to shoot?',options:[
+      {text:'The climax. We did 47 takes to get it right.',effect:{critic:8,mass:6,hype:4},mood:'intense'},
+      {text:'An intimate two-person scene that required total vulnerability.',effect:{critic:12,mass:3,hype:2},mood:'thoughtful'},
+      {text:'The opening sequence. It sets the entire tone.',effect:{critic:6,mass:8,hype:6},mood:'confident'},
+      {text:'Every scene was equally challenging and rewarding.',effect:{critic:2,mass:4,hype:4},mood:'diplomatic'}
+    ]},
+    {q:'How do you respond to early criticism of the film?',options:[
+      {text:'Art isn\'t meant to please everyone.',effect:{critic:10,mass:-5,hype:8},mood:'bold'},
+      {text:'We\'re grateful for all feedback. It makes us better.',effect:{critic:3,mass:8,hype:3},mood:'diplomatic'},
+      {text:'The audience will be the final judge.',effect:{critic:2,mass:10,hype:5},mood:'confident'},
+      {text:'I\'d rather make something polarizing than forgettable.',effect:{critic:15,mass:-3,hype:12},mood:'intense'}
+    ]}
+  ];
+
+  var shuffled=questions.sort(function(){return Math.random()-0.5;}).slice(0,4);
+  var qIdx=0;
+  var totalEff={critic:0,mass:0,hype:0};
+  var moodColors={thoughtful:'var(--accent-purple)',confident:'var(--accent-blue)',bold:'var(--accent-red)',warm:'var(--accent-gold)',funny:'#4ade80',mysterious:'var(--text-muted)',intense:'var(--accent-red)',diplomatic:'var(--accent-blue)'};
+
+  function renderQ(){
+    if(qIdx>=shuffled.length){finishInterview();return;}
+    var q=shuffled[qIdx];
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div><div class="minigame-title">'
+      +'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M12 18h.01M12 2a7 7 0 017 7c0 2.5-1.5 4-3 5s-2 2-2 3h-4c0-1 0-2-2-3S5 11.5 5 9a7 7 0 017-7z"/></svg>'
+      +' Press Interview: "'+movie.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Question '+(qIdx+1)+'/'+shuffled.length+'</div></div>'
+      +'<div class="minigame-phase badge-blue card-badge">INTERVIEW</div></div>'
+      +'<div class="minigame-body" style="max-width:700px;margin:0 auto;">'
+      +'<div class="card" style="margin-bottom:24px;padding:24px;text-align:center;background:linear-gradient(135deg,rgba(215,38,56,.05),rgba(139,92,246,.05));">'
+      +'<div style="font-size:10px;color:var(--accent-red);letter-spacing:2px;margin-bottom:8px;">INTERVIEWER ASKS</div>'
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:20px;font-weight:700;font-style:italic;">"'+q.q+'"</div></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:10px;">YOUR RESPONSE</div>'
+      +q.options.map(function(opt,i){
+        return '<div class="interview-option" onclick="answerInterview('+i+')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+          +'<div style="font-size:13px;color:var(--text-light);flex:1;font-style:italic;">"'+opt.text+'"</div>'
+          +'<div class="interview-mood" style="background:'+(moodColors[opt.mood]||'var(--text-muted)')+'22;color:'+(moodColors[opt.mood]||'var(--text-muted)')+';">'+opt.mood.toUpperCase()+'</div>'
+          +'</div></div>';
+      }).join('')
+      +'<div class="card" style="margin-top:16px;"><div class="grid-3">'
+      +'<div style="text-align:center;"><div style="font-size:16px;font-weight:700;color:var(--accent-gold);">'+(totalEff.critic>0?'+':'')+totalEff.critic+'</div><div style="font-size:9px;color:var(--text-muted);">CRITIC BUZZ</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:16px;font-weight:700;color:var(--accent-blue);">'+(totalEff.mass>0?'+':'')+totalEff.mass+'</div><div style="font-size:9px;color:var(--text-muted);">MASS APPEAL</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:16px;font-weight:700;color:var(--accent-red);">'+(totalEff.hype>0?'+':'')+totalEff.hype+'</div><div style="font-size:9px;color:var(--text-muted);">HYPE</div></div>'
+      +'</div></div></div></div>';
+  }
+
+  window.answerInterview=function(oi){
+    var opt=shuffled[qIdx].options[oi];
+    totalEff.critic+=opt.effect.critic;
+    totalEff.mass+=opt.effect.mass;
+    totalEff.hype+=opt.effect.hype;
+    qIdx++;
+    renderQ();
+  };
+
+  function finishInterview(){
+    movie.hype=clamp((movie.hype||0)+totalEff.hype,0,100);
+    if(movie.hypeRemaining!==undefined)movie.hypeRemaining+=Math.abs(totalEff.hype);
+    movie.criticScore=clamp((movie.criticScore||0)+Math.round(totalEff.critic/2),5,100);
+    movie.audienceScore=clamp((movie.audienceScore||0)+Math.round(totalEff.mass/2),5,100);
+    G.reputation=clamp(G.reputation+Math.round((totalEff.critic+totalEff.mass)/4),0,100);
+    G.fans+=Math.round(totalEff.mass*500);
+    document.getElementById('minigame-container').innerHTML='';
+    notify('Interview Complete!','Critic: '+(totalEff.critic>0?'+':'')+totalEff.critic+' | Appeal: '+(totalEff.mass>0?'+':'')+totalEff.mass+' | Hype: '+(totalEff.hype>0?'+':'')+totalEff.hype,'success');
+    updateAllUI();
+  }
+  renderQ();
+}
+
+scheduleInterview=function(){
+  if(!G.calendarEvents)G.calendarEvents=[];
+  if(G.money<50000){notify('Error','Need $50K.','error');return;}
+  var movie=G.completedMovies.length>0?G.completedMovies[G.completedMovies.length-1]:null;
+  if(movie){G.money-=50000;launchInterviewMinigame(movie);}
+  else{
+    G.money-=50000;
+    G.reputation=clamp(G.reputation+rnd(1,3),0,100);
+    notify('No Movie','No movie to promote yet. +Rep anyway.','info');
+  }
+};
+
+// --- 8. NEGOTIATION MINIGAME ---
+function launchNegotiationMinigame(talentName,baseSalary,callback){
+  var yourOffer=Math.round(baseSalary*0.5);
+  var theirAsk=baseSalary;
+  var round=0;var maxRounds=5;var mood=50;
+  var tactics=[
+    {name:'Flatter',desc:'Compliment their work'},
+    {name:'Lowball',desc:'Aggressive counter-offer'},
+    {name:'Promise Prestige',desc:'Offer awards potential'},
+    {name:'Threaten Walk',desc:'Hint at other options'},
+    {name:'Sweeten Deal',desc:'Add backend points'},
+    {name:'Final Offer',desc:'Take it or leave it'}
+  ];
+
+  function renderNego(){
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div><div class="minigame-title">'
+      +'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M16 3h5v5M8 21H3v-5M21 3L14 10M3 21l7-7"/></svg>'
+      +' Negotiation: '+talentName+'</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Round '+(round+1)+'/'+maxRounds+'</div></div>'
+      +'<div class="minigame-phase badge-gold card-badge">DEAL</div></div>'
+      +'<div class="minigame-body" style="max-width:700px;margin:0 auto;">'
+      +'<div class="grid-2" style="margin-bottom:20px;">'
+      +'<div class="stat-card"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">THEIR ASK</div><div class="stat-card-value" style="color:var(--accent-red);">$'+formatMoney(theirAsk)+'</div></div>'
+      +'<div class="stat-card"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">YOUR OFFER</div><div class="stat-card-value" style="color:#4ade80;">$'+formatMoney(yourOffer)+'</div></div>'
+      +'</div>'
+      +'<div class="card" style="margin-bottom:16px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">THEIR MOOD</div>'
+      +'<div class="nego-bar"><div class="nego-fill" style="width:'+mood+'%;background:linear-gradient(90deg,'+(mood>60?'#4ade80':mood>30?'var(--accent-gold)':'var(--accent-red)')+','+(mood>60?'#22a85a':mood>30?'#b8960f':'#a01a2a')+');"></div></div>'
+      +'<div style="font-size:11px;text-align:center;color:'+(mood>60?'#4ade80':mood>30?'var(--accent-gold)':'var(--accent-red)')+';">'+(mood>70?'Eager':mood>50?'Interested':mood>30?'Hesitant':'Walking away')+'</div></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">TACTICS</div>'
+      +'<div class="grid-3">'+tactics.map(function(t,i){
+        return '<div class="interview-option" style="text-align:center;padding:10px;" onclick="useNegoTactic('+i+')">'
+          +'<div style="font-size:11px;font-weight:700;">'+t.name+'</div>'
+          +'<div style="font-size:9px;color:var(--text-muted);margin-top:2px;">'+t.desc+'</div></div>';
+      }).join('')+'</div>'
+      +'<div style="text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center;">'
+      +'<button class="btn btn-red" onclick="acceptNegoDeal()">Accept ($'+formatMoney(yourOffer)+')</button>'
+      +'<button class="btn" onclick="walkAwayNego()">Walk Away</button>'
+      +'</div></div></div>';
+  }
+
+  window.useNegoTactic=function(idx){
+    var t=tactics[idx];
+    var moodDelta,priceDelta;
+    if(t.name==='Flatter'){moodDelta=rnd(5,15);priceDelta=0;}
+    else if(t.name==='Lowball'){moodDelta=rnd(-20,-5);priceDelta=rnd(-15,-5);}
+    else if(t.name==='Promise Prestige'){moodDelta=rnd(5,20);priceDelta=rnd(-10,-3);}
+    else if(t.name==='Threaten Walk'){moodDelta=rnd(-15,10);priceDelta=rnd(-20,-5);}
+    else if(t.name==='Sweeten Deal'){moodDelta=rnd(10,25);priceDelta=rnd(3,10);}
+    else{moodDelta=rnd(-10,5);priceDelta=0;}
+    mood=clamp(mood+moodDelta,0,100);
+    theirAsk=Math.max(Math.round(baseSalary*0.3),Math.round(theirAsk*(1+priceDelta/100)));
+    yourOffer=Math.round((yourOffer+theirAsk)/2);
+    round++;
+    if(round>=maxRounds||mood<=5){
+      if(mood<=5){document.getElementById('minigame-container').innerHTML='';notify('Deal Failed',talentName+' walked away.','error');callback(null);}
+      else acceptNegoDeal();
+    } else renderNego();
+  };
+
+  window.acceptNegoDeal=function(){
+    document.getElementById('minigame-container').innerHTML='';
+    notify('Deal Closed!',talentName+' for $'+formatMoney(yourOffer)+' (saved $'+formatMoney(Math.max(0,baseSalary-yourOffer))+')','success');
+    callback(yourOffer);
+  };
+
+  window.walkAwayNego=function(){
+    document.getElementById('minigame-container').innerHTML='';
+    notify('No Deal','Walked away from '+talentName+'.','info');
+    callback(null);
+  };
+  renderNego();
+}
+
+// --- 9. SETTINGS ENHANCEMENT ---
+(function(){
+  var el=document.querySelector('#settings-screen > div');
+  if(el){
+    el.innerHTML='<h2 style="font-family:\'Playfair Display\',Georgia,serif;font-size:32px;margin-bottom:4px;text-align:center;background:linear-gradient(135deg,var(--accent-gold),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Settings</h2>'
+      +'<p style="text-align:center;color:var(--text-muted);margin-bottom:20px;font-size:12px;">Configure your experience</p>'
+      +'<div class="card"><div class="card-header"><div class="card-title">Game</div></div>'
+      +'<div class="form-group"><label class="form-label" for="setting-studio-name">Default Studio Name</label><input type="text" class="form-input" id="setting-studio-name" value="Empire Pictures"></div>'
+      +'<div class="grid-2">'
+      +'<div class="form-group"><label class="form-label" for="setting-difficulty">Default Difficulty</label><select class="form-select" id="setting-difficulty"><option value="Easy">Easy</option><option value="Normal" selected>Normal</option><option value="Hard">Hard</option><option value="Mogul">Mogul</option></select></div>'
+      +'<div class="form-group"><label class="form-label" for="setting-autosave">Autosave</label><select class="form-select" id="setting-autosave"><option value="on">Every 10 weeks</option><option value="off">Off</option></select></div></div>'
+      +'<div class="grid-2">'
+      +'<div class="form-group"><label class="form-label" for="setting-speed">Animations</label><select class="form-select" id="setting-speed"><option value="normal">Normal</option><option value="fast">Reduced</option></select></div>'
+      +'<div class="form-group"><label class="form-label" for="setting-grain">Film Grain</label><select class="form-select" id="setting-grain" onchange="toggleGrain(this.value)"><option value="on">On</option><option value="off">Off</option></select></div></div></div>'
+      +'<div class="card" style="margin-top:16px;"><div class="card-header"><div class="card-title">Data</div></div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      +'<button class="btn btn-sm" onclick="clearAllSaves()">Clear All Saves</button>'
+      +'<button class="btn btn-sm" onclick="exportSave()">Export Save</button>'
+      +'<button class="btn btn-sm" onclick="importSavePrompt()">Import Save</button></div></div>'
+      +'<div style="text-align:center;margin-top:20px;"><button class="btn btn-red" onclick="showScreen(\'main-menu\')">Back to Menu</button></div>';
+  }
+})();
+
+window.toggleGrain=function(v){document.getElementById('film-grain').style.display=v==='on'?'block':'none';};
+window.clearAllSaves=function(){for(var i=0;i<3;i++){localStorage.removeItem('empire_slot_'+i);localStorage.removeItem('empire_posters_'+i);}notify('Cleared','All saves deleted.','info');};
+window.exportSave=function(){var b=new Blob([JSON.stringify(G)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='empire_'+G.year+'.json';a.click();notify('Exported','Save downloaded.','success');};
+window.importSavePrompt=function(){var inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=function(e){var r=new FileReader();r.onload=function(ev){try{G=JSON.parse(ev.target.result);initGameFromLoad();showScreen('game-screen');notify('Imported','Save loaded!','success');}catch(err){notify('Error','Invalid save.','error');}};r.readAsText(e.target.files[0]);};inp.click();};
+
+// --- 10. AWARD SHOW SVG ICONS ---
+(function(){
+  AWARD_SHOWS.forEach(function(s){
+    if(s.name==='Academy Awards')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="var(--accent-gold)"><path d="M12 2l2.5 5.5 6 .8-4.3 4.2 1 6L12 15.5 6.8 18.5l1-6L3.5 8.3l6-.8z"/></svg>';
+    else if(s.name==='Golden Globes')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-3 3-3 15 0 18M12 3c3 3 3 15 0 18"/></svg>';
+    else if(s.name==='Cannes')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><path d="M12 3v18M8 4c0 4 4 5 4 9M16 4c0 4-4 5-4 9"/><path d="M7 21h10"/></svg>';
+    else if(s.name==='Venice')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><path d="M3 17c3-2 5-2 9-2s6 0 9 2"/><path d="M12 3v12M8 7l4-4 4 4"/></svg>';
+    else if(s.name==='Sundance')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>';
+    else if(s.name==='BAFTA')s.icon='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><path d="M12 3c-5 0-8 4-8 8 0 5 8 10 8 10s8-5 8-10c0-4-3-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>';
+  });
+})();
+
+renderAwards=function(){
+  document.getElementById('awards-display').innerHTML=AWARD_SHOWS.map(function(s){
+    return '<div class="card" style="text-align:center;"><div style="margin-bottom:8px;">'+s.icon+'</div>'
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:16px;font-weight:700;">'+s.name+'</div>'
+      +'<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Prestige: '+s.prestige+'</div>'
+      +'<div style="font-size:12px;color:var(--accent-gold);">'
+      +(G.awards.filter(function(a){return a.show===s.name;}).length>0
+        ?G.awards.filter(function(a){return a.show===s.name;}).map(function(a){
+          return '<div><svg viewBox="0 0 16 16" width="12" height="12" fill="var(--accent-gold)" style="vertical-align:middle;"><path d="M8 1l2 4 4.5.7-3.3 3.2.8 4.5L8 11.2 3.9 13.4l.8-4.5L1.5 5.7 6 5z"/></svg> '+a.category+'</div>';}).join('')
+        :'<div style="color:var(--text-muted);">No wins yet</div>')+'</div></div>';
+  }).join('');
+};
+
+// --- 11. AUTOSAVE ---
+var _v3AdvWeek=advanceWeek;
+advanceWeek=function(){
+  _v3AdvWeek();
+  if(G.week%10===0){
+    var as=(document.getElementById('setting-autosave')||{}).value||'on';
+    if(as==='on')saveToSlot(G.saveSlot||0);
+  }
+};
+
+// --- 12. DASHBOARD GREETING ---
+var _v3UpdateAll=updateAllUI;
+updateAllUI=function(){
+  _v3UpdateAll();
+  var g=document.getElementById('dash-greeting');
+  if(g&&G.producerName)g.textContent='Welcome, '+G.producerName;
+};
+
+// --- 13. EMPTY STATE SVG REPLACEMENTS (override on DOM ready) ---
+(function(){
+  var emptyIcons=document.querySelectorAll('.empty-state-icon');
+  emptyIcons.forEach(function(el){
+    var parent=el.closest('.tab-content');
+    if(!parent)return;
+    var id=parent.id||'';
+    if(id.indexOf('production')>=0)el.innerHTML='<svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" opacity=".5"><circle cx="24" cy="24" r="20"/><circle cx="24" cy="24" r="6"/><path d="M24 4v6M24 38v6M4 24h6M38 24h6"/></svg>';
+    else if(id.indexOf('library')>=0)el.innerHTML='<svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" opacity=".5"><rect x="4" y="8" width="12" height="32" rx="2"/><rect x="18" y="4" width="12" height="40" rx="2"/><rect x="32" y="10" width="12" height="28" rx="2"/></svg>';
+    else if(id.indexOf('marketing')>=0)el.innerHTML='<svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" opacity=".5"><path d="M6 30V18l18-8v32l-18-8z"/><path d="M24 14c6 0 14 3 18 10-4 7-12 10-18 10"/></svg>';
+    else if(id.indexOf('franchise')>=0)el.innerHTML='<svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" opacity=".5"><circle cx="24" cy="10" r="6"/><circle cx="10" cy="36" r="6" opacity=".6"/><circle cx="38" cy="36" r="6" opacity=".6"/><path d="M24 16v8M15 32l6-8M33 32l-6-8"/></svg>';
+    else el.innerHTML='<svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="var(--text-muted)" stroke-width="1.5" opacity=".5"><rect x="4" y="10" width="40" height="28" rx="4"/><path d="M4 16h40M14 10v6M24 10v6M34 10v6"/><path d="M24 24l6 4-6 4z" fill="var(--text-muted)" opacity=".3"/></svg>';
+  });
+})();
+
+// --- 14. CALENDAR INTERVIEW BUTTON LAUNCHES MINIGAME ---
+renderCalendar=function(){
+  var container=document.getElementById('calendar-content');
+  if(!container)return;
+  if(!G.calendarEvents)G.calendarEvents=[];
+
+  var events=G.calendarEvents.slice();
+  G.completedMovies.forEach(function(m){
+    if(!m.released)events.push({week:G.week+rnd(1,4),type:'release',text:'"'+m.title+'" Release'});
+  });
+  if(G.week<12)events.push({week:10,type:'ceremony',text:'Awards Season'});
+  if(G.week<20)events.push({week:18,type:'ceremony',text:'Cannes Film Festival'});
+  if(G.week<35)events.push({week:30,type:'interview',text:'Press Junket Window'});
+  if(G.week<48)events.push({week:45,type:'ceremony',text:'Golden Globes Season'});
+
+  var html='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'
+    +'<div style="font-weight:700;font-size:16px;">Year '+G.year+' — Week '+G.week+'/52</div></div>'
+    +'<div class="calendar-grid">';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){html+='<div class="cal-header">'+d+'</div>';});
+  for(var w=Math.max(1,G.week-3);w<=Math.min(52,G.week+24);w++){
+    var isToday=w===G.week;
+    var dayEvts=events.filter(function(e){return e.week===w;});
+    html+='<div class="cal-day'+(isToday?' today':'')+'">'
+      +'<div class="cal-day-num" style="'+(isToday?'color:var(--accent-gold);':'')+'">W'+w+'</div>';
+    dayEvts.forEach(function(ev){html+='<div class="cal-event '+ev.type+'">'+ev.text+'</div>';});
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  html+='<div class="card" style="margin-top:16px;"><div class="card-header"><div class="card-title">Upcoming</div></div>';
+  var upcoming=events.filter(function(e){return e.week>=G.week;}).sort(function(a,b){return a.week-b.week;}).slice(0,8);
+  if(!upcoming.length)html+='<div style="color:var(--text-muted);font-size:13px;">Nothing scheduled</div>';
+  else upcoming.forEach(function(ev){
+    html+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">'
+      +'<span><span class="cal-event '+ev.type+'" style="display:inline-block;">'+ev.type.toUpperCase()+'</span> '+ev.text+'</span>'
+      +'<span style="color:var(--text-muted);font-size:12px;">Week '+ev.week+'</span></div>';
+  });
+  html+='</div>';
+
+  html+='<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">'
+    +'<button class="btn btn-blue btn-sm" onclick="scheduleInterview()">'
+    +'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:4px;"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>'
+    +'Interview ($50K)</button>'
+    +'<button class="btn btn-purple btn-sm" onclick="scheduleTrailerDrop()">'
+    +'<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" style="vertical-align:middle;margin-right:4px;"><path d="M4 2a1 1 0 00-1 1v10a1 1 0 001.5.87l8-5a1 1 0 000-1.74l-8-5A1 1 0 004 2z"/></svg>'
+    +'Trailer Drop ($100K)</button>'
+    +'</div>';
+
+  container.innerHTML=html;
+};
+
+// --- 15. SCRIPT MINIGAME: Replace emoji icons with SVG ---
+(function(){
+  var svgIcons={
+    openings:{
+      'Cold Open':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-blue)" stroke-width="1.5"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg>',
+      'Slow Burn':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-red)" stroke-width="1.5"><path d="M12 22c4-2 7-6 7-10 0-5-3-8-7-10-4 2-7 5-7 10 0 4 3 8 7 10z"/></svg>',
+      'In Media Res':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-gold)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>',
+      'Narration':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-purple)" stroke-width="1.5"><path d="M4 4h16v12H6l-2 4V4z"/></svg>',
+      'Mystery Hook':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--text-light)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115 3c0 1.5-2 2-2 3M12 18h.01"/></svg>',
+      'Flashforward':'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent-blue)" stroke-width="1.5"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>'
+    }
+  };
+  var origRender=renderScriptMinigame;
+  renderScriptMinigame=function(){
+    origRender();
+    var cards=document.querySelectorAll('.script-card-icon');
+    cards.forEach(function(el){
+      var name=el.nextElementSibling?el.nextElementSibling.textContent:'';
+      for(var cat in svgIcons){
+        if(svgIcons[cat][name]){el.innerHTML=svgIcons[cat][name];break;}
+      }
+      if(!el.querySelector('svg')){
+        el.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>';
+      }
+    });
+  };
+})();
 </script>
 </body>
 </html>
