@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Empire Pictures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Fonts loaded via link tag in head for non-blocking */
 
 :root {
   --primary: #0B0F18;
@@ -28,7 +31,7 @@ html, body {
   width:100%; height:100%;
   background: var(--primary);
   color: var(--text-white);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow: hidden;
 }
 
@@ -65,7 +68,7 @@ html, body {
 .spotlight-2 { bottom:-100px; right:10%; background:rgba(0,194,255,.1); animation-duration:30s; animation-direction:reverse; }
 .spotlight-3 { top:40%; left:60%; background:rgba(139,92,246,.08); animation-duration:35s; }
 .menu-content { position:relative; z-index:10; text-align:center; animation:slideUp 1s ease; }
-.menu-logo { font-family:'Playfair Display',serif; font-size:72px; font-weight:900; letter-spacing:8px; margin-bottom:8px; background:linear-gradient(135deg,var(--accent-gold),#fff,var(--accent-gold)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s linear infinite; }
+.menu-logo { font-family:'Playfair Display',Georgia,serif; font-size:72px; font-weight:900; letter-spacing:8px; margin-bottom:8px; background:linear-gradient(135deg,var(--accent-gold),#fff,var(--accent-gold)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s linear infinite; }
 .menu-subtitle { font-size:14px; letter-spacing:6px; text-transform:uppercase; color:var(--text-muted); margin-bottom:60px; }
 .menu-buttons { display:flex; flex-direction:column; align-items:center; gap:8px; }
 .menu-btn { width:320px; padding:16px 24px; background:rgba(21,28,44,.7); border:1px solid var(--border); color:var(--text-light); font-family:'Inter',sans-serif; font-size:15px; font-weight:500; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border-radius:4px; transition:all .3s; }
@@ -76,7 +79,7 @@ html, body {
 
 /* Sidebar */
 .sidebar { width:240px; min-width:240px; background:var(--secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; }
-.sidebar-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; padding:20px 20px 16px; color:var(--accent-gold); letter-spacing:3px; border-bottom:1px solid var(--border); }
+.sidebar-logo { font-family:'Playfair Display',Georgia,serif; font-size:20px; font-weight:700; padding:20px 20px 16px; color:var(--accent-gold); letter-spacing:3px; border-bottom:1px solid var(--border); }
 .sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
 .nav-section { padding:16px 20px 6px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); }
 .nav-btn { width:100%; padding:10px 20px; background:none; border:none; color:var(--text-light); font-family:'Inter',sans-serif; font-size:13px; text-align:left; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:10px; border-left:3px solid transparent; }
@@ -144,14 +147,14 @@ html, body {
 .data-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid rgba(42,53,80,.5); color:var(--text-light); }
 
 .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px; text-align:center; }
-.stat-card-value { font-size:28px; font-weight:700; font-family:'JetBrains Mono',monospace; margin-bottom:4px; }
+.stat-card-value { font-size:28px; font-weight:700; font-family:'JetBrains Mono','Courier New',monospace; margin-bottom:4px; }
 .stat-card-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); }
 
 .stat-bar-container { display:flex; align-items:center; gap:8px; margin:4px 0; }
 .stat-label { font-size:11px; color:var(--text-muted); width:80px; text-align:right; }
 .stat-bar { flex:1; height:4px; background:var(--primary); border-radius:2px; overflow:hidden; }
 .stat-bar-fill { height:100%; border-radius:2px; background:var(--accent-blue); transition:width .5s ease; }
-.stat-value { font-size:11px; color:var(--text-light); width:30px; font-weight:600; font-family:'JetBrains Mono',monospace; }
+.stat-value { font-size:11px; color:var(--text-light); width:30px; font-weight:600; font-family:'JetBrains Mono','Courier New',monospace; }
 
 .tab-content { display:none; }
 .tab-content.active { display:block; animation:fadeIn .3s ease; }
@@ -189,14 +192,14 @@ html, body {
   border-bottom:1px solid var(--border);
   display:flex; justify-content:space-between; align-items:center;
 }
-.minigame-title { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; }
+.minigame-title { font-family:'Playfair Display',Georgia,serif; font-size:22px; font-weight:700; }
 .minigame-phase { font-size:11px; padding:4px 14px; border-radius:20px; font-weight:700; letter-spacing:1px; }
 .minigame-body { flex:1; overflow-y:auto; padding:24px; }
 .minigame-footer { padding:16px 24px; background:var(--secondary); border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
 .minigame-score-bar { display:flex; gap:24px; }
 .minigame-score-item { text-align:center; }
 .minigame-score-item .label { font-size:9px; letter-spacing:1px; text-transform:uppercase; color:var(--text-muted); }
-.minigame-score-item .value { font-size:20px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+.minigame-score-item .value { font-size:20px; font-weight:700; font-family:'JetBrains Mono','Courier New',monospace; }
 
 /* Script cards */
 .script-choice-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0; }
@@ -219,7 +222,7 @@ html, body {
   padding:32px; text-align:center; margin:16px 0;
   min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center;
 }
-.audition-actor-name { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:8px; }
+.audition-actor-name { font-family:'Playfair Display',Georgia,serif; font-size:28px; font-weight:700; margin-bottom:8px; }
 .audition-performance { font-size:14px; color:var(--text-light); font-style:italic; margin:16px 0; max-width:500px; }
 .audition-meter { width:300px; height:12px; background:var(--primary); border-radius:6px; overflow:hidden; margin:12px auto; }
 .audition-meter-fill { height:100%; border-radius:6px; transition:width 1s ease; }
@@ -296,7 +299,7 @@ html, body {
 }
 .mixer-slider { writing-mode:vertical-lr; direction:rtl; height:120px; }
 .mixer-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
-.mixer-value { font-size:14px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+.mixer-value { font-size:14px; font-weight:700; font-family:'JetBrains Mono','Courier New',monospace; }
 
 .color-swatch {
   width:100%; height:80px; border-radius:8px; cursor:pointer;
@@ -326,7 +329,7 @@ html, body {
   margin:16px 0;
 }
 .premiere-counter {
-  font-family:'JetBrains Mono',monospace;
+  font-family:'JetBrains Mono','Courier New',monospace;
   font-size:48px; font-weight:700;
   animation:countUp .5s ease;
 }
@@ -413,7 +416,7 @@ html, body {
       <!-- Dashboard -->
       <div class="tab-content active" id="tab-dashboard">
         <div class="card" style="background:linear-gradient(135deg,rgba(215,38,56,.1),rgba(139,92,246,.05)); border-radius:12px; padding:32px; margin-bottom:20px;">
-          <h2 style="font-family:'Playfair Display',serif; font-size:28px; margin-bottom:8px;" id="dash-greeting">Welcome, Producer</h2>
+          <h2 style="font-family:'Playfair Display',Georgia,serif; font-size:28px; margin-bottom:8px;" id="dash-greeting">Welcome, Producer</h2>
           <p style="color:var(--text-muted);" id="dash-subtitle">Your journey begins now.</p>
         </div>
         <div class="grid-4" id="dash-stats"></div>
@@ -444,7 +447,7 @@ html, body {
               <div class="form-group"><label class="form-label">Rating</label><select class="form-select" id="movie-rating"><option>G</option><option>PG</option><option selected>PG-13</option><option>R</option></select></div>
               <div class="form-group"><label class="form-label">Production Scale</label><select class="form-select" id="movie-scale" onchange="updateBudgetEstimate()"><option value="Micro">Micro ($50K-$500K)</option><option value="Low">Low ($500K-$5M)</option><option value="Medium" selected>Medium ($5M-$30M)</option><option value="High">High ($30M-$100M)</option><option value="Blockbuster">Blockbuster ($100M+)</option></select></div>
               <div class="form-group"><label class="form-label">Release Season</label><select class="form-select" id="movie-season"><option value="Winter">Winter (Awards)</option><option>Spring</option><option value="Summer" selected>Summer (Blockbuster)</option><option>Fall</option><option>Holiday</option></select></div>
-              <div class="form-group"><label class="form-label">Budget Estimate</label><div id="budget-estimate" style="font-size:24px;font-weight:700;color:#4ade80;font-family:'JetBrains Mono',monospace;" data-value="10000000">$10.0M</div></div>
+              <div class="form-group"><label class="form-label">Budget Estimate</label><div id="budget-estimate" style="font-size:24px;font-weight:700;color:#4ade80;font-family:'JetBrains Mono','Courier New',monospace;" data-value="10000000">$10.0M</div></div>
             </div>
           </div>
         </div>
@@ -481,7 +484,7 @@ html, body {
 <!-- SETTINGS -->
 <div id="settings-screen" class="screen" style="justify-content:center;align-items:center;">
   <div style="max-width:500px;width:90%;">
-    <h2 style="font-family:'Playfair Display',serif;font-size:32px;margin-bottom:30px;text-align:center;">Settings</h2>
+    <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:32px;margin-bottom:30px;text-align:center;">Settings</h2>
     <div class="card">
       <div class="form-group"><label class="form-label">Studio Name</label><input type="text" class="form-input" id="setting-studio-name" value="Empire Pictures"></div>
       <div class="form-group"><label class="form-label">Difficulty</label><select class="form-select" id="setting-difficulty"><option value="Easy">Easy</option><option value="Normal" selected>Normal</option><option value="Hard">Hard</option><option value="Mogul">Mogul</option></select></div>
@@ -868,7 +871,7 @@ function renderScriptMinigame() {
           <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;">
             ${catNames.map((c,i) => `<div style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;${i===s.step?'background:var(--accent-gold);color:#000;':'background:var(--bg-card);color:var(--text-muted);'}${i<s.step?'background:rgba(74,222,128,.2);color:#4ade80;':''}">${c}</div>`).join('')}
           </div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;">Choose Your ${catNames[s.step]}</h3>
+          <h3 style="font-family:'Playfair Display',Georgia,serif;font-size:24px;margin-bottom:8px;">Choose Your ${catNames[s.step]}</h3>
           <p style="color:var(--text-muted);font-size:13px;">Each choice shapes your film's identity and affects critic & audience reception.</p>
         </div>
         <div class="script-choice-grid" style="max-width:800px;margin:0 auto;">
@@ -1025,7 +1028,7 @@ function renderShootingMinigame() {
           <div class="shooting-take-label">TAKE ${takeNum}</div>
           <div class="shooting-scene-content">
             <div style="font-size:36px;margin-bottom:16px;">&#127916;</div>
-            <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:8px;">${scene.name}</div>
+            <div style="font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:8px;">${scene.name}</div>
             <div class="shooting-scene-desc">${scene.desc}</div>
             <div class="shooting-choices">
               ${scene.choices.map((c,i) => `
@@ -1234,7 +1237,7 @@ function renderSoundMinigame() {
         </div>
         <div class="card" style="width:300px;text-align:center;">
           <div style="font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">MIX QUALITY</div>
-          <div style="font-size:36px;font-weight:700;color:${score>=80?'#4ade80':score>=60?'var(--accent-gold)':'var(--accent-red)'};font-family:'JetBrains Mono',monospace;">${score}/100</div>
+          <div style="font-size:36px;font-weight:700;color:${score>=80?'#4ade80':score>=60?'var(--accent-gold)':'var(--accent-red)'};font-family:'JetBrains Mono','Courier New',monospace;">${score}/100</div>
           <div class="progress-bar" style="height:8px;margin:8px 0;"><div class="progress-fill ${score>=80?'progress-green':score>=60?'progress-gold':'progress-red'}" style="width:${score}%;"></div></div>
           <div style="font-size:11px;color:var(--text-muted);">Get each channel in its green zone!</div>
         </div>
@@ -1402,7 +1405,7 @@ function renderPremiereMinigame() {
       <div class="premiere-stage" style="max-width:700px;width:90%;">
         <div style="font-size:64px;margin-bottom:16px;">&#127902;</div>
         <div style="font-size:12px;color:var(--accent-gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">${G.studioName} Presents</div>
-        <div style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;margin-bottom:8px;letter-spacing:2px;">${m.title}</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:42px;font-weight:900;margin-bottom:8px;letter-spacing:2px;">${m.title}</div>
         <div style="font-size:14px;color:var(--text-muted);margin-bottom:32px;">${m.genre} | ${m.tone} | ${m.rating} | ${m.releaseStrategy} Release</div>
         <div id="premiere-reveal" style="display:none;">
           <div class="grid-3" style="margin-bottom:24px;">
@@ -1410,7 +1413,7 @@ function renderPremiereMinigame() {
             <div><div style="font-size:11px;color:var(--text-muted);">AUDIENCE SCORE</div><div class="premiere-counter" id="audience-counter" style="color:var(--accent-blue);">0</div></div>
             <div><div style="font-size:11px;color:var(--text-muted);">BOX OFFICE</div><div class="premiere-counter" id="boxoffice-counter" style="color:#4ade80;">$0</div></div>
           </div>
-          <div id="premiere-verdict" style="font-family:'Playfair Display',serif;font-size:24px;color:var(--accent-gold);margin-bottom:24px;"></div>
+          <div id="premiere-verdict" style="font-family:'Playfair Display',Georgia,serif;font-size:24px;color:var(--accent-gold);margin-bottom:24px;"></div>
           <button class="btn btn-red btn-lg" onclick="finishPremiere()">VIEW FULL RESULTS</button>
         </div>
         <button class="btn btn-gold btn-lg" id="premiere-start-btn" onclick="startPremiereReveal()">&#127916; RELEASE THE FILM</button>
@@ -1532,7 +1535,7 @@ function showMovieResultModal(movie) {
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <div style="text-align:center;margin-bottom:24px;">
       <div style="font-size:12px;color:var(--accent-blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">${m.genre} | ${m.yearStarted}</div>
-      <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;margin-bottom:8px;">${m.title}</div>
+      <div style="font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;margin-bottom:8px;">${m.title}</div>
     </div>
     <div class="grid-3" style="margin-bottom:20px;">
       <div class="stat-card"><div class="stat-card-value" style="color:var(--accent-gold);">${m.criticScore}</div><div class="stat-card-label">Critic</div></div>
@@ -1599,7 +1602,7 @@ function renderLibrary(){
   if(!G.completedMovies.length){g.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">&#127902;</div><div class="empty-state-text">No completed movies</div></div>';return}
   g.innerHTML=G.completedMovies.map(m=>`<div class="movie-card" onclick='showMovieResultModal(G.completedMovies.find(x=>x.id==="${m.id}"))'>
     <div style="font-size:10px;color:var(--accent-blue);letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:6px;">${m.genre}</div>
-    <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:8px;">${m.title}</div>
+    <div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;margin-bottom:8px;">${m.title}</div>
     <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted);"><span>&#9733; ${m.criticScore}</span><span>&#128100; ${m.audienceScore}</span><span style="color:${m.profit>0?'#4ade80':'var(--accent-red)'}">$${formatMoney(Math.abs(m.profit))}</span></div>
     ${m.awardsWon.length>0?`<div style="margin-top:6px;font-size:11px;color:var(--accent-gold);">&#127942; ${m.awardsWon.length} Award(s)</div>`:''}
   </div>`).join('');
@@ -1688,9 +1691,9 @@ function renderFinance(){
 
 function upgradeStudio(){const cost=STUDIO_LEVELS[G.studioLevel].costToUpgrade;if(!cost||G.money<cost)return;G.money-=cost;G.studioLevel++;G.reputation=clamp(G.reputation+5,0,100);notify('Upgraded!',`Now: ${STUDIO_LEVELS[G.studioLevel].name}`,'success');updateAllUI();renderFinance()}
 
-function renderRivals(){document.getElementById('rivals-grid').innerHTML=G.rivalStudios.map(r=>`<div class="rival-card"><div style="width:50px;height:50px;border-radius:8px;background:${r.color}20;color:${r.color};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:'Playfair Display',serif;">${r.name.charAt(0)}</div><div style="flex:1;"><div style="font-weight:700;">${r.name}</div><div style="font-size:11px;color:var(--text-muted);">${r.style} — ${r.personality}</div><div style="margin-top:6px;display:flex;gap:16px;font-size:12px;"><span style="color:var(--text-muted);">Money: <span style="color:#4ade80;">$${formatMoney(r.money)}</span></span><span style="color:var(--text-muted);">Rep: <span style="color:var(--accent-blue);">${r.rep}</span></span></div></div></div>`).join('')}
+function renderRivals(){document.getElementById('rivals-grid').innerHTML=G.rivalStudios.map(r=>`<div class="rival-card"><div style="width:50px;height:50px;border-radius:8px;background:${r.color}20;color:${r.color};display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;font-family:'Playfair Display',Georgia,serif;">${r.name.charAt(0)}</div><div style="flex:1;"><div style="font-weight:700;">${r.name}</div><div style="font-size:11px;color:var(--text-muted);">${r.style} — ${r.personality}</div><div style="margin-top:6px;display:flex;gap:16px;font-size:12px;"><span style="color:var(--text-muted);">Money: <span style="color:#4ade80;">$${formatMoney(r.money)}</span></span><span style="color:var(--text-muted);">Rep: <span style="color:var(--accent-blue);">${r.rep}</span></span></div></div></div>`).join('')}
 
-function renderAwards(){document.getElementById('awards-display').innerHTML=AWARD_SHOWS.map(s=>`<div class="card" style="text-align:center;"><div style="font-size:36px;margin-bottom:8px;">${s.icon}</div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;">${s.name}</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Prestige: ${s.prestige}</div><div style="font-size:12px;color:var(--accent-gold);">${G.awards.filter(a=>a.show===s.name).length>0?G.awards.filter(a=>a.show===s.name).map(a=>`<div>&#127942; ${a.category}</div>`).join(''):'<div style="color:var(--text-muted);">No wins</div>'}</div></div>`).join('')}
+function renderAwards(){document.getElementById('awards-display').innerHTML=AWARD_SHOWS.map(s=>`<div class="card" style="text-align:center;"><div style="font-size:36px;margin-bottom:8px;">${s.icon}</div><div style="font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;">${s.name}</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Prestige: ${s.prestige}</div><div style="font-size:12px;color:var(--accent-gold);">${G.awards.filter(a=>a.show===s.name).length>0?G.awards.filter(a=>a.show===s.name).map(a=>`<div>&#127942; ${a.category}</div>`).join(''):'<div style="color:var(--text-muted);">No wins</div>'}</div></div>`).join('')}
 
 function renderSkillTree(){document.getElementById('skill-points').textContent=G.skillPoints;let html='';for(const[tn,skills]of Object.entries(SKILL_TREES)){html+=`<div class="card"><div class="card-header"><div class="card-title">${tn.charAt(0).toUpperCase()+tn.slice(1)}</div></div><div class="grid-3">${skills.map(s=>{const u=G.skillsUnlocked.includes(s.id);const can=!u&&G.skillPoints>=s.cost&&s.requires.every(r=>G.skillsUnlocked.includes(r));return`<div class="skill-node ${u?'unlocked':can?'':'locked'}" onclick="${can?`unlockSkill('${tn}','${s.id}')`:''}""><div style="font-size:12px;font-weight:700;">${s.name}</div><div style="font-size:10px;color:var(--text-muted);margin:4px 0;">${s.desc}</div><div style="font-size:10px;color:var(--accent-gold);">${u?'&#10003; Unlocked':s.cost+' SP'}</div></div>`}).join('')}</div></div>`;} document.getElementById('skills-content').innerHTML=html}
 function unlockSkill(tn,id){const s=SKILL_TREES[tn].find(x=>x.id===id);if(!s||G.skillPoints<s.cost||G.skillsUnlocked.includes(id))return;if(!s.requires.every(r=>G.skillsUnlocked.includes(r)))return;G.skillPoints-=s.cost;G.skillsUnlocked.push(id);notify('Skill Unlocked!',`${s.name}: ${s.desc}`,'success');renderSkillTree()}
