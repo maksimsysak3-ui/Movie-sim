@@ -47,7 +47,7 @@ html, body {
 
 .screen { display:none; width:100%; height:100%; position:absolute; top:0; left:0; animation: fadeIn 0.5s ease; }
 .screen.active { display:flex; flex-direction:column; }
-#game-screen.active { flex-direction:column; }
+#game-screen.active { flex-direction:row; }
 
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
@@ -78,21 +78,16 @@ html, body {
 .menu-btn.primary-btn:hover { background:linear-gradient(135deg,#e83a4e,var(--accent-red)); transform:translateX(4px) scale(1.02); }
 .menu-version { position:absolute; bottom:30px; right:40px; font-size:11px; color:var(--text-muted); letter-spacing:2px; }
 
-/* Top Ribbon Navigation */
-.sidebar { display:none; }
-.top-ribbon { background:var(--secondary); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 16px; height:44px; gap:2px; overflow-x:auto; }
-.nav-group { position:relative; }
-.nav-group-btn { padding:8px 14px; background:none; border:none; color:var(--text-muted); font-family:'Inter',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .2s; border-bottom:2px solid transparent; white-space:nowrap; display:flex; align-items:center; gap:6px; }
-.nav-group-btn:hover { color:var(--text-white); background:var(--bg-hover); }
-.nav-group-btn.group-active { color:var(--accent-gold); border-bottom-color:var(--accent-gold); }
-.nav-group-btn svg { width:14px; height:14px; }
-.nav-dropdown { display:none; position:absolute; top:100%; left:0; background:var(--secondary); border:1px solid var(--border); border-radius:0 0 8px 8px; min-width:180px; z-index:100; box-shadow:0 12px 40px rgba(0,0,0,.6); padding:4px 0; }
-.nav-group:hover .nav-dropdown, .nav-group.open .nav-dropdown { display:block; }
-.nav-drop-item { display:flex; align-items:center; gap:10px; padding:10px 16px; color:var(--text-light); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; border:none; background:none; width:100%; text-align:left; font-family:'Inter',sans-serif; }
-.nav-drop-item:hover { background:var(--bg-hover); color:var(--text-white); padding-left:20px; }
-.nav-drop-item.active { color:var(--accent-gold); background:var(--glow-gold); }
-.nav-drop-item svg { width:16px; height:16px; opacity:.7; }
-.sidebar-stats { display:none; }
+/* Sidebar */
+.sidebar { width:240px; min-width:240px; background:var(--secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; }
+.sidebar-logo { font-family:'Playfair Display',Georgia,serif; font-size:20px; font-weight:700; padding:20px 20px 16px; color:var(--accent-gold); letter-spacing:3px; border-bottom:1px solid var(--border); }
+.sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
+.nav-section { padding:16px 20px 6px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); }
+.nav-btn { width:100%; padding:10px 20px; background:none; border:none; color:var(--text-light); font-family:'Inter',sans-serif; font-size:13px; text-align:left; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:10px; border-left:3px solid transparent; }
+.nav-btn:hover { background:var(--bg-hover); color:white; }
+.nav-btn.active { background:rgba(230,57,70,.1); border-left-color:var(--accent-red); color:white; font-weight:600; }
+.nav-btn .nav-icon { font-size:16px; width:24px; text-align:center; }
+.sidebar-stats { padding:16px 20px; border-top:1px solid var(--border); font-size:12px; }
 .stat-row { display:flex; justify-content:space-between; margin-bottom:6px; color:var(--text-muted); }
 .stat-row span:last-child { color:var(--text-light); font-weight:600; }
 
@@ -466,6 +461,40 @@ html, body {
 
 <!-- GAME SCREEN -->
 <div id="game-screen" class="screen">
+  <div class="sidebar">
+    <div class="sidebar-logo">EMPIRE</div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Studio</div>
+      <button class="nav-btn active" onclick="showTab('dashboard')" data-tab="dashboard"><span class="nav-icon"></span> Dashboard</button>
+      <button class="nav-btn" onclick="showTab('new-movie')" data-tab="new-movie"><span class="nav-icon"></span> New Production</button>
+      <button class="nav-btn" onclick="showTab('production')" data-tab="production"><span class="nav-icon"></span> In Production</button>
+      <button class="nav-btn" onclick="showTab('library')" data-tab="library"><span class="nav-icon"></span> Film Library</button>
+      <div class="nav-section">Talent</div>
+      <button class="nav-btn" onclick="showTab('actors')" data-tab="actors"><span class="nav-icon"></span> Actors</button>
+      <button class="nav-btn" onclick="showTab('directors')" data-tab="directors"><span class="nav-icon"></span> Directors</button>
+      <button class="nav-btn" onclick="showTab('composers')" data-tab="composers"><span class="nav-icon"></span> Composers</button>
+      <div class="nav-section">Business</div>
+      <button class="nav-btn" onclick="showTab('marketing')" data-tab="marketing"><span class="nav-icon"></span> Marketing</button>
+      <button class="nav-btn" onclick="showTab('finance')" data-tab="finance"><span class="nav-icon"></span> Finances</button>
+      <button class="nav-btn" onclick="showTab('rivals')" data-tab="rivals"><span class="nav-icon"></span> Rivals</button>
+      <button class="nav-btn" onclick="showTab('franchise')" data-tab="franchise"><span class="nav-icon"></span> Franchises</button>
+      <div class="nav-section">Prestige</div>
+      <button class="nav-btn" onclick="showTab('awards')" data-tab="awards"><span class="nav-icon"></span> Awards</button>
+      <button class="nav-btn" onclick="showTab('skills')" data-tab="skills"><span class="nav-icon"></span> Skill Tree</button>
+      <button class="nav-btn" onclick="showTab('tech')" data-tab="tech"><span class="nav-icon"></span> Tech Lab</button>
+      <div class="nav-section">Media</div>
+      <button class="nav-btn" onclick="showTab('imdb')" data-tab="imdb"><span class="nav-icon"></span> IMDB</button>
+      <button class="nav-btn" onclick="showTab('calendar')" data-tab="calendar"><span class="nav-icon"></span> Calendar</button>
+      <button class="nav-btn" onclick="showTab('tvshows')" data-tab="tvshows"><span class="nav-icon"></span> TV Shows</button>
+      <button class="nav-btn" onclick="showTab('trailers')" data-tab="trailers"><span class="nav-icon"></span> Trailers</button>
+      <button class="nav-btn" onclick="showTab('posters')" data-tab="posters"><span class="nav-icon"></span> Posters</button>
+    </div>
+    <div class="sidebar-stats">
+      <div class="stat-row"><span>Week</span><span id="week-display">1</span></div>
+      <div class="stat-row"><span>Year</span><span id="year-display">1982</span></div>
+      <div class="stat-row"><span>Movies</span><span id="movies-count">0</span></div>
+    </div>
+  </div>
   <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
     <div class="top-bar">
       <div class="top-bar-left">
@@ -481,59 +510,6 @@ html, body {
         <button class="top-bar-btn" style="background:var(--border)" onclick="showScreen('main-menu')">MENU</button>
       </div>
     </div>
-    <nav class="top-ribbon" id="top-ribbon">
-      <div class="nav-group">
-        <button class="nav-group-btn group-active" onclick="showTab('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> HQ</button>
-      </div>
-      <div class="nav-group">
-        <button class="nav-group-btn">STUDIO</button>
-        <div class="nav-dropdown">
-          <button class="nav-drop-item" onclick="showTab('new-movie')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 4v16M17 4v16M3 8h4M17 8h4M3 12h18M3 16h4M17 16h4M3 4h18v16H3z"/></svg> New Production</button>
-          <button class="nav-drop-item" onclick="showTab('production')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> In Production</button>
-          <button class="nav-drop-item" onclick="showTab('library')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> Film Library</button>
-          <button class="nav-drop-item" onclick="showTab('tvshows')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l-5 5-5-5"/></svg> TV Shows</button>
-        </div>
-      </div>
-      <div class="nav-group">
-        <button class="nav-group-btn">TALENT</button>
-        <div class="nav-dropdown">
-          <button class="nav-drop-item" onclick="showTab('actors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg> Actors</button>
-          <button class="nav-drop-item" onclick="showTab('directors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Directors</button>
-          <button class="nav-drop-item" onclick="showTab('composers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Composers</button>
-        </div>
-      </div>
-      <div class="nav-group">
-        <button class="nav-group-btn">BUSINESS</button>
-        <div class="nav-dropdown">
-          <button class="nav-drop-item" onclick="showTab('marketing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Marketing</button>
-          <button class="nav-drop-item" onclick="showTab('finance')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Finances</button>
-          <button class="nav-drop-item" onclick="showTab('rivals')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg> Rivals</button>
-          <button class="nav-drop-item" onclick="showTab('franchise')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Franchises</button>
-        </div>
-      </div>
-      <div class="nav-group">
-        <button class="nav-group-btn">PRESTIGE</button>
-        <div class="nav-dropdown">
-          <button class="nav-drop-item" onclick="showTab('awards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg> Awards</button>
-          <button class="nav-drop-item" onclick="showTab('skills')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> Skill Tree</button>
-          <button class="nav-drop-item" onclick="showTab('tech')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10M18 20V4M6 20v-4"/></svg> Tech Lab</button>
-        </div>
-      </div>
-      <div class="nav-group">
-        <button class="nav-group-btn">MEDIA</button>
-        <div class="nav-dropdown">
-          <button class="nav-drop-item" onclick="showTab('imdb')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> IMDB</button>
-          <button class="nav-drop-item" onclick="showTab('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</button>
-          <button class="nav-drop-item" onclick="showTab('trailers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 19,12 5,21"/></svg> Trailers</button>
-          <button class="nav-drop-item" onclick="showTab('posters')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Posters</button>
-        </div>
-      </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted);">
-        <span>W<strong id="week-display" style="color:var(--accent-warm);margin-left:2px;">1</strong></span>
-        <span>Y<strong id="year-display" style="color:var(--accent-warm);margin-left:2px;">1982</strong></span>
-        <span style="color:var(--accent-gold);"><strong id="movies-count">0</strong> Films</span>
-      </div>
-    </nav>
     <div class="main-content" id="main-content">
       <!-- Dashboard -->
       <div class="tab-content active" id="tab-dashboard">
@@ -4855,26 +4831,6 @@ function v4SoundMinigame(m) {
   render();
 }
 
-// ---- showTab override for new nav highlighting ----
-var _origShowTab = showTab;
-showTab = function(tab) {
-  _origShowTab(tab);
-  // Update nav ribbon active states
-  var items = document.querySelectorAll('.nav-drop-item');
-  items.forEach(function(item){item.classList.remove('active');});
-  items.forEach(function(item){
-    if(item.getAttribute('onclick') && item.getAttribute('onclick').indexOf("'"+tab+"'") !== -1) {
-      item.classList.add('active');
-      // Also highlight parent group
-      var group = item.closest('.nav-group');
-      if(group){
-        document.querySelectorAll('.nav-group-btn').forEach(function(b){b.classList.remove('group-active');});
-        var btn = group.querySelector('.nav-group-btn');
-        if(btn) btn.classList.add('group-active');
-      }
-    }
-  });
-};
 </script>
 </body>
 </html>
