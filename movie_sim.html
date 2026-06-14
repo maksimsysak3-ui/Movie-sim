@@ -8,18 +8,21 @@
 /* No external font dependencies - fully offline */
 
 :root {
-  --primary: #0B0F18;
-  --secondary: #151C2C;
-  --accent-red: #D72638;
-  --accent-gold: #F5C518;
-  --accent-blue: #00C2FF;
-  --accent-purple: #8B5CF6;
-  --text-white: #FFFFFF;
-  --text-light: #B8C1D1;
-  --text-muted: #7A869A;
-  --bg-card: #1a2236;
-  --bg-hover: #202a40;
-  --border: #2a3550;
+  --primary: #0D0A0E;
+  --secondary: #1A1520;
+  --accent-red: #E63946;
+  --accent-gold: #FFD700;
+  --accent-blue: #00B4D8;
+  --accent-purple: #9B5DE5;
+  --accent-warm: #C9A96E;
+  --text-white: #F5F0EB;
+  --text-light: #C4B8A8;
+  --text-muted: #8A7E72;
+  --bg-card: #221C28;
+  --bg-hover: #2E2636;
+  --border: #3A2F44;
+  --glow-gold: rgba(255,215,0,.12);
+  --glow-red: rgba(230,57,70,.15);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -44,7 +47,7 @@ html, body {
 
 .screen { display:none; width:100%; height:100%; position:absolute; top:0; left:0; animation: fadeIn 0.5s ease; }
 .screen.active { display:flex; flex-direction:column; }
-#game-screen.active { flex-direction:row; }
+#game-screen.active { flex-direction:column; }
 
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideUp { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
@@ -59,12 +62,12 @@ html, body {
 @keyframes clapperClose { 0%{transform:rotate(0)} 50%{transform:rotate(-30deg)} 100%{transform:rotate(0)} }
 
 /* Main Menu */
-#main-menu { justify-content:center; align-items:center; background:radial-gradient(ellipse at 50% 120%,#1a2540 0%,var(--primary) 70%); overflow:hidden; }
+#main-menu { justify-content:center; align-items:center; background:radial-gradient(ellipse at 50% 120%,#2a1a30 0%,var(--primary) 70%); overflow:hidden; }
 .menu-bg { position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; }
 .spotlight { position:absolute; width:300px; height:300px; border-radius:50%; filter:blur(80px); animation:spotlightMove 20s linear infinite; }
-.spotlight-1 { top:-100px; left:20%; background:rgba(215,38,56,.15); animation-duration:25s; }
-.spotlight-2 { bottom:-100px; right:10%; background:rgba(0,194,255,.1); animation-duration:30s; animation-direction:reverse; }
-.spotlight-3 { top:40%; left:60%; background:rgba(139,92,246,.08); animation-duration:35s; }
+.spotlight-1 { top:-100px; left:20%; background:rgba(230,57,70,.2); animation-duration:25s; }
+.spotlight-2 { bottom:-100px; right:10%; background:rgba(201,169,110,.12); animation-duration:30s; animation-direction:reverse; }
+.spotlight-3 { top:40%; left:60%; background:rgba(155,93,229,.1); animation-duration:35s; }
 .menu-content { position:relative; z-index:10; text-align:center; animation:slideUp 1s ease; }
 .menu-logo { font-family:'Playfair Display',Georgia,serif; font-size:72px; font-weight:900; letter-spacing:8px; margin-bottom:8px; background:linear-gradient(135deg,var(--accent-gold),#fff,var(--accent-gold)); background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s linear infinite; }
 .menu-subtitle { font-size:14px; letter-spacing:6px; text-transform:uppercase; color:var(--text-muted); margin-bottom:60px; }
@@ -75,21 +78,26 @@ html, body {
 .menu-btn.primary-btn:hover { background:linear-gradient(135deg,#e83a4e,var(--accent-red)); transform:translateX(4px) scale(1.02); }
 .menu-version { position:absolute; bottom:30px; right:40px; font-size:11px; color:var(--text-muted); letter-spacing:2px; }
 
-/* Sidebar */
-.sidebar { width:240px; min-width:240px; background:var(--secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; }
-.sidebar-logo { font-family:'Playfair Display',Georgia,serif; font-size:20px; font-weight:700; padding:20px 20px 16px; color:var(--accent-gold); letter-spacing:3px; border-bottom:1px solid var(--border); }
-.sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
-.nav-section { padding:16px 20px 6px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); }
-.nav-btn { width:100%; padding:10px 20px; background:none; border:none; color:var(--text-light); font-family:'Inter',sans-serif; font-size:13px; text-align:left; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:10px; border-left:3px solid transparent; }
-.nav-btn:hover { background:var(--bg-hover); color:white; }
-.nav-btn.active { background:rgba(215,38,56,.1); border-left-color:var(--accent-red); color:white; font-weight:600; }
-.nav-btn .nav-icon { font-size:16px; width:24px; text-align:center; }
-.sidebar-stats { padding:16px 20px; border-top:1px solid var(--border); font-size:12px; }
+/* Top Ribbon Navigation */
+.sidebar { display:none; }
+.top-ribbon { background:var(--secondary); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 16px; height:44px; gap:2px; overflow-x:auto; }
+.nav-group { position:relative; }
+.nav-group-btn { padding:8px 14px; background:none; border:none; color:var(--text-muted); font-family:'Inter',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .2s; border-bottom:2px solid transparent; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+.nav-group-btn:hover { color:var(--text-white); background:var(--bg-hover); }
+.nav-group-btn.group-active { color:var(--accent-gold); border-bottom-color:var(--accent-gold); }
+.nav-group-btn svg { width:14px; height:14px; }
+.nav-dropdown { display:none; position:absolute; top:100%; left:0; background:var(--secondary); border:1px solid var(--border); border-radius:0 0 8px 8px; min-width:180px; z-index:100; box-shadow:0 12px 40px rgba(0,0,0,.6); padding:4px 0; }
+.nav-group:hover .nav-dropdown, .nav-group.open .nav-dropdown { display:block; }
+.nav-drop-item { display:flex; align-items:center; gap:10px; padding:10px 16px; color:var(--text-light); font-size:12px; font-weight:500; cursor:pointer; transition:all .15s; border:none; background:none; width:100%; text-align:left; font-family:'Inter',sans-serif; }
+.nav-drop-item:hover { background:var(--bg-hover); color:var(--text-white); padding-left:20px; }
+.nav-drop-item.active { color:var(--accent-gold); background:var(--glow-gold); }
+.nav-drop-item svg { width:16px; height:16px; opacity:.7; }
+.sidebar-stats { display:none; }
 .stat-row { display:flex; justify-content:space-between; margin-bottom:6px; color:var(--text-muted); }
 .stat-row span:last-child { color:var(--text-light); font-weight:600; }
 
 /* Top bar */
-.top-bar { height:56px; min-height:56px; background:var(--secondary); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; }
+.top-bar { height:52px; min-height:52px; background:linear-gradient(180deg,#1E1828,var(--secondary)); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; box-shadow:0 2px 12px rgba(0,0,0,.4); position:relative; z-index:50; }
 .top-bar-left { display:flex; align-items:center; gap:16px; }
 .top-bar-title { font-size:16px; font-weight:600; }
 .top-bar-era { font-size:11px; padding:4px 12px; background:rgba(139,92,246,.2); border:1px solid var(--accent-purple); border-radius:20px; color:var(--accent-purple); font-weight:600; letter-spacing:1px; }
@@ -102,8 +110,8 @@ html, body {
 .main-content { flex:1; overflow-y:auto; padding:24px; background:var(--primary); }
 
 /* Cards, badges, buttons, forms, tables */
-.card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:16px; transition:all .3s; }
-.card:hover { border-color:rgba(0,194,255,.3); }
+.card { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:16px; transition:all .3s; box-shadow:0 2px 12px rgba(0,0,0,.3); }
+.card:hover { border-color:rgba(201,169,110,.3); box-shadow:0 4px 20px rgba(0,0,0,.4),0 0 15px var(--glow-gold); }
 .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
 .card-title { font-size:16px; font-weight:700; letter-spacing:1px; }
 .card-badge { font-size:10px; padding:3px 10px; border-radius:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
@@ -458,40 +466,6 @@ html, body {
 
 <!-- GAME SCREEN -->
 <div id="game-screen" class="screen">
-  <div class="sidebar">
-    <div class="sidebar-logo">EMPIRE</div>
-    <div class="sidebar-nav">
-      <div class="nav-section">Studio</div>
-      <button class="nav-btn active" onclick="showTab('dashboard')" data-tab="dashboard"><span class="nav-icon">&#9632;</span> Dashboard</button>
-      <button class="nav-btn" onclick="showTab('new-movie')" data-tab="new-movie"><span class="nav-icon">&#9654;</span> New Movie</button>
-      <button class="nav-btn" onclick="showTab('production')" data-tab="production"><span class="nav-icon">&#9881;</span> Production</button>
-      <button class="nav-btn" onclick="showTab('library')" data-tab="library"><span class="nav-icon">&#9733;</span> Film Library</button>
-      <div class="nav-section">Talent</div>
-      <button class="nav-btn" onclick="showTab('actors')" data-tab="actors"><span class="nav-icon">&#9834;</span> Actors</button>
-      <button class="nav-btn" onclick="showTab('directors')" data-tab="directors"><span class="nav-icon">&#9668;</span> Directors</button>
-      <button class="nav-btn" onclick="showTab('composers')" data-tab="composers"><span class="nav-icon">&#9835;</span> Composers</button>
-      <div class="nav-section">Business</div>
-      <button class="nav-btn" onclick="showTab('marketing')" data-tab="marketing"><span class="nav-icon">&#9670;</span> Marketing</button>
-      <button class="nav-btn" onclick="showTab('finance')" data-tab="finance"><span class="nav-icon">&#9679;</span> Finances</button>
-      <button class="nav-btn" onclick="showTab('rivals')" data-tab="rivals"><span class="nav-icon">&#9876;</span> Rivals</button>
-      <button class="nav-btn" onclick="showTab('franchise')" data-tab="franchise"><span class="nav-icon">&#10070;</span> Franchises</button>
-      <div class="nav-section">Prestige</div>
-      <button class="nav-btn" onclick="showTab('awards')" data-tab="awards"><span class="nav-icon">&#127942;</span> Awards</button>
-      <button class="nav-btn" onclick="showTab('skills')" data-tab="skills"><span class="nav-icon">&#9733;</span> Skill Tree</button>
-      <button class="nav-btn" onclick="showTab('tech')" data-tab="tech"><span class="nav-icon">&#128300;</span> Tech Lab</button>
-      <div class="nav-section">Media</div>
-      <button class="nav-btn" onclick="showTab('imdb')" data-tab="imdb"><span class="nav-icon">&#9733;</span> IMDB</button>
-      <button class="nav-btn" onclick="showTab('calendar')" data-tab="calendar"><span class="nav-icon">&#9638;</span> Calendar</button>
-      <button class="nav-btn" onclick="showTab('tvshows')" data-tab="tvshows"><span class="nav-icon">&#9641;</span> TV Shows</button>
-      <button class="nav-btn" onclick="showTab('trailers')" data-tab="trailers"><span class="nav-icon">&#9654;</span> Trailers</button>
-      <button class="nav-btn" onclick="showTab('posters')" data-tab="posters"><span class="nav-icon">&#9635;</span> Posters</button>
-    </div>
-    <div class="sidebar-stats">
-      <div class="stat-row"><span>Week</span><span id="week-display">1</span></div>
-      <div class="stat-row"><span>Year</span><span id="year-display">1982</span></div>
-      <div class="stat-row"><span>Movies</span><span id="movies-count">0</span></div>
-    </div>
-  </div>
   <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
     <div class="top-bar">
       <div class="top-bar-left">
@@ -507,6 +481,59 @@ html, body {
         <button class="top-bar-btn" style="background:var(--border)" onclick="showScreen('main-menu')">MENU</button>
       </div>
     </div>
+    <nav class="top-ribbon" id="top-ribbon">
+      <div class="nav-group">
+        <button class="nav-group-btn group-active" onclick="showTab('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> HQ</button>
+      </div>
+      <div class="nav-group">
+        <button class="nav-group-btn">STUDIO</button>
+        <div class="nav-dropdown">
+          <button class="nav-drop-item" onclick="showTab('new-movie')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 4v16M17 4v16M3 8h4M17 8h4M3 12h18M3 16h4M17 16h4M3 4h18v16H3z"/></svg> New Production</button>
+          <button class="nav-drop-item" onclick="showTab('production')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> In Production</button>
+          <button class="nav-drop-item" onclick="showTab('library')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> Film Library</button>
+          <button class="nav-drop-item" onclick="showTab('tvshows')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2l-5 5-5-5"/></svg> TV Shows</button>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button class="nav-group-btn">TALENT</button>
+        <div class="nav-dropdown">
+          <button class="nav-drop-item" onclick="showTab('actors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg> Actors</button>
+          <button class="nav-drop-item" onclick="showTab('directors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Directors</button>
+          <button class="nav-drop-item" onclick="showTab('composers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> Composers</button>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button class="nav-group-btn">BUSINESS</button>
+        <div class="nav-dropdown">
+          <button class="nav-drop-item" onclick="showTab('marketing')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Marketing</button>
+          <button class="nav-drop-item" onclick="showTab('finance')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Finances</button>
+          <button class="nav-drop-item" onclick="showTab('rivals')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg> Rivals</button>
+          <button class="nav-drop-item" onclick="showTab('franchise')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Franchises</button>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button class="nav-group-btn">PRESTIGE</button>
+        <div class="nav-dropdown">
+          <button class="nav-drop-item" onclick="showTab('awards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="7"/><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/></svg> Awards</button>
+          <button class="nav-drop-item" onclick="showTab('skills')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> Skill Tree</button>
+          <button class="nav-drop-item" onclick="showTab('tech')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10M18 20V4M6 20v-4"/></svg> Tech Lab</button>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button class="nav-group-btn">MEDIA</button>
+        <div class="nav-dropdown">
+          <button class="nav-drop-item" onclick="showTab('imdb')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg> IMDB</button>
+          <button class="nav-drop-item" onclick="showTab('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</button>
+          <button class="nav-drop-item" onclick="showTab('trailers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 19,12 5,21"/></svg> Trailers</button>
+          <button class="nav-drop-item" onclick="showTab('posters')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Posters</button>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted);">
+        <span>W<strong id="week-display" style="color:var(--accent-warm);margin-left:2px;">1</strong></span>
+        <span>Y<strong id="year-display" style="color:var(--accent-warm);margin-left:2px;">1982</strong></span>
+        <span style="color:var(--accent-gold);"><strong id="movies-count">0</strong> Films</span>
+      </div>
+    </nav>
     <div class="main-content" id="main-content">
       <!-- Dashboard -->
       <div class="tab-content active" id="tab-dashboard">
@@ -4131,6 +4158,723 @@ startProductionPipeline=function(){
     });
   };
 })();
+
+// ============================================================
+// V4 — CINEMATIC MINIGAME OVERHAUL
+// ============================================================
+
+// Override the minigame launcher with deeper, multi-phase minigames
+var _origLaunchMinigame = launchMinigame;
+launchMinigame = function(phase) {
+  var m = G.currentMovie;
+  var container = document.getElementById('minigame-container');
+  if (phase === 'script') {
+    v4ScriptMinigame(m);
+  } else if (phase === 'audition') {
+    v4AuditionMinigame(m);
+  } else if (phase === 'shooting') {
+    v4ShootingMinigame(m);
+  } else if (phase === 'editing') {
+    v4EditingMinigame(m);
+  } else if (phase === 'sound') {
+    v4SoundMinigame(m);
+  } else {
+    _origLaunchMinigame(phase);
+  }
+};
+
+// ---- SCRIPT WRITING: Story Beat Timeline Builder ----
+function v4ScriptMinigame(m) {
+  var beats = [
+    {id:'hook',name:'The Hook',desc:'Opening that grabs attention',type:'opening'},
+    {id:'world',name:'World Building',desc:'Establish the setting and rules',type:'setup'},
+    {id:'incite',name:'Inciting Incident',desc:'Event that launches the story',type:'catalyst'},
+    {id:'stakes',name:'Raise the Stakes',desc:'Consequences become real',type:'rising'},
+    {id:'ally',name:'Ally Introduced',desc:'Key relationship forms',type:'character'},
+    {id:'betray',name:'Betrayal',desc:'Trust is shattered',type:'twist'},
+    {id:'dark',name:'Dark Night',desc:'All seems lost',type:'low'},
+    {id:'reveal',name:'The Revelation',desc:'Hidden truth comes to light',type:'twist'},
+    {id:'climax',name:'Final Confrontation',desc:'Everything on the line',type:'climax'},
+    {id:'resolve',name:'Resolution',desc:'New equilibrium',type:'ending'},
+    {id:'mirror',name:'Mirror Scene',desc:'Echoes the opening with new meaning',type:'ending'},
+    {id:'twist_end',name:'Final Twist',desc:'One last surprise',type:'twist'}
+  ];
+
+  var timeline = [];
+  var available = beats.slice().sort(function(){return Math.random()-0.5;});
+  var maxSlots = 7;
+  var revisions = 2;
+  var genreBonus = {Action:['climax','hook'],Drama:['dark','reveal'],Horror:['dark','betray'],Comedy:['ally','hook'],'Sci-Fi':['world','reveal'],Thriller:['betray','twist_end']};
+  var bonusBeats = genreBonus[m.genre] || ['hook','climax'];
+
+  function calcNarrativeScore() {
+    if (timeline.length === 0) return 0;
+    var score = 0;
+    var hasOpening = false, hasClimax = false, hasEnding = false;
+    var tensionCurve = [];
+    var typeValues = {opening:2,setup:3,catalyst:5,rising:6,character:4,twist:7,low:3,climax:9,ending:2};
+    timeline.forEach(function(b,i) {
+      if (b.type==='opening') hasOpening = true;
+      if (b.type==='climax') hasClimax = true;
+      if (b.type==='ending') hasEnding = true;
+      tensionCurve.push(typeValues[b.type]||5);
+      if (bonusBeats.indexOf(b.id)!==-1) score += 8;
+    });
+    if (hasOpening) score += 10;
+    if (hasClimax) score += 12;
+    if (hasEnding) score += 10;
+    // Check for rising tension pattern
+    var rising = 0;
+    for (var i=1;i<tensionCurve.length;i++) {
+      if (tensionCurve[i] > tensionCurve[i-1]) rising++;
+    }
+    score += rising * 4;
+    // Penalize if climax is too early
+    var climaxPos = -1;
+    timeline.forEach(function(b,i){if(b.type==='climax')climaxPos=i;});
+    if (climaxPos >= 0 && climaxPos >= timeline.length*0.6) score += 10;
+    else if (climaxPos >= 0 && climaxPos < timeline.length*0.4) score -= 8;
+    score += timeline.length * 3;
+    return clamp(score, 0, 100);
+  }
+
+  function render() {
+    var score = calcNarrativeScore();
+    var tensionVals = {opening:2,setup:3,catalyst:5,rising:6,character:4,twist:7,low:3,climax:9,ending:2};
+    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg> Screenplay: "'+m.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Build your story arc by placing beats on the timeline. Order matters!</div></div>'
+      +'<div style="display:flex;gap:12px;align-items:center;">'
+      +'<span class="card-badge badge-purple">'+revisions+' REVISIONS LEFT</span>'
+      +'<div class="minigame-phase badge-gold card-badge">WRITING</div></div></div>'
+      +'<div class="minigame-body" style="max-width:1000px;margin:0 auto;">'
+      // Tension graph
+      +'<div class="card" style="margin-bottom:16px;padding:16px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">NARRATIVE TENSION CURVE</div>'
+      +'<div style="display:flex;align-items:flex-end;gap:3px;height:80px;">'
+      +(timeline.length > 0 ? timeline.map(function(b,i){
+        var h = (tensionVals[b.type]||5)/9*100;
+        var colors = {opening:'var(--accent-blue)',setup:'var(--accent-warm)',catalyst:'var(--accent-gold)',rising:'#4ade80',character:'var(--accent-purple)',twist:'var(--accent-red)',low:'#666',climax:'var(--accent-gold)',ending:'var(--accent-blue)'};
+        return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">'
+          +'<div style="width:100%;height:'+h+'%;background:'+colors[b.type]+';border-radius:3px 3px 0 0;min-height:8px;transition:height .3s;"></div>'
+          +'<div style="font-size:7px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;">'+b.name+'</div></div>';
+      }).join('') : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;">Place beats to build your arc</div>')
+      +'</div></div>'
+      // Timeline slots
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">YOUR TIMELINE ('+timeline.length+'/'+maxSlots+' beats)</div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:20px;min-height:70px;padding:12px;background:var(--primary);border:2px dashed var(--border);border-radius:8px;">'
+      +(timeline.length > 0 ? timeline.map(function(b,i){
+        return '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;position:relative;cursor:pointer;" onclick="v4RemoveBeat('+i+')">'
+          +'<div style="font-size:11px;font-weight:700;">'+b.name+'</div>'
+          +'<div style="font-size:9px;color:var(--text-muted);margin-top:2px;">'+b.type.toUpperCase()+'</div>'
+          +(bonusBeats.indexOf(b.id)!==-1?'<div style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:var(--accent-gold);border-radius:50%;font-size:8px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;">G</div>':'')
+          +'<div style="font-size:8px;color:var(--accent-red);margin-top:4px;">click to remove</div></div>';
+      }).join('<div style="display:flex;align-items:center;color:var(--text-muted);font-size:14px;">&#8594;</div>') : '<div style="display:flex;align-items:center;justify-content:center;width:100%;color:var(--text-muted);font-size:12px;">Drag story beats here from below</div>')
+      +'</div>'
+      // Available beats
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">AVAILABLE BEATS '+(m.genre?' <span style="color:var(--accent-gold);">('+m.genre+' bonus: '+bonusBeats.map(function(id){var b=beats.find(function(x){return x.id===id;});return b?b.name:id;}).join(', ')+')</span>':'')+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">'
+      +available.map(function(b,i){
+        var isBonus = bonusBeats.indexOf(b.id)!==-1;
+        var disabled = timeline.length >= maxSlots;
+        return '<div class="script-card" style="padding:12px;text-align:left;'+(disabled?'opacity:.4;pointer-events:none;':'')+(isBonus?'border-color:var(--accent-gold);box-shadow:0 0 12px var(--glow-gold);':'')+'" onclick="v4AddBeat('+i+')">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+          +'<span class="script-card-name" style="font-size:12px;">'+b.name+'</span>'
+          +(isBonus?'<span style="font-size:8px;background:var(--accent-gold);color:#000;padding:1px 6px;border-radius:8px;font-weight:700;">GENRE FIT</span>':'')
+          +'</div>'
+          +'<div class="script-card-desc" style="font-size:10px;">'+b.desc+'</div>'
+          +'<div style="font-size:9px;color:var(--accent-warm);margin-top:4px;">'+b.type.toUpperCase()+'</div></div>';
+      }).join('')
+      +'</div>'
+      // Score + actions
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">'
+      +'<div class="card" style="margin:0;padding:12px 20px;display:flex;align-items:center;gap:16px;">'
+      +'<div><div style="font-size:10px;color:var(--text-muted);">SCRIPT SCORE</div><div style="font-size:28px;font-weight:700;color:'+(score>=70?'#4ade80':score>=40?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+score+'</div></div>'
+      +'<div style="width:1px;height:40px;background:var(--border);"></div>'
+      +'<div style="font-size:11px;color:var(--text-muted);max-width:200px;">'
+      +(score<20?'Start placing beats to build your story.':score<40?'Needs more structure. Add a climax and strong opening.':score<60?'Decent arc forming. Consider beat placement for tension.':score<80?'Strong screenplay! Good tension curve.':'Masterful storytelling. Oscar-worthy script!')
+      +'</div></div>'
+      +'<div style="display:flex;gap:8px;">'
+      +(revisions>0?'<button class="btn btn-purple" onclick="v4ShuffleBeat()">Shuffle Available</button>':'')
+      +'<button class="btn btn-red btn-lg" onclick="v4FinishScript()" '+(timeline.length<3?'disabled':'')+'>LOCK SCREENPLAY</button>'
+      +'</div></div></div></div>';
+  }
+
+  window.v4AddBeat = function(idx) {
+    if (timeline.length >= maxSlots) return;
+    var beat = available.splice(idx, 1)[0];
+    timeline.push(beat);
+    render();
+  };
+  window.v4RemoveBeat = function(idx) {
+    var beat = timeline.splice(idx, 1)[0];
+    available.push(beat);
+    render();
+  };
+  window.v4ShuffleBeat = function() {
+    if (revisions <= 0) return;
+    revisions--;
+    // Add 3 new random beats
+    var extras = [
+      {id:'subplot_'+Date.now(),name:'Subplot Twist',desc:'Secondary story interweaves',type:'twist'},
+      {id:'montage_'+Date.now(),name:'Training Montage',desc:'Character grows through effort',type:'rising'},
+      {id:'sacrifice_'+Date.now(),name:'The Sacrifice',desc:'Something must be given up',type:'low'}
+    ];
+    available = available.concat(extras).sort(function(){return Math.random()-0.5;});
+    notify('Revision!','New story beats unlocked!','success');
+    render();
+  };
+  window.v4FinishScript = function() {
+    if (timeline.length < 3) return;
+    var score = calcNarrativeScore();
+    m.scriptScore = clamp(score, 10, 100);
+    m.scriptData.massFeel = timeline.filter(function(b){return b.type==='climax'||b.type==='rising';}).length * 8;
+    m.scriptData.criticFeel = timeline.filter(function(b){return b.type==='character'||b.type==='low';}).length * 8;
+    m.scriptData.awardPotential = score > 70 ? 15 : score > 50 ? 8 : 0;
+    m.scriptData.depth = timeline.filter(function(b){return b.type==='twist'||b.type==='character';}).length * 6;
+    m.scriptData.originality = timeline.filter(function(b){return b.id.indexOf('subplot')!==-1||b.id.indexOf('sacrifice')!==-1;}).length * 10;
+    m.scriptData.pacing = timeline.length >= 5 ? 12 : 4;
+    notify('Script Complete!','"'+m.title+'" screenplay scored '+m.scriptScore+'/100!','success');
+    launchMinigame('audition');
+  };
+  render();
+}
+
+// ---- AUDITION: Stat-matching role puzzle ----
+function v4AuditionMinigame(m) {
+  var roles = [
+    {name:'Lead Protagonist',needs:{charisma:60,range:50,intensity:40},importance:3},
+    {name:'Antagonist',needs:{charisma:40,range:60,intensity:70},importance:2},
+    {name:'Love Interest',needs:{charisma:70,range:40,intensity:30},importance:2},
+    {name:'Comic Relief',needs:{charisma:50,range:70,intensity:20},importance:1},
+    {name:'Mentor Figure',needs:{charisma:40,range:50,intensity:50},importance:2}
+  ];
+  var candidates = [];
+  for (var i=0; i<8; i++) {
+    candidates.push({
+      name:pick(FIRST_NAMES)+' '+pick(LAST_NAMES),
+      charisma:rnd(20,95),range:rnd(20,95),intensity:rnd(20,95),
+      salary:rnd(50,500)*10000,
+      quirk:pick(['Method actor','Improviser','Scene stealer','Quiet professional','Diva','Perfectionist','Natural talent','Rising star']),
+      chemistry:{}
+    });
+  }
+  // Pre-calculate chemistry between pairs
+  candidates.forEach(function(c){
+    candidates.forEach(function(c2){
+      if(c!==c2) c.chemistry[candidates.indexOf(c2)] = rnd(-15,25);
+    });
+  });
+
+  var assignments = {};
+  var budget = Math.round(m.budget * 0.3);
+  var spent = 0;
+  var callbacks = 2;
+
+  function calcFit(cand, role) {
+    var fit = 0;
+    fit += Math.max(0, 20 - Math.abs(cand.charisma - role.needs.charisma)/3);
+    fit += Math.max(0, 20 - Math.abs(cand.range - role.needs.range)/3);
+    fit += Math.max(0, 20 - Math.abs(cand.intensity - role.needs.intensity)/3);
+    return Math.round(fit);
+  }
+
+  function calcTotalCastScore() {
+    var total = 0;
+    var assigned = Object.keys(assignments);
+    assigned.forEach(function(ri) {
+      var ci = assignments[ri];
+      var role = roles[ri];
+      var cand = candidates[ci];
+      total += calcFit(cand, role) * role.importance;
+      // Chemistry bonus with other cast
+      assigned.forEach(function(ri2) {
+        if (ri !== ri2) {
+          var ci2 = assignments[ri2];
+          total += (cand.chemistry[ci2] || 0);
+        }
+      });
+    });
+    return Math.round(total / (assigned.length || 1));
+  }
+
+  function render() {
+    var castScore = calcTotalCastScore();
+    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/><circle cx="19" cy="7" r="3"/><path d="M19 14a3 3 0 013 3v1"/></svg> Casting: "'+m.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Match actors to roles. Chemistry between cast members matters!</div></div>'
+      +'<div style="display:flex;gap:12px;align-items:center;">'
+      +'<span style="font-size:11px;color:var(--accent-warm);">Budget: $'+formatMoney(budget-spent)+' left</span>'
+      +'<span class="card-badge badge-blue">'+callbacks+' CALLBACKS</span>'
+      +'<div class="minigame-phase badge-blue card-badge">CASTING</div></div></div>'
+      +'<div class="minigame-body" style="max-width:1100px;margin:0 auto;">'
+      // Roles row
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">ROLES TO FILL</div>'
+      +'<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">'
+      +roles.map(function(r,ri){
+        var assigned = assignments[ri] !== undefined;
+        var cand = assigned ? candidates[assignments[ri]] : null;
+        var fit = assigned ? calcFit(cand, r) : 0;
+        return '<div style="flex:1;min-width:140px;background:'+(assigned?'rgba(74,222,128,.08)':'var(--bg-card)')+';border:1px solid '+(assigned?'#4ade80':'var(--border)')+';border-radius:8px;padding:12px;text-align:center;">'
+          +'<div style="font-size:12px;font-weight:700;margin-bottom:4px;">'+r.name+'</div>'
+          +'<div style="font-size:9px;color:var(--text-muted);margin-bottom:6px;">Need: C:'+r.needs.charisma+' R:'+r.needs.range+' I:'+r.needs.intensity+'</div>'
+          +'<div style="font-size:9px;color:var(--accent-warm);margin-bottom:6px;">Importance: '+('*'.repeat(r.importance))+'</div>'
+          +(assigned
+            ? '<div style="font-size:11px;color:#4ade80;font-weight:600;">'+cand.name+'</div><div style="font-size:9px;color:var(--accent-gold);">Fit: '+fit+'/60</div><button class="btn btn-sm" style="margin-top:6px;font-size:9px;" onclick="v4UncastRole('+ri+')">Remove</button>'
+            : '<div style="font-size:11px;color:var(--text-muted);">Empty</div>')
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Candidates grid
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">AVAILABLE TALENT</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">'
+      +candidates.map(function(c,ci){
+        var isAssigned = Object.values(assignments).indexOf(ci) !== -1;
+        if (isAssigned) return '';
+        var overBudget = spent + c.salary > budget;
+        return '<div class="talent-card" style="padding:12px;'+(overBudget?'opacity:.5;':'')+'cursor:default;">'
+          +'<div style="font-weight:700;font-size:13px;margin-bottom:4px;">'+c.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">'+c.quirk+'</div>'
+          +'<div style="display:flex;gap:8px;font-size:10px;margin-bottom:6px;">'
+          +'<span style="color:var(--accent-gold);">C:'+c.charisma+'</span>'
+          +'<span style="color:var(--accent-blue);">R:'+c.range+'</span>'
+          +'<span style="color:var(--accent-red);">I:'+c.intensity+'</span></div>'
+          +'<div style="font-size:10px;color:var(--accent-red);margin-bottom:6px;">$'+formatMoney(c.salary)+'</div>'
+          +'<div style="display:flex;gap:4px;flex-wrap:wrap;">'
+          +roles.map(function(r,ri){
+            if(assignments[ri]!==undefined) return '';
+            var fit = calcFit(c,r);
+            return '<button class="btn btn-sm" style="font-size:8px;padding:3px 6px;'+(overBudget?'pointer-events:none;':'')+(fit>40?'border-color:#4ade80;color:#4ade80;':fit>25?'border-color:var(--accent-gold);color:var(--accent-gold);':'')+'" onclick="v4CastActor('+ci+','+ri+')">'+r.name.split(' ')[0]+' ('+fit+')</button>';
+          }).join('')
+          +'</div></div>';
+      }).join('')
+      +'</div>'
+      // Score + actions
+      +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+      +'<div class="card" style="margin:0;padding:12px 20px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);">CAST SCORE</div>'
+      +'<div style="font-size:28px;font-weight:700;color:'+(castScore>=40?'#4ade80':castScore>=20?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+castScore+'</div></div>'
+      +'<div style="display:flex;gap:8px;">'
+      +(callbacks>0?'<button class="btn btn-purple" onclick="v4Callback()">Callback (New Talent)</button>':'')
+      +'<button class="btn btn-red btn-lg" onclick="v4FinishCasting()" '+(Object.keys(assignments).length<2?'disabled':'')+'>FINALIZE CAST</button>'
+      +'</div></div></div></div>';
+  }
+
+  window.v4CastActor = function(ci, ri) {
+    if (assignments[ri] !== undefined) return;
+    var c = candidates[ci];
+    if (spent + c.salary > budget) { notify('Over Budget!','Cannot afford '+c.name+'.','error'); return; }
+    spent += c.salary;
+    assignments[ri] = ci;
+    notify('Cast!',c.name+' cast as '+roles[ri].name+'.','success');
+    render();
+  };
+  window.v4UncastRole = function(ri) {
+    var ci = assignments[ri];
+    if (ci === undefined) return;
+    spent -= candidates[ci].salary;
+    delete assignments[ri];
+    render();
+  };
+  window.v4Callback = function() {
+    if (callbacks <= 0) return;
+    callbacks--;
+    for (var i=0;i<3;i++) {
+      candidates.push({
+        name:pick(FIRST_NAMES)+' '+pick(LAST_NAMES),
+        charisma:rnd(40,98),range:rnd(40,98),intensity:rnd(40,98),
+        salary:rnd(80,600)*10000,
+        quirk:pick(['Method actor','Improviser','Scene stealer','Natural talent','Rising star','Award winner']),
+        chemistry:{}
+      });
+    }
+    candidates.forEach(function(c){candidates.forEach(function(c2){if(c!==c2&&!c.chemistry[candidates.indexOf(c2)])c.chemistry[candidates.indexOf(c2)]=rnd(-15,25);});});
+    notify('Callbacks!','3 new actors available!','info');
+    render();
+  };
+  window.v4FinishCasting = function() {
+    var castScore = calcTotalCastScore();
+    m.quality += castScore;
+    notify('Casting Done!','Cast assembled! Score: '+castScore,'success');
+    launchMinigame('shooting');
+  };
+  render();
+}
+
+// ---- SHOOTING: Resource Management per Scene ----
+function v4ShootingMinigame(m) {
+  var genre = m.genre;
+  var scenePool = [
+    {name:'Opening Sequence',desc:'First impression sets the tone',baseDiff:3,type:'establish'},
+    {name:'Character Introduction',desc:'Audience meets the protagonist',baseDiff:2,type:'character'},
+    {name:'First Conflict',desc:'Tension begins building',baseDiff:4,type:'action'},
+    {name:'Emotional Core',desc:'The heart of the film',baseDiff:5,type:'drama'},
+    {name:'Chase/Action Set Piece',desc:'High-energy spectacle',baseDiff:7,type:'action'},
+    {name:'Quiet Moment',desc:'Breathing room between storms',baseDiff:2,type:'drama'},
+    {name:'Plot Twist Reveal',desc:'Everything changes',baseDiff:6,type:'drama'},
+    {name:'Climactic Battle',desc:'Final confrontation',baseDiff:8,type:'action'},
+    {name:'Resolution',desc:'Tying up loose ends',baseDiff:3,type:'establish'},
+    {name:'Final Shot',desc:'The lasting image',baseDiff:4,type:'establish'}
+  ];
+  var scenes = scenePool.sort(function(){return Math.random()-0.5;}).slice(0,6);
+  var sceneIdx = 0;
+  var totalTakes = 15 + (m.director ? Math.round(m.director.discipline/10) : 0);
+  var takesLeft = totalTakes;
+  var energy = 100;
+  var morale = 80;
+  var results = [];
+  var dirBonus = m.director ? Math.round(m.director.vision/15) : 0;
+
+  function renderScene() {
+    if (sceneIdx >= scenes.length) {
+      finishShooting();
+      return;
+    }
+    var sc = scenes[sceneIdx];
+    var approaches = [
+      {name:'Master Shot',desc:'Wide, safe, by the book',takes:1,energy:8,quality:rnd(5,10)+dirBonus,risk:5,morale:0},
+      {name:'Coverage Heavy',desc:'Multiple angles, many takes',takes:3,energy:20,quality:rnd(10,18)+dirBonus,risk:15,morale:-5},
+      {name:'One-Take Wonder',desc:'Single continuous shot — risky but brilliant',takes:1,energy:30,quality:rnd(15,25)+dirBonus,risk:40,morale:5},
+      {name:'Improvised',desc:'Let actors find the moment',takes:2,energy:15,quality:rnd(8,22)+dirBonus,risk:25,morale:10},
+      {name:'Reshoot from Scratch',desc:'Start over for perfection',takes:4,energy:35,quality:rnd(18,28)+dirBonus,risk:10,morale:-15}
+    ];
+    // Filter approaches you can afford
+    approaches = approaches.filter(function(a){return a.takes<=takesLeft;});
+
+    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" opacity=".5"/></svg> Filming: "'+m.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Scene '+(sceneIdx+1)+'/'+scenes.length+': '+sc.name+'</div></div>'
+      +'<div class="minigame-phase badge-red card-badge">FILMING</div></div>'
+      +'<div class="minigame-body" style="max-width:900px;margin:0 auto;">'
+      // Resource bars
+      +'<div style="display:flex;gap:16px;margin-bottom:20px;">'
+      +'<div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>TAKES REMAINING</span><span style="color:var(--accent-gold);">'+takesLeft+'/'+totalTakes+'</span></div>'
+      +'<div class="progress-bar" style="height:10px;"><div class="progress-fill progress-gold" style="width:'+(takesLeft/totalTakes*100)+'%;"></div></div></div>'
+      +'<div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>CREW ENERGY</span><span style="color:'+(energy>50?'#4ade80':'var(--accent-red)')+';">'+energy+'%</span></div>'
+      +'<div class="progress-bar" style="height:10px;"><div class="progress-fill '+(energy>50?'progress-green':'progress-red')+'" style="width:'+energy+'%;"></div></div></div>'
+      +'<div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>MORALE</span><span style="color:'+(morale>50?'var(--accent-blue)':'var(--accent-red)')+';">'+morale+'%</span></div>'
+      +'<div class="progress-bar" style="height:10px;"><div class="progress-fill '+(morale>50?'progress-blue':'progress-red')+'" style="width:'+morale+'%;"></div></div></div>'
+      +'</div>'
+      // Scene viewport
+      +'<div class="shooting-viewport" style="min-height:200px;">'
+      +'<div class="shooting-scene-label">SCENE '+(sceneIdx+1)+': '+sc.name.toUpperCase()+'</div>'
+      +'<div class="shooting-scene-content" style="min-height:200px;">'
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:22px;font-weight:700;margin-bottom:8px;">'+sc.name+'</div>'
+      +'<div class="shooting-scene-desc">'+sc.desc+'</div>'
+      +'<div style="font-size:10px;color:var(--accent-warm);margin-top:8px;">Difficulty: '+('*'.repeat(sc.baseDiff))+' | Type: '+sc.type.toUpperCase()+'</div>'
+      +'</div></div>'
+      // Approaches
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin:16px 0 8px;">CHOOSE YOUR APPROACH</div>'
+      +'<div style="display:grid;grid-template-columns:repeat('+Math.min(approaches.length,3)+',1fr);gap:10px;">'
+      +approaches.map(function(a,i){
+        var tiredPenalty = energy < 30 ? ' (Crew exhausted! -Quality)' : '';
+        var moralePenalty = morale < 30 ? ' (Low morale! +Risk)' : '';
+        return '<div class="shoot-choice" onclick="v4ShootApproach('+i+')" style="padding:16px;">'
+          +'<div class="shoot-choice-title">'+a.name+'</div>'
+          +'<div class="shoot-choice-desc" style="margin-bottom:8px;">'+a.desc+'</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:10px;">'
+          +'<span style="color:var(--accent-gold);">Takes: '+a.takes+'</span>'
+          +'<span style="color:var(--accent-red);">Energy: -'+a.energy+'%</span>'
+          +'<span style="color:#4ade80;">Quality: ~'+a.quality+'</span>'
+          +'<span style="color:var(--accent-purple);">Risk: '+a.risk+'%</span>'
+          +'</div>'
+          +(tiredPenalty||moralePenalty?'<div style="font-size:9px;color:var(--accent-red);margin-top:4px;">'+tiredPenalty+moralePenalty+'</div>':'')
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Previous scenes
+      +(results.length>0?'<div style="margin-top:16px;font-size:10px;color:var(--text-muted);letter-spacing:1px;">COMPLETED SCENES</div>'
+      +'<div style="display:flex;gap:6px;margin-top:6px;">'+results.map(function(r){
+        return '<div style="padding:6px 10px;background:'+r.color+'20;border:1px solid '+r.color+';border-radius:4px;font-size:10px;"><strong>'+r.name+'</strong> Q:'+r.quality+'</div>';
+      }).join('')+'</div>':'')
+      +'</div></div>';
+
+    window._v4ShootApproaches = approaches;
+  }
+
+  window.v4ShootApproach = function(idx) {
+    var a = window._v4ShootApproaches[idx];
+    takesLeft -= a.takes;
+    energy = clamp(energy - a.energy, 0, 100);
+    morale = clamp(morale + a.morale, 0, 100);
+
+    var q = a.quality;
+    // Energy penalty
+    if (energy < 30) q = Math.max(1, q - rnd(3,8));
+    // Morale penalty increases risk
+    var effectiveRisk = a.risk + (morale < 30 ? 20 : 0);
+
+    if (Math.random()*100 < effectiveRisk) {
+      var mishaps = ['Actor broke character!','Lighting rig fell!','Sound boom visible!','Continuity error spotted!','Extra walked into frame!','Director and actor argued!','Camera malfunction!'];
+      q = Math.max(1, q - rnd(4,10));
+      morale = clamp(morale - 5, 0, 100);
+      notify('On Set!', pick(mishaps)+' Quality reduced.','error');
+    } else if (Math.random() < 0.15) {
+      q += rnd(3,8);
+      morale = clamp(morale + 5, 0, 100);
+      notify('Magic!', pick(['Perfect take!','Actor improvised brilliance!','Stunning natural light!','Crew gave standing ovation!'])+' Bonus quality!','success');
+    }
+
+    var sc = scenes[sceneIdx];
+    var colors = ['#E63946','#457B9D','#2A9D8F','#E76F51','#6D6875','#264653'];
+    results.push({name:sc.name,quality:q,color:colors[sceneIdx%6]});
+    m.editClips = m.editClips || [];
+    m.editClips.push({name:sc.name,quality:q,take:1,color:colors[sceneIdx%6]});
+
+    sceneIdx++;
+    if (takesLeft <= 0 && sceneIdx < scenes.length) {
+      // Ran out of takes, auto-fill remaining with low quality
+      for (var i=sceneIdx;i<scenes.length;i++) {
+        results.push({name:scenes[i].name,quality:rnd(1,5),color:colors[i%6]});
+        m.editClips.push({name:scenes[i].name,quality:rnd(1,5),take:1,color:colors[i%6]});
+      }
+      sceneIdx = scenes.length;
+      notify('Out of Takes!','Remaining scenes rushed. Quality suffered.','error');
+    }
+    renderScene();
+  };
+
+  function finishShooting() {
+    var totalQ = 0;
+    results.forEach(function(r){totalQ+=r.quality;});
+    m.shootingScore = totalQ;
+    notify('That\'s a Wrap!','Shooting complete! Total quality: '+totalQ,'success');
+    launchMinigame('editing');
+  }
+
+  renderScene();
+}
+
+// ---- EDITING: Deep Timeline with multiple tools ----
+function v4EditingMinigame(m) {
+  if (!m.editClips || m.editClips.length === 0) {
+    m.editClips = [
+      {name:'Opening',quality:rnd(5,12),color:'#e63946',take:1},
+      {name:'Act 1',quality:rnd(5,12),color:'#457b9d',take:1},
+      {name:'Midpoint',quality:rnd(5,12),color:'#2a9d8f',take:1},
+      {name:'Act 2',quality:rnd(5,12),color:'#e76f51',take:1},
+      {name:'Climax',quality:rnd(5,12),color:'#6d6875',take:1},
+      {name:'Ending',quality:rnd(5,12),color:'#264653',take:1}
+    ];
+  }
+  var clips = m.editClips;
+  var order = clips.map(function(_,i){return i;});
+  var pacing = 50, depth = 50, visual = 50, flow = 50;
+  var editsLeft = 8;
+  var tools = [
+    {name:'Tighten Cuts',desc:'Remove dead space between shots',effect:{pacing:10,flow:5,depth:-3},icon:'&#9986;'},
+    {name:'Extend Scene',desc:'Let moments breathe',effect:{pacing:-5,depth:12,flow:3},icon:'&#9202;'},
+    {name:'Add B-Roll',desc:'Insert establishing shots',effect:{visual:12,pacing:-3,flow:5},icon:'&#127909;'},
+    {name:'Cross-Cut',desc:'Interweave parallel storylines',effect:{pacing:8,depth:8,flow:-5},icon:'&#10006;'},
+    {name:'Jump Cut',desc:'Jarring, modern, energetic',effect:{pacing:15,visual:5,depth:-8},icon:'&#9889;'},
+    {name:'Slow Motion',desc:'Emphasize key moments',effect:{visual:10,depth:5,pacing:-8},icon:'&#9201;'},
+    {name:'Montage Sequence',desc:'Compress time, build energy',effect:{pacing:12,visual:8,depth:-5,flow:5},icon:'&#127916;'},
+    {name:'Color Correct',desc:'Unify the visual palette',effect:{visual:15,flow:8},icon:'&#127912;'},
+    {name:'Sound Bridge',desc:'Audio connects scenes smoothly',effect:{flow:15,depth:3},icon:'&#127911;'},
+    {name:'Restructure Act 2',desc:'Major recut of middle section',effect:{pacing:8,depth:10,flow:10,visual:-5},icon:'&#128260;'}
+  ];
+
+  function calcEditScore() {
+    return clamp(Math.round((pacing+depth+visual+flow)/4), 0, 100);
+  }
+
+  function render() {
+    var score = calcEditScore();
+    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M4 7h16M4 12h10M4 17h6"/><path d="M18 14l4 4-4 4"/></svg> Editing Room: "'+m.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">'+editsLeft+' editing operations remaining</div></div>'
+      +'<div class="minigame-phase badge-purple card-badge">EDITING</div></div>'
+      +'<div class="minigame-body" style="max-width:1000px;margin:0 auto;">'
+      // Clip timeline
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">TIMELINE — drag clips to reorder</div>'
+      +'<div class="editing-timeline" style="min-height:90px;">'
+      +order.map(function(ci,pos){
+        var clip=clips[ci];
+        return '<div class="edit-clip" draggable="true" data-pos="'+pos+'" ondragstart="v4EditDragStart(event,'+pos+')" ondragover="v4EditDragOver(event)" ondrop="v4EditDrop(event,'+pos+')" style="background:'+clip.color+'25;border-color:'+clip.color+';min-width:110px;height:75px;">'
+          +'<div class="edit-clip-name">'+clip.name+'</div>'
+          +'<div class="edit-clip-quality" style="color:'+clip.color+';">Q:'+clip.quality+'</div>'
+          +'<div class="edit-clip-dur">Take '+clip.take+'</div></div>';
+      }).join('<div style="color:var(--text-muted);font-size:14px;display:flex;align-items:center;">&#8594;</div>')
+      +'</div>'
+      // Quality meters
+      +'<div class="grid-4" style="margin:20px 0;">'
+      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-blue);">'+pacing+'</div><div class="progress-bar"><div class="progress-fill progress-blue" style="width:'+pacing+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Pacing</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-purple);">'+depth+'</div><div class="progress-bar"><div class="progress-fill progress-purple" style="width:'+depth+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Depth</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-gold);">'+visual+'</div><div class="progress-bar"><div class="progress-fill progress-gold" style="width:'+visual+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Visual</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#4ade80;">'+flow+'</div><div class="progress-bar"><div class="progress-fill progress-green" style="width:'+flow+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Flow</div></div>'
+      +'</div>'
+      // Editing tools
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">EDITING TOOLS ('+editsLeft+' remaining)</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">'
+      +tools.map(function(t,i){
+        return '<div class="edit-control-btn" style="text-align:center;padding:10px;'+(editsLeft<=0?'opacity:.3;pointer-events:none;':'')+'" onclick="v4ApplyEditTool('+i+')">'
+          +'<div style="font-size:18px;margin-bottom:4px;">'+t.icon+'</div>'
+          +'<div style="font-weight:700;font-size:10px;">'+t.name+'</div>'
+          +'<div style="font-size:8px;color:var(--text-muted);margin-top:2px;">'+t.desc+'</div>'
+          +'<div style="font-size:8px;color:var(--accent-gold);margin-top:3px;">'+Object.entries(t.effect).map(function(e){return e[0]+':'+(e[1]>0?'+':'')+e[1];}).join(' ')+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Score + lock
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">'
+      +'<div class="card" style="margin:0;padding:12px 20px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);">EDIT SCORE</div>'
+      +'<div style="font-size:32px;font-weight:700;color:'+(score>=70?'#4ade80':score>=40?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+score+'/100</div></div>'
+      +'<button class="btn btn-red btn-lg" onclick="v4FinishEdit()">LOCK PICTURE</button>'
+      +'</div></div></div>';
+  }
+
+  var _dragIdx = null;
+  window.v4EditDragStart = function(e,pos){_dragIdx=pos;e.dataTransfer.effectAllowed='move';};
+  window.v4EditDragOver = function(e){e.preventDefault();};
+  window.v4EditDrop = function(e,targetPos){
+    e.preventDefault();
+    if(_dragIdx===null||_dragIdx===targetPos) return;
+    var moved=order.splice(_dragIdx,1)[0];
+    order.splice(targetPos,0,moved);
+    _dragIdx=null;
+    // Reordering gives small flow bonus
+    flow = clamp(flow + 2, 0, 100);
+    render();
+  };
+  window.v4ApplyEditTool = function(idx) {
+    if (editsLeft <= 0) return;
+    var t = tools[idx];
+    editsLeft--;
+    Object.entries(t.effect).forEach(function(e){
+      if(e[0]==='pacing') pacing=clamp(pacing+e[1],0,100);
+      if(e[0]==='depth') depth=clamp(depth+e[1],0,100);
+      if(e[0]==='visual') visual=clamp(visual+e[1],0,100);
+      if(e[0]==='flow') flow=clamp(flow+e[1],0,100);
+    });
+    notify('Edit Applied',t.name+': '+t.desc,'info');
+    render();
+  };
+  window.v4FinishEdit = function() {
+    var score = calcEditScore();
+    m.editingScore = score;
+    var bonuses = {pacing:pacing-50,depth:depth-50,visual:visual-50,originality:flow-50};
+    minigameState = {phase:'editing',bonuses:bonuses,operations:8-editsLeft};
+    notify('Picture Locked!','Edit quality: '+score+'/100','success');
+    launchMinigame('sound');
+  };
+  render();
+}
+
+// ---- SOUND: Multi-layer mixing with target zones ----
+function v4SoundMinigame(m) {
+  var channels = [
+    {key:'dialogue',label:'Dialogue',value:65,target:[65,85],color:'#00B4D8'},
+    {key:'music',label:'Score',value:55,target:[50,75],color:'var(--accent-gold)'},
+    {key:'sfx',label:'Sound FX',value:45,target:[35,65],color:'var(--accent-red)'},
+    {key:'ambience',label:'Ambience',value:35,target:[25,55],color:'var(--accent-purple)'},
+    {key:'bass',label:'Bass/LFE',value:50,target:[40,60],color:'var(--accent-warm)'},
+    {key:'reverb',label:'Reverb',value:40,target:[30,50],color:'#4ade80'}
+  ];
+  var composerBonus = m.composer ? Math.round(m.composer.talent/10) : 0;
+  var presets = [
+    {name:'Theater Standard',desc:'Balanced for cinema',values:{dialogue:75,music:65,sfx:55,ambience:40,bass:50,reverb:40}},
+    {name:'IMAX Bombastic',desc:'Heavy bass, huge score',values:{dialogue:70,music:80,sfx:70,ambience:30,bass:70,reverb:35}},
+    {name:'Indie Intimate',desc:'Dialog-forward, minimal',values:{dialogue:85,music:45,sfx:30,ambience:50,bass:35,reverb:45}},
+    {name:'Surround Immersive',desc:'Environmental, spatial',values:{dialogue:70,music:60,sfx:60,ambience:65,bass:55,reverb:50}}
+  ];
+  var presetUsed = false;
+
+  function calcScore() {
+    var score = 0;
+    channels.forEach(function(ch){
+      var v=ch.value;
+      if(v>=ch.target[0]&&v<=ch.target[1]) score+=Math.round(100/channels.length);
+      else score+=Math.max(0,Math.round(100/channels.length)-Math.abs(v-(ch.target[0]+ch.target[1])/2));
+    });
+    return clamp(score+composerBonus,0,100);
+  }
+
+  function render() {
+    var score = calcScore();
+    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg> Sound Mix: "'+m.title+'"</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Get each channel into its green target zone</div></div>'
+      +'<div class="minigame-phase badge-blue card-badge">POST-PRODUCTION</div></div>'
+      +'<div class="minigame-body" style="max-width:900px;margin:0 auto;">'
+      // Mixer channels
+      +'<div style="display:flex;gap:20px;justify-content:center;margin:24px 0;">'
+      +channels.map(function(ch){
+        var inZone = ch.value>=ch.target[0] && ch.value<=ch.target[1];
+        return '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--bg-card);border:1px solid '+(inZone?'#4ade80':'var(--border)')+';border-radius:10px;padding:16px 12px;width:100px;">'
+          +'<div style="font-size:18px;font-weight:700;color:'+(inZone?'#4ade80':ch.color)+';font-family:\'JetBrains Mono\',monospace;">'+ch.value+'</div>'
+          +'<div style="position:relative;height:160px;width:30px;">'
+          // Target zone indicator
+          +'<div style="position:absolute;left:0;width:100%;background:rgba(74,222,128,.15);border:1px dashed #4ade80;border-radius:3px;bottom:'+(ch.target[0])+'%;height:'+((ch.target[1]-ch.target[0]))+'%;"></div>'
+          // Slider
+          +'<input type="range" min="0" max="100" value="'+ch.value+'" style="position:absolute;left:50%;transform:translateX(-50%);height:160px;writing-mode:vertical-lr;direction:rtl;accent-color:'+ch.color+';" oninput="v4UpdateChannel(\''+ch.key+'\',this.value)">'
+          +'</div>'
+          +'<div style="font-size:10px;color:var(--text-muted);font-weight:700;letter-spacing:1px;">'+ch.label.toUpperCase()+'</div>'
+          +'<div style="font-size:8px;color:#4ade80;">'+ch.target[0]+'-'+ch.target[1]+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Presets
+      +(!presetUsed?'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">MIX PRESETS (one-time use)</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:16px;">'
+      +presets.map(function(p,i){
+        return '<button class="btn btn-sm" onclick="v4SoundPreset('+i+')" style="flex:1;">'+p.name+'<br><span style="font-size:8px;color:var(--text-muted);">'+p.desc+'</span></button>';
+      }).join('')+'</div>':'')
+      // Score
+      +'<div style="text-align:center;">'
+      +'<div class="card" style="display:inline-block;padding:16px 32px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">MIX QUALITY</div>'
+      +'<div style="font-size:36px;font-weight:700;color:'+(score>=80?'#4ade80':score>=50?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+score+'/100</div>'
+      +(m.composer?'<div style="font-size:10px;color:var(--accent-purple);margin-top:4px;">Composer bonus: +'+composerBonus+'</div>':'')
+      +'</div></div>'
+      +'<div style="text-align:center;margin-top:20px;"><button class="btn btn-red btn-lg" onclick="v4FinishSound('+score+')">FINALIZE MIX</button></div>'
+      +'</div></div>';
+  }
+
+  window.v4UpdateChannel = function(key, val) {
+    channels.forEach(function(ch){if(ch.key===key)ch.value=parseInt(val);});
+    render();
+  };
+  window.v4SoundPreset = function(idx) {
+    var p = presets[idx];
+    channels.forEach(function(ch){if(p.values[ch.key]!==undefined)ch.value=p.values[ch.key];});
+    presetUsed = true;
+    notify('Preset Applied',p.name+' loaded. Fine-tune from here.','info');
+    render();
+  };
+  window.v4FinishSound = function(score) {
+    m.soundScore = clamp(score, 0, 100);
+    notify('Sound Mixed!','Final mix: '+m.soundScore+'/100','success');
+    launchMinigame('color');
+  };
+  render();
+}
+
+// ---- showTab override for new nav highlighting ----
+var _origShowTab = showTab;
+showTab = function(tab) {
+  _origShowTab(tab);
+  // Update nav ribbon active states
+  var items = document.querySelectorAll('.nav-drop-item');
+  items.forEach(function(item){item.classList.remove('active');});
+  items.forEach(function(item){
+    if(item.getAttribute('onclick') && item.getAttribute('onclick').indexOf("'"+tab+"'") !== -1) {
+      item.classList.add('active');
+      // Also highlight parent group
+      var group = item.closest('.nav-group');
+      if(group){
+        document.querySelectorAll('.nav-group-btn').forEach(function(b){b.classList.remove('group-active');});
+        var btn = group.querySelector('.nav-group-btn');
+        if(btn) btn.classList.add('group-active');
+      }
+    }
+  });
+};
 </script>
 </body>
 </html>
