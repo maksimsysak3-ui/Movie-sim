@@ -4862,451 +4862,415 @@ function v4SoundMinigame(m) {
 }
 
 // ============================================================
-// V5 — INTRO, TV POSTERS, TV MINIGAME OVERHAUL
+// V6 — TV SHOW MINIGAME COMPLETE REWRITE
+// Unique interactive mechanics: drag-drop, timing, sliders, matching
 // ============================================================
 
-// --- INTRO CINEMATIC ---
-(function(){
-  var intro = document.getElementById('intro-screen');
-  if(!intro) return;
-  setTimeout(function(){ intro.classList.add('fade-out'); }, 3500);
-  setTimeout(function(){ intro.style.display='none'; }, 5000);
-})();
-
-// --- TV SHOW POSTERS ---
-var _origRenderTVShows = renderTVShows;
-renderTVShows = function(){
-  _origRenderTVShows();
-  var container = document.getElementById('tvshows-content');
-  if(!container || !G.tvShows) return;
-  // Add poster upload buttons to each show
-  var cards = container.querySelectorAll('.card');
-  // We inject via a different approach — add poster section to shows
-};
-
-// TV poster upload/display integrated into renderTVShows override
-(function(){
-  var orig = renderTVShows;
-  renderTVShows = function(){
-    orig();
-    if(!G.tvShows || G.tvShows.length===0) return;
-    var container = document.getElementById('tvshows-content');
-    if(!container) return;
-    // Find each show card and append poster section
-    var showDivs = container.children;
-    G.tvShows.forEach(function(tv, idx){
-      if(!showDivs[idx]) return;
-      var existing = showDivs[idx].querySelector('.tv-poster-section');
-      if(existing) return;
-      var section = document.createElement('div');
-      section.className = 'tv-poster-section';
-      section.style.cssText = 'margin-top:12px;display:flex;align-items:center;gap:12px;padding-top:12px;border-top:1px solid var(--border);';
-      var posterHtml = '';
-      if(!G.tvPosters) G.tvPosters={};
-      if(G.tvPosters[tv.id]){
-        posterHtml = '<div style="width:60px;height:90px;border-radius:4px;overflow:hidden;border:1px solid var(--accent-gold);flex-shrink:0;"><img src="'+G.tvPosters[tv.id]+'" style="width:100%;height:100%;object-fit:cover;"></div>';
-      } else {
-        posterHtml = '<div style="width:60px;height:90px;border:2px dashed var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;" onclick="uploadTVPoster(\''+tv.id+'\')">'
-          +'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
-      }
-      section.innerHTML = posterHtml
-        +'<div style="font-size:11px;color:var(--text-muted);">'
-        +(G.tvPosters[tv.id]?'<span style="color:var(--accent-gold);cursor:pointer;" onclick="uploadTVPoster(\''+tv.id+'\')">Change Poster</span>':'<span style="cursor:pointer;" onclick="uploadTVPoster(\''+tv.id+'\')">Upload Show Poster</span>')
-        +'</div>';
-      showDivs[idx].appendChild(section);
-    });
-  };
-})();
-
-window.uploadTVPoster = function(tvId){
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = function(e){
-    var file = e.target.files[0];
-    if(!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev){
-      if(!G.tvPosters) G.tvPosters = {};
-      G.tvPosters[tvId] = ev.target.result;
-      notify('Poster Set!','Show poster uploaded.','success');
-      renderTVShows();
-    };
-    reader.readAsDataURL(file);
-  };
-  input.click();
-};
-
-// --- TV EPISODE MINIGAME OVERHAUL ---
-// Replace the simple click-card TV minigames with interactive ones
-
-// Override: TV Writing becomes a story beat puzzle (like movie script but per-episode)
+// ---- 1. WRITERS ROOM: Drag-and-drop storyboard with scene cards ----
 launchTVWritingMinigame = function(tv, epIndex){
-  var beats = [
-    {id:'cold_open',name:'Cold Open',desc:'Hook viewers before the title card',tension:8,type:'hook'},
-    {id:'recap',name:'Previously On...',desc:'Remind viewers of key threads',tension:2,type:'setup'},
-    {id:'new_thread',name:'New Subplot',desc:'Introduce a fresh storyline',tension:4,type:'setup'},
-    {id:'confrontation',name:'Confrontation',desc:'Characters clash',tension:7,type:'rising'},
-    {id:'revelation',name:'Revelation',desc:'A secret comes to light',tension:8,type:'twist'},
-    {id:'quiet_beat',name:'Quiet Character Moment',desc:'Intimate, grounded scene',tension:2,type:'character'},
-    {id:'setpiece',name:'Set Piece',desc:'Big visual/action sequence',tension:9,type:'action'},
-    {id:'cliffhanger',name:'Cliffhanger',desc:'End on a suspenseful note',tension:10,type:'hook'},
-    {id:'resolution',name:'Resolution',desc:'Wrap up this episode\'s thread',tension:3,type:'ending'},
-    {id:'tease',name:'Next Week Tease',desc:'Plant seeds for upcoming episodes',tension:5,type:'setup'}
+  var scenes = [
+    {id:'teaser',name:'TEASER',desc:'Cold open hook',color:'#E63946',weight:8},
+    {id:'intro',name:'INTRO',desc:'Establish the world',color:'#457B9D',weight:3},
+    {id:'conflict',name:'CONFLICT',desc:'Tension rises',color:'#E76F51',weight:6},
+    {id:'twist',name:'TWIST',desc:'Unexpected turn',color:'#9B5DE5',weight:9},
+    {id:'depth',name:'CHARACTER',desc:'Emotional depth',color:'#00B4D8',weight:4},
+    {id:'action',name:'ACTION',desc:'Spectacle scene',color:'#E63946',weight:7},
+    {id:'quiet',name:'QUIET',desc:'Breathing room',color:'#2A9D8F',weight:2},
+    {id:'reveal',name:'REVEAL',desc:'Truth uncovered',color:'#FFD700',weight:8},
+    {id:'climax',name:'CLIMAX',desc:'Peak intensity',color:'#E63946',weight:10},
+    {id:'resolve',name:'RESOLVE',desc:'Wrap threads',color:'#4ade80',weight:3},
+    {id:'cliffhanger',name:'CLIFFHANGER',desc:'Leave wanting more',color:'#9B5DE5',weight:9},
+    {id:'montage',name:'MONTAGE',desc:'Time compression',color:'#C9A96E',weight:5}
   ];
-
-  var timeline = [];
-  var available = beats.sort(function(){return Math.random()-0.5;});
-  var maxSlots = 5;
+  var pool = scenes.sort(function(){return Math.random()-0.5;}).slice(0,9);
+  var board = [null,null,null,null,null,null]; // 6 slots (acts)
+  var actNames = ['COLD OPEN','ACT 1','ACT 2','ACT 3','ACT 4','TAG'];
+  var idealPattern = [8,4,6,9,10,3]; // ideal tension curve
+  var dragSrc = null;
 
   function calcScore(){
-    if(timeline.length===0) return 0;
-    var score = timeline.length * 5;
-    var hasCold = timeline.some(function(b){return b.id==='cold_open';});
-    var hasCliff = timeline.some(function(b){return b.id==='cliffhanger';});
-    if(hasCold && timeline[0].id==='cold_open') score += 15;
-    if(hasCliff && timeline[timeline.length-1].id==='cliffhanger') score += 15;
-    // Rising tension check
-    for(var i=1;i<timeline.length;i++){
-      if(timeline[i].tension > timeline[i-1].tension) score += 5;
+    var filled = board.filter(function(b){return b!==null;});
+    if(filled.length<3) return 0;
+    var score = filled.length * 6;
+    // Tension curve match
+    for(var i=0;i<board.length;i++){
+      if(board[i]){
+        var diff = Math.abs(board[i].weight - idealPattern[i]);
+        score += Math.max(0, 12 - diff*2);
+      }
     }
-    score += timeline.filter(function(b){return b.type==='twist'||b.type==='action';}).length * 6;
-    return clamp(score, 0, 100);
+    // Bonus: climax in act 3 or 4
+    if((board[3]&&board[3].id==='climax')||(board[4]&&board[4].id==='climax')) score+=12;
+    // Bonus: teaser first
+    if(board[0]&&(board[0].id==='teaser'||board[0].id==='action')) score+=8;
+    // Bonus: cliffhanger last
+    if(board[5]&&(board[5].id==='cliffhanger'||board[5].id==='reveal')) score+=10;
+    // Penalty: quiet before climax
+    for(var j=0;j<board.length-1;j++){
+      if(board[j]&&board[j+1]&&board[j].id==='quiet'&&board[j+1].id==='climax') score-=5;
+    }
+    return clamp(score,0,100);
   }
 
   function render(){
     var score = calcScore();
-    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
+    var con = document.getElementById('minigame-container');
+    con.innerHTML = '<div class="minigame-fullscreen">'
       +'<div class="minigame-header"><div>'
-      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h6M8 16h4"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Writers Room</div>'
-      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Build this episode\'s story arc</div></div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h6M8 16h4"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Storyboard</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Drag scene cards into the act slots to build your episode</div></div>'
       +'<div class="minigame-phase badge-gold card-badge">WRITING</div></div>'
-      +'<div class="minigame-body" style="max-width:900px;margin:0 auto;">'
-      // Tension curve
-      +'<div class="card" style="padding:12px;margin-bottom:16px;">'
-      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">EPISODE TENSION CURVE</div>'
-      +'<div style="display:flex;align-items:flex-end;gap:4px;height:60px;">'
-      +(timeline.length>0?timeline.map(function(b){
-        var h=b.tension/10*100;
-        var c=b.type==='hook'?'var(--accent-red)':b.type==='twist'?'var(--accent-gold)':b.type==='action'?'#E63946':b.type==='character'?'var(--accent-purple)':'var(--accent-blue)';
-        return '<div style="flex:1;height:'+h+'%;background:'+c+';border-radius:3px 3px 0 0;min-height:6px;"></div>';
-      }).join(''):'<div style="flex:1;text-align:center;color:var(--text-muted);font-size:11px;">Place beats below</div>')
+      +'<div class="minigame-body" style="max-width:1000px;margin:0 auto;">'
+      // Ideal curve hint
+      +'<div class="card" style="padding:12px;margin-bottom:12px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;">TENSION CURVE — drag cards to match the ideal arc</div>'
+      +'<div style="font-size:10px;color:var(--accent-gold);">Goal: start strong, build to climax, resolve</div></div>'
+      +'<div style="display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:8px;">'
+      +board.map(function(b,i){
+        var idealH = idealPattern[i]/10*100;
+        var actualH = b ? b.weight/10*100 : 0;
+        var matchPct = b ? Math.max(0,100 - Math.abs(b.weight-idealPattern[i])*15) : 0;
+        return '<div style="flex:1;position:relative;">'
+          +'<div style="position:absolute;bottom:0;width:100%;height:'+idealH+'%;background:rgba(255,215,0,.1);border:1px dashed rgba(255,215,0,.3);border-radius:3px 3px 0 0;"></div>'
+          +(b?'<div style="position:absolute;bottom:0;width:100%;height:'+actualH+'%;background:'+b.color+'80;border-radius:3px 3px 0 0;transition:height .3s;"></div>':'')
+          +'<div style="position:absolute;bottom:-16px;width:100%;text-align:center;font-size:7px;color:var(--text-muted);">'+actNames[i]+'</div>'
+          +'</div>';
+      }).join('')
       +'</div></div>'
-      // Timeline
-      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">YOUR EPISODE ('+timeline.length+'/'+maxSlots+')</div>'
-      +'<div style="display:flex;gap:6px;margin-bottom:16px;min-height:60px;padding:10px;background:var(--primary);border:2px dashed var(--border);border-radius:8px;">'
-      +(timeline.length>0?timeline.map(function(b,i){
-        return '<div style="flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:8px;text-align:center;cursor:pointer;" onclick="tvWriteRemove('+i+')">'
-          +'<div style="font-size:10px;font-weight:700;">'+b.name+'</div>'
-          +'<div style="font-size:8px;color:var(--text-muted);">'+b.type+'</div>'
-          +'<div style="font-size:7px;color:var(--accent-red);margin-top:3px;">remove</div></div>';
-      }).join(''):'<div style="display:flex;align-items:center;justify-content:center;width:100%;color:var(--text-muted);font-size:11px;">Click beats below to add them</div>')
-      +'</div>'
-      // Available
-      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px;">'
-      +available.filter(function(b){return timeline.indexOf(b)===-1;}).map(function(b,i){
-        var disabled=timeline.length>=maxSlots;
-        return '<div class="script-card" style="padding:10px;'+(disabled?'opacity:.3;pointer-events:none;':'')+'" onclick="tvWriteAdd(\''+b.id+'\')">'
-          +'<div style="font-size:10px;font-weight:700;">'+b.name+'</div>'
-          +'<div style="font-size:8px;color:var(--text-muted);">'+b.desc+'</div>'
-          +'<div style="font-size:8px;color:var(--accent-warm);margin-top:3px;">T:'+b.tension+'</div></div>';
+      // Board slots (drop zones)
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">EPISODE STRUCTURE — drop scenes here</div>'
+      +'<div id="tv-board" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;">'
+      +board.map(function(b,i){
+        return '<div class="tv-drop-slot" data-slot="'+i+'" style="min-height:110px;background:'+(b?b.color+'15':'var(--primary)')+';border:2px '+(b?'solid '+b.color:'dashed var(--border)')+';border-radius:8px;padding:8px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:'+(b?'grab':'default')+';" draggable="'+(b?'true':'false')+'" ondragstart="tvwDragStart(event,\'board\','+i+')" ondragover="tvwDragOver(event)" ondrop="tvwDrop(event,'+i+')">'
+          +'<div style="font-size:8px;color:var(--text-muted);letter-spacing:1px;margin-bottom:4px;">'+actNames[i]+'</div>'
+          +(b
+            ?'<div style="font-size:11px;font-weight:700;color:'+b.color+';">'+b.name+'</div>'
+            +'<div style="font-size:8px;color:var(--text-muted);margin-top:2px;">'+b.desc+'</div>'
+            +'<div style="font-size:8px;color:var(--accent-warm);margin-top:3px;">T:'+b.weight+'</div>'
+            +'<div style="font-size:7px;color:var(--accent-red);margin-top:4px;cursor:pointer;" onclick="tvwRemove('+i+')">remove</div>'
+            :'<div style="font-size:9px;color:var(--text-muted);">Drop here</div>')
+          +'</div>';
       }).join('')
       +'</div>'
+      // Pool (drag sources)
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">SCENE CARDS — drag into slots above</div>'
+      +'<div id="tv-pool" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;min-height:80px;padding:12px;background:var(--primary);border:1px solid var(--border);border-radius:8px;">'
+      +pool.filter(function(s){return board.indexOf(s)===-1;}).map(function(s,i){
+        return '<div class="tv-pool-card" draggable="true" data-pool="'+pool.indexOf(s)+'" ondragstart="tvwDragStart(event,\'pool\','+pool.indexOf(s)+')" style="background:'+s.color+'20;border:2px solid '+s.color+';border-radius:8px;padding:10px 14px;cursor:grab;transition:all .2s;min-width:100px;text-align:center;">'
+          +'<div style="font-size:11px;font-weight:700;color:'+s.color+';">'+s.name+'</div>'
+          +'<div style="font-size:8px;color:var(--text-muted);margin-top:2px;">'+s.desc+'</div>'
+          +'<div style="font-size:9px;color:var(--accent-warm);margin-top:3px;">Tension: '+s.weight+'</div></div>';
+      }).join('')
+      +'</div>'
+      // Score + submit
       +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-      +'<div style="font-size:14px;">Score: <strong style="color:'+(score>=60?'#4ade80':'var(--accent-gold)')+';">'+score+'/100</strong></div>'
-      +'<button class="btn btn-red btn-lg" onclick="tvWriteFinish()" '+(timeline.length<2?'disabled':'')+'>LOCK SCRIPT</button>'
+      +'<div class="card" style="margin:0;padding:12px 20px;display:flex;align-items:center;gap:16px;">'
+      +'<div><div style="font-size:10px;color:var(--text-muted);">SCRIPT</div><div style="font-size:28px;font-weight:700;color:'+(score>=60?'#4ade80':score>=30?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+score+'</div></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);max-width:180px;">'+(score<30?'Drag scenes into slots. Match the tension curve!':score<60?'Getting there. Climax in Act 3-4 and strong opener help.':score<80?'Solid episode structure!':'Brilliant storyboard!')+'</div>'
+      +'</div>'
+      +'<button class="btn btn-red btn-lg" onclick="tvwFinish()" '+(board.filter(function(b){return b!==null;}).length<3?'disabled':'')+'>LOCK STORYBOARD</button>'
       +'</div></div></div>';
   }
 
-  window.tvWriteAdd = function(id){
-    if(timeline.length>=maxSlots) return;
-    var beat = available.find(function(b){return b.id===id;});
-    if(beat && timeline.indexOf(beat)===-1) timeline.push(beat);
+  window.tvwDragStart=function(e,src,idx){
+    dragSrc={source:src,index:idx};
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain','');
+  };
+  window.tvwDragOver=function(e){e.preventDefault();e.dataTransfer.dropEffect='move';};
+  window.tvwDrop=function(e,slotIdx){
+    e.preventDefault();
+    if(!dragSrc) return;
+    var card = null;
+    if(dragSrc.source==='pool'){
+      card = pool[dragSrc.index];
+      if(board.indexOf(card)!==-1) return; // already placed
+    } else if(dragSrc.source==='board'){
+      card = board[dragSrc.index];
+      board[dragSrc.index]=null;
+    }
+    // If slot occupied, swap back to pool or swap positions
+    if(board[slotIdx]!==null && dragSrc.source==='board'){
+      board[dragSrc.index]=board[slotIdx];
+    }
+    board[slotIdx]=card;
+    dragSrc=null;
     render();
   };
-  window.tvWriteRemove = function(idx){
-    timeline.splice(idx,1);
-    render();
-  };
-  window.tvWriteFinish = function(){
-    if(timeline.length<2) return;
-    var score = calcScore();
-    window._tvEpData = {quality:score, audience:timeline.filter(function(b){return b.type==='action'||b.type==='hook';}).length*6, critic:timeline.filter(function(b){return b.type==='character'||b.type==='twist';}).length*6, choiceName:'Custom Episode'};
-    launchTVCastingMinigame(tv, epIndex);
+  window.tvwRemove=function(idx){board[idx]=null;render();};
+  window.tvwFinish=function(){
+    var score=calcScore();
+    window._tvEpData={quality:score,audience:board.filter(function(b){return b&&(b.id==='action'||b.id==='climax');}).length*8,critic:board.filter(function(b){return b&&(b.id==='depth'||b.id==='quiet');}).length*8,choiceName:'Storyboard'};
+    launchTVCastingMinigame(tv,epIndex);
   };
   render();
 };
 
-// Override: TV Casting becomes a drag-match puzzle
+// ---- 2. CASTING: Chemistry Table — pair actors and test reads ----
 launchTVCastingMinigame = function(tv, epIndex){
-  var roles = [
-    {name:'Lead',needs:rnd(50,80),importance:3},
-    {name:'Recurring',needs:rnd(40,70),importance:2},
-    {name:'Guest Star',needs:rnd(30,60),importance:1}
-  ];
-  var actors = [];
-  for(var i=0;i<6;i++){
-    actors.push({
-      name:pick(FIRST_NAMES)+' '+pick(LAST_NAMES),
-      talent:rnd(25,95),
-      salary:Math.round(tv.budgetPerEp*rnd(2,10)/100),
-      chemistry:rnd(-10,20)
-    });
+  var roles=['Lead','Antagonist','Support'];
+  var actors=[];
+  for(var i=0;i<7;i++){
+    actors.push({id:i,name:pick(FIRST_NAMES)+' '+pick(LAST_NAMES),talent:rnd(30,95),type:pick(['Method','Natural','Intense','Subtle','Comedic','Dramatic']),salary:Math.round(tv.budgetPerEp*rnd(3,12)/100)});
   }
-  var assignments = {};
-  var budget = Math.round(tv.budgetPerEp * 0.4);
-  var spent = 0;
+  // Chemistry matrix
+  var chem={};
+  actors.forEach(function(a){actors.forEach(function(b){if(a.id!==b.id){var key=Math.min(a.id,b.id)+'_'+Math.max(a.id,b.id);if(!chem[key])chem[key]=rnd(-20,30);}});});
 
-  function render(){
-    var castQ = 0;
-    Object.keys(assignments).forEach(function(ri){
-      var ci = assignments[ri];
-      var fit = Math.max(0, 20 - Math.abs(actors[ci].talent - roles[ri].needs)/3);
-      castQ += Math.round((fit + actors[ci].chemistry) * roles[ri].importance);
+  var cast=[null,null,null]; // assigned actor index per role
+  var testedPairs={}; // which pairs have been chemistry-tested
+  var testsLeft=4;
+
+  function getChem(a,b){var key=Math.min(a,b)+'_'+Math.max(a,b);return chem[key]||0;}
+  function calcScore(){
+    var s=0;
+    cast.forEach(function(ci,ri){
+      if(ci===null) return;
+      s+=Math.round(actors[ci].talent/3);
+      // Chemistry with other cast
+      cast.forEach(function(ci2,ri2){
+        if(ri!==ri2&&ci2!==null){
+          var c=getChem(ci,ci2);
+          s+=c>0?Math.round(c/2):c;
+        }
+      });
     });
-
-    document.getElementById('minigame-container').innerHTML = '<div class="minigame-fullscreen">'
-      +'<div class="minigame-header"><div>'
-      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Casting</div></div>'
-      +'<div class="minigame-phase badge-blue card-badge">CASTING</div></div>'
-      +'<div class="minigame-body" style="max-width:800px;margin:0 auto;">'
-      +'<div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:11px;"><span style="color:var(--text-muted);">Budget: $'+formatMoney(budget-spent)+' left</span><span style="color:var(--accent-gold);">Cast Score: '+castQ+'</span></div>'
-      // Roles
-      +'<div style="display:flex;gap:10px;margin-bottom:16px;">'
-      +roles.map(function(r,ri){
-        var assigned = assignments[ri]!==undefined;
-        var a = assigned ? actors[assignments[ri]] : null;
-        return '<div style="flex:1;background:'+(assigned?'rgba(74,222,128,.08)':'var(--bg-card)')+';border:1px solid '+(assigned?'#4ade80':'var(--border)')+';border-radius:8px;padding:12px;text-align:center;">'
-          +'<div style="font-weight:700;font-size:12px;">'+r.name+'</div>'
-          +'<div style="font-size:9px;color:var(--text-muted);">Need: '+r.needs+' talent</div>'
-          +(assigned?'<div style="font-size:11px;color:#4ade80;margin-top:6px;">'+a.name+'</div><button class="btn btn-sm" style="margin-top:4px;font-size:8px;" onclick="tvCastRemove('+ri+')">Remove</button>':'<div style="font-size:10px;color:var(--text-muted);margin-top:6px;">Empty</div>')
-          +'</div>';
-      }).join('')
-      +'</div>'
-      // Actors
-      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">'
-      +actors.map(function(a,ci){
-        if(Object.values(assignments).indexOf(ci)!==-1) return '';
-        var over = spent+a.salary>budget;
-        return '<div class="talent-card" style="padding:10px;'+(over?'opacity:.4;':'')+'">'
-          +'<div style="font-weight:700;font-size:12px;">'+a.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">T:'+a.talent+' | Chem:'+(a.chemistry>0?'+':'')+a.chemistry+'</div>'
-          +'<div style="font-size:10px;color:var(--accent-red);margin-bottom:6px;">$'+formatMoney(a.salary)+'</div>'
-          +'<div style="display:flex;gap:4px;">'
-          +roles.map(function(r,ri){
-            if(assignments[ri]!==undefined) return '';
-            var fit = Math.max(0,20-Math.abs(a.talent-r.needs)/3);
-            return '<button class="btn btn-sm" style="font-size:8px;padding:2px 5px;'+(over?'pointer-events:none;':'')+'" onclick="tvCastAssign('+ci+','+ri+')">'+r.name+' ('+Math.round(fit)+')</button>';
-          }).join('')
-          +'</div></div>';
-      }).join('')
-      +'</div>'
-      +'<div style="text-align:right;"><button class="btn btn-red btn-lg" onclick="tvCastDone()" '+(Object.keys(assignments).length<1?'disabled':'')+'>FINALIZE CAST</button></div>'
-      +'</div></div>';
+    return clamp(s,0,100);
   }
-
-  window.tvCastAssign = function(ci,ri){
-    if(assignments[ri]!==undefined) return;
-    if(spent+actors[ci].salary>budget){notify('Over Budget!','','error');return;}
-    spent+=actors[ci].salary;
-    assignments[ri]=ci;
-    render();
-  };
-  window.tvCastRemove = function(ri){
-    if(assignments[ri]===undefined) return;
-    spent-=actors[assignments[ri]].salary;
-    delete assignments[ri];
-    render();
-  };
-  window.tvCastDone = function(){
-    var castQ=0;
-    Object.keys(assignments).forEach(function(ri){
-      var ci=assignments[ri];
-      var fit=Math.max(0,20-Math.abs(actors[ci].talent-roles[ri].needs)/3);
-      castQ+=Math.round((fit+actors[ci].chemistry)*roles[ri].importance);
-    });
-    window._tvEpData.castQuality=castQ;
-    launchTVShootingMinigame(tv,epIndex);
-  };
-  render();
-};
-
-// Override: TV Shooting becomes resource management
-launchTVShootingMinigame = function(tv, epIndex){
-  var scenes = [
-    {name:'Opening',diff:3},{name:'Key Scene',diff:5},{name:'Climax',diff:7},{name:'Closing',diff:4}
-  ];
-  var sceneIdx = 0;
-  var takesLeft = 10;
-  var energy = 100;
-  var shootQ = 0;
-  var dirBonus = tv.showrunner ? Math.round(tv.showrunner.vision/15) : 0;
-
-  function renderScene(){
-    if(sceneIdx>=scenes.length){
-      window._tvEpData.shootQuality=shootQ;
-      launchTVEditMinigame(tv,epIndex);
-      return;
-    }
-    var sc=scenes[sceneIdx];
-    var approaches=[
-      {name:'Safe Take',takes:1,energy:10,quality:rnd(4,8)+dirBonus,risk:5},
-      {name:'Multiple Angles',takes:2,energy:20,quality:rnd(8,14)+dirBonus,risk:15},
-      {name:'One-Take',takes:1,energy:25,quality:rnd(12,22)+dirBonus,risk:35},
-      {name:'Improvised',takes:2,energy:15,quality:rnd(6,18)+dirBonus,risk:25}
-    ].filter(function(a){return a.takes<=takesLeft;});
-
-    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
-      +'<div class="minigame-header"><div>'
-      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" opacity=".5"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Filming</div>'
-      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Scene '+(sceneIdx+1)+'/'+scenes.length+': '+sc.name+'</div></div>'
-      +'<div class="minigame-phase badge-red card-badge">FILMING</div></div>'
-      +'<div class="minigame-body" style="max-width:800px;margin:0 auto;">'
-      // Resource bars
-      +'<div style="display:flex;gap:16px;margin-bottom:16px;">'
-      +'<div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>TAKES</span><span style="color:var(--accent-gold);">'+takesLeft+'</span></div>'
-      +'<div class="progress-bar" style="height:8px;"><div class="progress-fill progress-gold" style="width:'+(takesLeft/10*100)+'%;"></div></div></div>'
-      +'<div style="flex:1;"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>ENERGY</span><span style="color:'+(energy>40?'#4ade80':'var(--accent-red)')+';">'+energy+'%</span></div>'
-      +'<div class="progress-bar" style="height:8px;"><div class="progress-fill '+(energy>40?'progress-green':'progress-red')+'" style="width:'+energy+'%;"></div></div></div>'
-      +'</div>'
-      // Scene + approaches
-      +'<div class="shooting-viewport" style="min-height:180px;">'
-      +'<div class="shooting-scene-label">'+sc.name.toUpperCase()+' (Diff: '+sc.diff+')</div>'
-      +'<div class="shooting-scene-content" style="min-height:180px;">'
-      +'<div style="font-size:20px;font-weight:700;margin-bottom:16px;">'+sc.name+'</div>'
-      +'<div style="display:grid;grid-template-columns:repeat('+Math.min(approaches.length,4)+',1fr);gap:8px;max-width:700px;">'
-      +approaches.map(function(a,i){
-        var tired=energy<30;
-        return '<div class="shoot-choice" onclick="tvShootPick('+i+')" style="padding:14px;">'
-          +'<div class="shoot-choice-title">'+a.name+'</div>'
-          +'<div style="font-size:10px;color:var(--text-muted);margin:4px 0;">Takes:'+a.takes+' | Energy:-'+a.energy+'%</div>'
-          +'<div style="font-size:10px;"><span style="color:#4ade80;">Q:~'+a.quality+'</span> <span style="color:var(--accent-red);">Risk:'+a.risk+'%</span></div>'
-          +(tired?'<div style="font-size:8px;color:var(--accent-red);margin-top:3px;">Crew tired!</div>':'')
-          +'</div>';
-      }).join('')
-      +'</div></div></div>'
-      +'<div style="margin-top:12px;font-size:11px;color:var(--text-muted);">Total shoot quality: <strong style="color:#4ade80;">'+shootQ+'</strong></div>'
-      +'</div></div>';
-
-    window._tvShootApproaches=approaches;
-  }
-
-  window.tvShootPick = function(idx){
-    var a=window._tvShootApproaches[idx];
-    takesLeft-=a.takes;
-    energy=clamp(energy-a.energy,0,100);
-    var q=a.quality;
-    if(energy<30) q=Math.max(1,q-rnd(2,5));
-    var effectiveRisk=a.risk+(energy<30?15:0);
-    if(Math.random()*100<effectiveRisk){
-      q=Math.max(1,q-rnd(3,7));
-      notify('On Set!',pick(['Boom in shot!','Actor forgot lines!','Light flicker!','Continuity error!']),'error');
-    } else if(Math.random()<0.15){
-      q+=rnd(2,6);
-      notify('Magic!',pick(['Perfect take!','Brilliant improv!','Stunning shot!']),'success');
-    }
-    shootQ+=q;
-    sceneIdx++;
-    if(takesLeft<=0&&sceneIdx<scenes.length){
-      for(var i=sceneIdx;i<scenes.length;i++) shootQ+=rnd(1,4);
-      sceneIdx=scenes.length;
-      notify('Out of Takes!','Remaining scenes rushed.','error');
-    }
-    renderScene();
-  };
-
-  // Override the old tvShootChoice too
-  window.tvShootChoice = window.tvShootPick;
-  renderScene();
-};
-
-// Override: TV Edit becomes slider-based with tools
-launchTVEditMinigame = function(tv, epIndex){
-  var pacing=50,tension=50,emotion=50,flow=50;
-  var editsLeft=6;
-  var tools=[
-    {name:'Tighten Cuts',effect:{pacing:12,flow:4,tension:-3}},
-    {name:'Reaction Shots',effect:{emotion:14,pacing:-4}},
-    {name:'Build Suspense',effect:{tension:14,emotion:3,pacing:-5}},
-    {name:'Music Swell',effect:{emotion:10,tension:5,flow:3}},
-    {name:'Cold Open',effect:{pacing:8,tension:8}},
-    {name:'Jump Cuts',effect:{pacing:12,flow:-6,tension:4}},
-    {name:'Cross-Dissolve',effect:{flow:12,emotion:5,pacing:-3}},
-    {name:'Sound Bridge',effect:{flow:14,tension:3}}
-  ];
-
-  function calcScore(){ return clamp(Math.round((pacing+tension+emotion+flow)/4),0,100); }
 
   function render(){
     var score=calcScore();
     document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
       +'<div class="minigame-header"><div>'
-      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M4 7h16M4 12h10M4 17h6"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Edit Suite</div>'
-      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">'+editsLeft+' edits remaining</div></div>'
-      +'<div class="minigame-phase badge-purple card-badge">EDITING</div></div>'
-      +'<div class="minigame-body" style="max-width:800px;margin:0 auto;">'
-      // Quality bars
-      +'<div class="grid-4" style="margin-bottom:20px;">'
-      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-blue);">'+pacing+'</div><div class="progress-bar"><div class="progress-fill progress-blue" style="width:'+pacing+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Pacing</div></div>'
-      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-red);">'+tension+'</div><div class="progress-bar"><div class="progress-fill progress-red" style="width:'+tension+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Tension</div></div>'
-      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent-gold);">'+emotion+'</div><div class="progress-bar"><div class="progress-fill progress-gold" style="width:'+emotion+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Emotion</div></div>'
-      +'<div style="text-align:center;"><div style="font-size:22px;font-weight:700;color:#4ade80;">'+flow+'</div><div class="progress-bar"><div class="progress-fill progress-green" style="width:'+flow+'%;"></div></div><div style="font-size:10px;color:var(--text-muted);">Flow</div></div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/><circle cx="19" cy="7" r="3"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Casting</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Assign actors to roles, then test chemistry between pairs</div></div>'
+      +'<div style="display:flex;gap:8px;align-items:center;">'
+      +'<span class="card-badge badge-purple">'+testsLeft+' CHEMISTRY READS</span>'
+      +'<div class="minigame-phase badge-blue card-badge">CASTING</div></div></div>'
+      +'<div class="minigame-body" style="max-width:950px;margin:0 auto;">'
+      // Role slots
+      +'<div style="display:flex;gap:12px;margin-bottom:20px;">'
+      +roles.map(function(r,ri){
+        var a=cast[ri]!==null?actors[cast[ri]]:null;
+        return '<div ondragover="tvcastDragOver(event)" ondrop="tvcastDrop(event,'+ri+')" style="flex:1;min-height:120px;background:'+(a?'rgba(74,222,128,.06)':'var(--primary)')+';border:2px '+(a?'solid #4ade80':'dashed var(--border)')+';border-radius:10px;padding:14px;text-align:center;">'
+          +'<div style="font-size:12px;font-weight:700;color:var(--accent-warm);margin-bottom:8px;">'+r+'</div>'
+          +(a
+            ?'<div style="font-size:14px;font-weight:700;color:var(--text-white);">'+a.name+'</div>'
+            +'<div style="font-size:10px;color:var(--text-muted);margin:4px 0;">'+a.type+' | Talent: '+a.talent+'</div>'
+            +'<div style="font-size:10px;color:var(--accent-red);">$'+formatMoney(a.salary)+'</div>'
+            +'<button class="btn btn-sm" style="margin-top:6px;font-size:8px;" onclick="tvcastUnassign('+ri+')">Remove</button>'
+            :'<div style="font-size:10px;color:var(--text-muted);">Drag actor here</div>')
+          +'</div>';
+      }).join('')
       +'</div>'
-      // Tools grid
-      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;">'
-      +tools.map(function(t,i){
-        return '<div class="edit-control-btn" style="text-align:center;padding:10px;'+(editsLeft<=0?'opacity:.3;pointer-events:none;':'')+'" onclick="tvEditPick('+i+')">'
-          +'<div style="font-weight:700;font-size:10px;">'+t.name+'</div>'
-          +'<div style="font-size:8px;color:var(--accent-gold);margin-top:3px;">'+Object.entries(t.effect).map(function(e){return e[0]+':'+(e[1]>0?'+':'')+e[1];}).join(' ')+'</div></div>';
+      // Chemistry test area
+      +(cast.filter(function(c){return c!==null;}).length>=2
+        ?'<div class="card" style="margin-bottom:16px;padding:14px;">'
+        +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px;">CHEMISTRY READS ('+testsLeft+' left) — click a pair to test</div>'
+        +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+        +cast.map(function(ci,ri){
+          if(ci===null) return '';
+          return cast.map(function(ci2,ri2){
+            if(ci2===null||ri2<=ri) return '';
+            var key=Math.min(ci,ci2)+'_'+Math.max(ci,ci2);
+            var tested=testedPairs[key]!==undefined;
+            var c=getChem(ci,ci2);
+            return '<div onclick="'+(tested||testsLeft<=0?'':'tvcastTest('+ci+','+ci2+')')+'" style="padding:8px 14px;background:var(--bg-card);border:1px solid '+(tested?(c>10?'#4ade80':c>0?'var(--accent-gold)':'var(--accent-red)'):'var(--border)')+';border-radius:6px;cursor:'+(tested||testsLeft<=0?'default':'pointer')+';text-align:center;">'
+              +'<div style="font-size:10px;font-weight:700;">'+actors[ci].name.split(' ')[0]+' + '+actors[ci2].name.split(' ')[0]+'</div>'
+              +(tested
+                ?'<div style="font-size:14px;font-weight:700;color:'+(c>10?'#4ade80':c>0?'var(--accent-gold)':'var(--accent-red)')+';margin-top:4px;">'+(c>0?'+':'')+c+'</div>'
+                +'<div style="font-size:8px;color:var(--text-muted);">'+(c>15?'Electric!':c>5?'Good rapport':c>0?'Workable':'Tension on set')+'</div>'
+                :'<div style="font-size:9px;color:var(--accent-blue);margin-top:4px;">Test read?</div>')
+              +'</div>';
+          }).join('');
+        }).join('')
+        +'</div></div>':'')
+      // Actor pool
+      +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:1px;margin-bottom:6px;">AVAILABLE ACTORS — drag to role slots</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">'
+      +actors.map(function(a,ci){
+        if(cast.indexOf(ci)!==-1) return '';
+        return '<div draggable="true" ondragstart="tvcastDragStart(event,'+ci+')" class="talent-card" style="padding:10px;cursor:grab;">'
+          +'<div style="font-weight:700;font-size:12px;">'+a.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-muted);">'+a.type+'</div>'
+          +'<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;">'
+          +'<span style="color:var(--accent-gold);">T:'+a.talent+'</span>'
+          +'<span style="color:var(--accent-red);">$'+formatMoney(a.salary)+'</span></div></div>';
       }).join('')
       +'</div>'
       +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-      +'<div style="font-size:14px;">Edit Score: <strong style="color:'+(score>=60?'#4ade80':'var(--accent-gold)')+';">'+score+'/100</strong></div>'
-      +'<button class="btn btn-red btn-lg" onclick="tvEditDone()">PROCEED TO SOUND</button>'
+      +'<div style="font-size:14px;">Cast Score: <strong style="color:'+(score>=40?'#4ade80':'var(--accent-gold)')+';">'+score+'</strong></div>'
+      +'<button class="btn btn-red btn-lg" onclick="tvcastFinish()" '+(cast.filter(function(c){return c!==null;}).length<2?'disabled':'')+'>FINALIZE CAST</button>'
       +'</div></div></div>';
   }
 
-  window.tvEditPick = function(idx){
-    if(editsLeft<=0) return;
-    var t=tools[idx];
-    editsLeft--;
-    if(t.effect.pacing) pacing=clamp(pacing+t.effect.pacing,0,100);
-    if(t.effect.tension) tension=clamp(tension+t.effect.tension,0,100);
-    if(t.effect.emotion) emotion=clamp(emotion+t.effect.emotion,0,100);
-    if(t.effect.flow) flow=clamp(flow+t.effect.flow,0,100);
-    notify('Edit',t.name+' applied.','info');
+  var _castDrag=null;
+  window.tvcastDragStart=function(e,ci){_castDrag=ci;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','');};
+  window.tvcastDragOver=function(e){e.preventDefault();};
+  window.tvcastDrop=function(e,ri){
+    e.preventDefault();
+    if(_castDrag===null) return;
+    if(cast[ri]!==null) return; // slot occupied
+    cast[ri]=_castDrag;
+    _castDrag=null;
     render();
   };
-  window.tvEditDone = function(){
-    window._tvEpData.editPacing=pacing;
-    window._tvEpData.editTension=tension;
-    window._tvEpData.editEmotion=emotion;
-    window._tvEpData.editFlow=flow;
-    // Launch sound minigame
-    var ctx=window._tvProducing;
-    launchTVSoundMinigameV5(tv,epIndex);
+  window.tvcastUnassign=function(ri){cast[ri]=null;render();};
+  window.tvcastTest=function(ci1,ci2){
+    if(testsLeft<=0) return;
+    testsLeft--;
+    var key=Math.min(ci1,ci2)+'_'+Math.max(ci1,ci2);
+    testedPairs[key]=true;
+    var c=getChem(ci1,ci2);
+    notify('Chemistry Read',actors[ci1].name.split(' ')[0]+' & '+actors[ci2].name.split(' ')[0]+': '+(c>10?'Amazing chemistry!':c>0?'Decent rapport.':'Friction on set.'),'info');
+    render();
   };
-
-  // Override old tvEditApply
-  window.tvEditApply = window.tvEditPick;
+  window.tvcastFinish=function(){
+    window._tvEpData.castQuality=calcScore();
+    launchTVShootingMinigame(tv,epIndex);
+  };
   render();
 };
 
-// TV Sound minigame — mixer with sliders and target zones
-function launchTVSoundMinigameV5(tv, epIndex){
-  var channels=[
-    {key:'dialog',label:'Dialog',value:65,target:[65,85]},
-    {key:'score',label:'Score',value:55,target:[50,70]},
-    {key:'sfx',label:'SFX',value:45,target:[35,60]},
-    {key:'ambience',label:'Ambient',value:40,target:[30,50]}
+// ---- 3. SHOOTING: Director's timing game — stop the needle in the zone ----
+launchTVShootingMinigame = function(tv, epIndex){
+  var scenes=[
+    {name:'Opening',targetZone:[55,75],speed:1.5},
+    {name:'Dialog Scene',targetZone:[60,80],speed:2},
+    {name:'Emotional Core',targetZone:[65,85],speed:2.5},
+    {name:'Action/Climax',targetZone:[50,70],speed:3},
+    {name:'Closing Shot',targetZone:[60,80],speed:2}
   ];
+  var sceneIdx=0;
+  var shootQ=0;
+  var needlePos=0;
+  var needleDir=1;
+  var animFrame=null;
+  var frozen=false;
+  var dirBonus=tv.showrunner?Math.round(tv.showrunner.vision/10):0;
+  var results=[];
+
+  function renderScene(){
+    if(sceneIdx>=scenes.length){
+      window._tvEpData.shootQuality=shootQ;
+      // cleanup
+      if(animFrame) cancelAnimationFrame(animFrame);
+      launchTVEditMinigame(tv,epIndex);
+      return;
+    }
+    var sc=scenes[sceneIdx];
+    frozen=false;
+    needlePos=0;needleDir=1;
+
+    function drawMeter(){
+      var meter=document.getElementById('tv-shoot-meter');
+      var needle=document.getElementById('tv-shoot-needle');
+      if(!meter||!needle) return;
+      needle.style.left=needlePos+'%';
+    }
+
+    function tick(){
+      if(frozen) return;
+      needlePos+=needleDir*sc.speed;
+      if(needlePos>=100){needlePos=100;needleDir=-1;}
+      if(needlePos<=0){needlePos=0;needleDir=1;}
+      drawMeter();
+      animFrame=requestAnimationFrame(tick);
+    }
+
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" opacity=".5"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Filming</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Scene '+(sceneIdx+1)+'/'+scenes.length+': '+sc.name+' — Click TAKE when the needle is in the green zone!</div></div>'
+      +'<div class="minigame-phase badge-red card-badge">FILMING</div></div>'
+      +'<div class="minigame-body" style="max-width:700px;margin:0 auto;text-align:center;">'
+      // Scene title
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;margin:20px 0;">'+sc.name+'</div>'
+      // Timing meter
+      +'<div style="position:relative;margin:40px auto;width:100%;max-width:500px;">'
+      +'<div id="tv-shoot-meter" style="position:relative;height:40px;background:var(--primary);border:2px solid var(--border);border-radius:20px;overflow:hidden;">'
+      // Zone markers
+      +'<div style="position:absolute;left:'+sc.targetZone[0]+'%;width:'+(sc.targetZone[1]-sc.targetZone[0])+'%;height:100%;background:rgba(74,222,128,.25);border-left:2px solid #4ade80;border-right:2px solid #4ade80;"></div>'
+      // Needle
+      +'<div id="tv-shoot-needle" style="position:absolute;top:-4px;width:4px;height:48px;background:var(--accent-red);border-radius:2px;transition:none;box-shadow:0 0 8px rgba(230,57,70,.6);"></div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:4px;"><span>0</span><span style="color:#4ade80;">PERFECT ZONE</span><span>100</span></div>'
+      +'</div>'
+      // Take button
+      +'<button id="tv-take-btn" class="btn btn-red btn-lg" onclick="tvShootTake()" style="font-size:18px;padding:16px 48px;margin:20px 0;">TAKE!</button>'
+      // Results so far
+      +(results.length>0?'<div style="display:flex;gap:8px;justify-content:center;margin-top:20px;">'
+        +results.map(function(r){
+          return '<div style="padding:6px 12px;border-radius:6px;font-size:10px;background:'+r.color+'20;border:1px solid '+r.color+';"><strong>'+r.name+'</strong> '+r.quality+'pts</div>';
+        }).join('')+'</div>':'')
+      +'<div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Showrunner bonus: +'+dirBonus+'</div>'
+      +'</div></div>';
+
+    // Start animation
+    animFrame=requestAnimationFrame(tick);
+  }
+
+  window.tvShootTake=function(){
+    if(frozen) return;
+    frozen=true;
+    if(animFrame) cancelAnimationFrame(animFrame);
+    var sc=scenes[sceneIdx];
+    var inZone=needlePos>=sc.targetZone[0]&&needlePos<=sc.targetZone[1];
+    var center=(sc.targetZone[0]+sc.targetZone[1])/2;
+    var distFromCenter=Math.abs(needlePos-center);
+    var zoneWidth=(sc.targetZone[1]-sc.targetZone[0])/2;
+    var q=0;
+    if(inZone){
+      var accuracy=1-distFromCenter/zoneWidth;
+      q=Math.round(12+accuracy*12)+dirBonus;
+      notify('Great Take!','Right in the zone! Quality: +'+q,'success');
+    } else {
+      q=Math.max(1,Math.round(6-distFromCenter/10))+dirBonus;
+      notify('Missed!','Outside the zone. Quality: +'+q,'error');
+    }
+    shootQ+=q;
+    var colors=['#E63946','#457B9D','#2A9D8F','#E76F51','#6D6875'];
+    results.push({name:sc.name,quality:q,color:colors[sceneIdx%5]});
+
+    // Flash result on needle
+    var needle=document.getElementById('tv-shoot-needle');
+    if(needle) needle.style.background=inZone?'#4ade80':'var(--accent-red)';
+    var btn=document.getElementById('tv-take-btn');
+    if(btn){btn.textContent='NEXT SCENE';btn.onclick=function(){sceneIdx++;renderScene();};}
+  };
+
+  window.tvShootChoice=window.tvShootTake; // compat
+  renderScene();
+};
+
+// ---- 4. EDITING: Clip trim timeline — drag handles to set in/out points ----
+launchTVEditMinigame = function(tv, epIndex){
+  var clips=[
+    {name:'Cold Open',fullLen:100,inPt:0,outPt:100,ideal:[10,70],color:'#E63946'},
+    {name:'Act 1',fullLen:100,inPt:0,outPt:100,ideal:[5,80],color:'#457B9D'},
+    {name:'Act 2',fullLen:100,inPt:0,outPt:100,ideal:[0,65],color:'#2A9D8F'},
+    {name:'Climax',fullLen:100,inPt:0,outPt:100,ideal:[15,90],color:'#E76F51'},
+    {name:'Tag',fullLen:100,inPt:0,outPt:100,ideal:[20,60],color:'#9B5DE5'}
+  ];
+  var transitions=['Cut','Dissolve','Fade','Wipe','Match Cut'];
+  var chosenTransitions=[0,0,0,0]; // between clips
 
   function calcScore(){
     var s=0;
-    channels.forEach(function(ch){
-      if(ch.value>=ch.target[0]&&ch.value<=ch.target[1]) s+=25;
-      else s+=Math.max(0,25-Math.abs(ch.value-(ch.target[0]+ch.target[1])/2));
+    clips.forEach(function(c){
+      var trimLen=c.outPt-c.inPt;
+      var idealLen=c.ideal[1]-c.ideal[0];
+      var idealMid=(c.ideal[0]+c.ideal[1])/2;
+      var actualMid=(c.inPt+c.outPt)/2;
+      var lenMatch=Math.max(0,20-Math.abs(trimLen-idealLen)/3);
+      var posMatch=Math.max(0,10-Math.abs(actualMid-idealMid)/5);
+      s+=lenMatch+posMatch;
     });
+    // Transition variety bonus
+    var unique={};
+    chosenTransitions.forEach(function(t){unique[t]=true;});
+    s+=Object.keys(unique).length*3;
     return clamp(Math.round(s),0,100);
   }
 
@@ -5314,32 +5278,163 @@ function launchTVSoundMinigameV5(tv, epIndex){
     var score=calcScore();
     document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
       +'<div class="minigame-header"><div>'
-      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Sound Mix</div></div>'
-      +'<div class="minigame-phase badge-blue card-badge">SOUND</div></div>'
-      +'<div class="minigame-body" style="max-width:700px;margin:0 auto;">'
-      +'<div style="display:flex;gap:24px;justify-content:center;margin:24px 0;">'
-      +channels.map(function(ch){
-        var inZone=ch.value>=ch.target[0]&&ch.value<=ch.target[1];
-        return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg-card);border:1px solid '+(inZone?'#4ade80':'var(--border)')+';border-radius:10px;padding:14px 10px;width:90px;">'
-          +'<div style="font-size:16px;font-weight:700;color:'+(inZone?'#4ade80':'var(--text-light)')+';font-family:\'JetBrains Mono\',monospace;">'+ch.value+'</div>'
-          +'<input type="range" min="0" max="100" value="'+ch.value+'" style="height:130px;writing-mode:vertical-lr;direction:rtl;" oninput="tvSoundSlide(\''+ch.key+'\',this.value)">'
-          +'<div style="font-size:9px;color:var(--text-muted);font-weight:700;">'+ch.label.toUpperCase()+'</div>'
-          +'<div style="font-size:8px;color:#4ade80;">'+ch.target[0]+'-'+ch.target[1]+'</div></div>';
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M4 7h16M4 12h10M4 17h6"/><path d="M18 14l4 4-4 4"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Edit Suite</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Trim each clip with the sliders. Match the ideal length shown by the green zone.</div></div>'
+      +'<div class="minigame-phase badge-purple card-badge">EDITING</div></div>'
+      +'<div class="minigame-body" style="max-width:900px;margin:0 auto;">'
+      // Clips with trim sliders
+      +clips.map(function(c,i){
+        var trimLen=c.outPt-c.inPt;
+        var inZone=c.inPt>=c.ideal[0]-10&&c.outPt<=c.ideal[1]+10&&trimLen>10;
+        return '<div class="card" style="padding:14px;margin-bottom:10px;border-color:'+(inZone?'#4ade80':'var(--border)')+';">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+          +'<div style="font-size:13px;font-weight:700;color:'+c.color+';">'+c.name+'</div>'
+          +'<div style="font-size:10px;color:var(--text-muted);">Length: '+trimLen+'% | Ideal: '+(c.ideal[1]-c.ideal[0])+'%</div>'
+          +'</div>'
+          // Visual timeline bar
+          +'<div style="position:relative;height:30px;background:var(--primary);border-radius:4px;overflow:visible;margin-bottom:8px;">'
+          // Ideal zone
+          +'<div style="position:absolute;left:'+c.ideal[0]+'%;width:'+(c.ideal[1]-c.ideal[0])+'%;height:100%;background:rgba(74,222,128,.12);border-left:1px dashed #4ade80;border-right:1px dashed #4ade80;"></div>'
+          // Active region
+          +'<div style="position:absolute;left:'+c.inPt+'%;width:'+(c.outPt-c.inPt)+'%;height:100%;background:'+c.color+'40;border-radius:4px;"></div>'
+          +'</div>'
+          // Sliders
+          +'<div style="display:flex;gap:16px;align-items:center;">'
+          +'<div style="flex:1;"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">IN POINT</div>'
+          +'<input type="range" min="0" max="90" value="'+c.inPt+'" style="width:100%;" oninput="tvEditTrim('+i+',\'in\',this.value)"></div>'
+          +'<div style="flex:1;"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px;">OUT POINT</div>'
+          +'<input type="range" min="10" max="100" value="'+c.outPt+'" style="width:100%;" oninput="tvEditTrim('+i+',\'out\',this.value)"></div>'
+          +'</div>'
+          // Transition selector (except last clip)
+          +(i<clips.length-1?'<div style="margin-top:8px;display:flex;gap:6px;align-items:center;">'
+            +'<span style="font-size:9px;color:var(--text-muted);">Transition to next:</span>'
+            +transitions.map(function(t,ti){
+              return '<button class="btn btn-sm" style="font-size:8px;padding:2px 8px;'+(chosenTransitions[i]===ti?'border-color:var(--accent-gold);color:var(--accent-gold);background:rgba(255,215,0,.1);':'')+'" onclick="tvEditTransition('+i+','+ti+')">'+t+'</button>';
+            }).join('')
+            +'</div>':'')
+          +'</div>';
       }).join('')
-      +'</div>'
-      +'<div style="text-align:center;">'
-      +'<div style="font-size:28px;font-weight:700;color:'+(score>=80?'#4ade80':score>=50?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;margin-bottom:16px;">'+score+'/100</div>'
-      +'<button class="btn btn-red btn-lg" onclick="tvSoundDone()">FINALIZE MIX</button>'
+      // Score
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">'
+      +'<div class="card" style="margin:0;padding:12px 20px;">'
+      +'<div style="font-size:10px;color:var(--text-muted);">EDIT SCORE</div>'
+      +'<div style="font-size:28px;font-weight:700;color:'+(score>=60?'#4ade80':score>=30?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;">'+score+'/100</div></div>'
+      +'<button class="btn btn-red btn-lg" onclick="tvEditFinish()">LOCK EDIT</button>'
       +'</div></div></div>';
   }
 
-  window.tvSoundSlide=function(key,val){
-    channels.forEach(function(ch){if(ch.key===key)ch.value=parseInt(val);});
+  window.tvEditTrim=function(clipIdx,type,val){
+    var v=parseInt(val);
+    if(type==='in'){
+      clips[clipIdx].inPt=Math.min(v,clips[clipIdx].outPt-10);
+    } else {
+      clips[clipIdx].outPt=Math.max(v,clips[clipIdx].inPt+10);
+    }
     render();
   };
-  window.tvSoundDone=function(){
+  window.tvEditTransition=function(clipIdx,transIdx){
+    chosenTransitions[clipIdx]=transIdx;
+    render();
+  };
+  window.tvEditFinish=function(){
     var score=calcScore();
-    window._tvEpData.soundScore=score;
+    window._tvEpData.editPacing=score;
+    window._tvEpData.editTension=score;
+    window._tvEpData.editEmotion=score;
+    window._tvEpData.editFlow=score;
+    launchTVSoundMinigameV5(tv,epIndex);
+  };
+  window.tvEditApply=window.tvEditTrim; // compat
+  render();
+};
+
+// ---- 5. SOUND: Waveform matching — adjust EQ bands to match target ----
+function launchTVSoundMinigameV5(tv, epIndex){
+  // 8 EQ bands the player adjusts, target values are hidden until "preview"
+  var bands=[
+    {freq:'60Hz',value:50,target:rnd(30,80)},
+    {freq:'125Hz',value:50,target:rnd(30,70)},
+    {freq:'250Hz',value:50,target:rnd(35,75)},
+    {freq:'500Hz',value:50,target:rnd(40,70)},
+    {freq:'1kHz',value:50,target:rnd(40,75)},
+    {freq:'2kHz',value:50,target:rnd(35,70)},
+    {freq:'4kHz',value:50,target:rnd(30,65)},
+    {freq:'8kHz',value:50,target:rnd(25,60)}
+  ];
+  var previewsLeft=3;
+  var showTarget=false;
+
+  function calcScore(){
+    var total=0;
+    bands.forEach(function(b){
+      var diff=Math.abs(b.value-b.target);
+      total+=Math.max(0,Math.round(100/bands.length)-diff);
+    });
+    return clamp(total,0,100);
+  }
+
+  function render(){
+    var score=calcScore();
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen">'
+      +'<div class="minigame-header"><div>'
+      +'<div class="minigame-title"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" style="vertical-align:middle;margin-right:8px;"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg> '+tv.title+' S'+tv.currentSeason+'E'+(epIndex+1)+' — Sound EQ</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Match the EQ to the reference mix. Use Preview to peek at the target curve.</div></div>'
+      +'<div style="display:flex;gap:8px;align-items:center;">'
+      +'<span class="card-badge badge-blue">'+previewsLeft+' PREVIEWS</span>'
+      +'<div class="minigame-phase badge-blue card-badge">SOUND</div></div></div>'
+      +'<div class="minigame-body" style="max-width:800px;margin:0 auto;">'
+      // EQ Visualizer
+      +'<div style="display:flex;gap:8px;justify-content:center;align-items:flex-end;height:220px;margin:20px 0;padding:16px;background:var(--primary);border:1px solid var(--border);border-radius:10px;">'
+      +bands.map(function(b,i){
+        var diff=Math.abs(b.value-b.target);
+        var matchColor=diff<5?'#4ade80':diff<15?'var(--accent-gold)':'var(--accent-red)';
+        return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;height:100%;">'
+          // Target indicator (shown during preview)
+          +(showTarget?'<div style="position:absolute;bottom:'+(b.target-5)+'%;width:80%;height:6px;background:rgba(74,222,128,.4);border:1px solid #4ade80;border-radius:3px;z-index:2;"></div>':'')
+          // Current bar
+          +'<div style="position:absolute;bottom:0;width:70%;height:'+b.value+'%;background:linear-gradient(to top,'+matchColor+'40,'+matchColor+'80);border-radius:4px 4px 0 0;transition:height .15s;"></div>'
+          // Value label
+          +'<div style="position:absolute;top:0;font-size:10px;font-weight:700;color:'+matchColor+';font-family:\'JetBrains Mono\',monospace;">'+b.value+'</div>'
+          // Freq label
+          +'<div style="position:absolute;bottom:-20px;font-size:8px;color:var(--text-muted);">'+b.freq+'</div>'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Sliders
+      +'<div style="display:flex;gap:8px;justify-content:center;margin:30px 0 20px;">'
+      +bands.map(function(b,i){
+        return '<div style="display:flex;flex-direction:column;align-items:center;width:60px;">'
+          +'<input type="range" min="0" max="100" value="'+b.value+'" style="height:100px;writing-mode:vertical-lr;direction:rtl;" oninput="tvEqSlide('+i+',this.value)">'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      // Controls
+      +'<div style="display:flex;justify-content:center;gap:12px;margin-bottom:20px;">'
+      +(previewsLeft>0?'<button class="btn btn-purple" onclick="tvEqPreview()">Preview Target ('+previewsLeft+' left)</button>':'')
+      +'<button class="btn" onclick="tvEqRandomize()">Randomize</button>'
+      +'</div>'
+      // Score
+      +'<div style="text-align:center;">'
+      +'<div style="font-size:32px;font-weight:700;color:'+(score>=70?'#4ade80':score>=40?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;margin-bottom:12px;">'+score+'/100</div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;">'+(score<40?'Way off — preview to see the target.':score<60?'Getting closer. Fine-tune the bands.':score<80?'Almost there! Subtle adjustments needed.':'Perfect match!')+'</div>'
+      +'<button class="btn btn-red btn-lg" onclick="tvEqFinish()">FINALIZE MIX</button>'
+      +'</div></div></div>';
+  }
+
+  window.tvEqSlide=function(idx,val){bands[idx].value=parseInt(val);render();};
+  window.tvEqPreview=function(){
+    if(previewsLeft<=0) return;
+    previewsLeft--;
+    showTarget=true;
+    render();
+    setTimeout(function(){showTarget=false;render();},2000);
+  };
+  window.tvEqRandomize=function(){
+    bands.forEach(function(b){b.value=rnd(20,80);});
+    render();
+  };
+  window.tvEqFinish=function(){
+    window._tvEpData.soundScore=calcScore();
     finishTVEpisode();
   };
   render();
