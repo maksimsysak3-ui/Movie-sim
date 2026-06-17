@@ -5440,6 +5440,560 @@ function launchTVSoundMinigameV5(tv, epIndex){
   render();
 }
 
+// ============================================================
+// V7 — POLISH, CALENDAR FIX, DASHBOARD, MENU, GAME FEEL
+// ============================================================
+
+// --- 1. CALENDAR FIX: Map weeks to actual months/dates ---
+renderCalendar=function(){
+  var container=document.getElementById('calendar-content');
+  if(!container)return;
+  if(!G.calendarEvents)G.calendarEvents=[];
+
+  function weekToDate(week,year){
+    var monthStarts=[0,4,8,13,17,21,26,30,34,39,43,47];
+    var monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var mi=0;
+    for(var i=monthStarts.length-1;i>=0;i--){if(week>monthStarts[i]){mi=i;break;}}
+    var dayInMonth=Math.min(28,(week-monthStarts[mi])*7);
+    if(dayInMonth<1)dayInMonth=1;
+    return{month:monthNames[mi],monthIdx:mi,day:dayInMonth,label:monthNames[mi]+' '+dayInMonth+', '+year};
+  }
+
+  var events=G.calendarEvents.slice();
+  G.completedMovies.forEach(function(m){
+    if(!m.released)events.push({week:G.week+rnd(1,4),type:'release',text:'"'+m.title+'" Release'});
+  });
+  if(G.tvShows)G.tvShows.forEach(function(tv){
+    if(tv.airing)events.push({week:G.week+rnd(1,3),type:'premiere',text:'"'+tv.title+'" S'+tv.currentSeason});
+  });
+
+  var annualEvents=[
+    {week:6,type:'ceremony',text:'Sundance Film Festival'},
+    {week:10,type:'ceremony',text:'Academy Awards'},
+    {week:15,type:'ceremony',text:'Cannes Film Festival'},
+    {week:20,type:'ceremony',text:'E3 / Summer Preview'},
+    {week:24,type:'interview',text:'Comic-Con'},
+    {week:30,type:'ceremony',text:'Venice Film Festival'},
+    {week:35,type:'ceremony',text:'Toronto Film Festival'},
+    {week:40,type:'interview',text:'Fall Press Tour'},
+    {week:45,type:'ceremony',text:'Golden Globes Season'},
+    {week:50,type:'release',text:'Holiday Release Window'}
+  ];
+  annualEvents.forEach(function(ae){if(ae.week>=G.week)events.push(ae);});
+
+  var curDate=weekToDate(G.week,G.year);
+  var html='<div class="card" style="padding:24px;background:linear-gradient(135deg,rgba(201,169,110,.05),rgba(139,92,246,.03));">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">'
+    +'<div><div style="font-family:\'Playfair Display\',Georgia,serif;font-size:24px;font-weight:700;">'+curDate.month+' '+curDate.day+', '+G.year+'</div>'
+    +'<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Week '+G.week+' of 52 — '+G.era+'</div></div>'
+    +'<div style="text-align:right;"><div style="font-size:32px;font-weight:700;color:var(--accent-gold);font-family:\'JetBrains Mono\',monospace;">W'+G.week+'</div></div></div>';
+
+  // Monthly grid view
+  var monthStarts=[0,4,8,13,17,21,26,30,34,39,43,47];
+  var monthNames=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  html+='<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-bottom:20px;">';
+  for(var mi=0;mi<12;mi++){
+    var wStart=monthStarts[mi]+1;
+    var wEnd=mi<11?monthStarts[mi+1]:52;
+    var isCurrentMonth=G.week>=wStart&&G.week<=wEnd;
+    var hasEvts=events.filter(function(e){return e.week>=wStart&&e.week<=wEnd;}).length>0;
+    var pastMonth=wEnd<G.week;
+    html+='<div style="padding:8px 4px;text-align:center;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;'
+      +(isCurrentMonth?'background:rgba(255,215,0,.15);border:1px solid var(--accent-gold);color:var(--accent-gold);'
+        :pastMonth?'background:var(--primary);color:var(--text-muted);opacity:.5;border:1px solid transparent;'
+        :'background:var(--bg-card);border:1px solid var(--border);color:var(--text-light);')
+      +'cursor:pointer;" onclick="scrollCalTo('+mi+')">'
+      +monthNames[mi]
+      +(hasEvts&&!pastMonth?'<div style="width:4px;height:4px;border-radius:50%;background:var(--accent-red);margin:3px auto 0;"></div>':'')
+      +'</div>';
+  }
+  html+='</div>';
+
+  // Week-by-week detail for current quarter
+  var qStart=Math.max(1,G.week-4);
+  var qEnd=Math.min(52,G.week+12);
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="cal-weeks">';
+  for(var w=qStart;w<=qEnd;w++){
+    var isNow=w===G.week;
+    var wd=weekToDate(w,G.year);
+    var dayEvts=events.filter(function(e){return e.week===w;});
+    html+='<div style="background:'+(isNow?'rgba(255,215,0,.1)':'var(--bg-card)')+';border:1px solid '+(isNow?'var(--accent-gold)':'var(--border)')+';border-radius:8px;padding:10px;min-height:80px;transition:all .2s;" '
+      +'onmouseenter="this.style.borderColor=\'var(--accent-blue)\'" onmouseleave="this.style.borderColor=\''+(isNow?'var(--accent-gold)':'var(--border)')+'\'">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:6px;">'
+      +'<span style="font-size:11px;font-weight:700;'+(isNow?'color:var(--accent-gold);':'color:var(--text-light);')+'">'+wd.month+' '+wd.day+'</span>'
+      +'<span style="font-size:9px;color:var(--text-muted);">W'+w+'</span></div>';
+    if(isNow) html+='<div style="font-size:7px;padding:1px 6px;background:var(--accent-gold);color:var(--primary);border-radius:3px;display:inline-block;font-weight:700;margin-bottom:4px;">TODAY</div>';
+    dayEvts.forEach(function(ev){
+      var evColors={release:'#E63946',ceremony:'#FFD700',interview:'#00B4D8',trailer:'#9B5DE5',premiere:'#4ade80'};
+      html+='<div style="font-size:8px;padding:2px 5px;border-radius:3px;margin-bottom:2px;background:'+(evColors[ev.type]||'var(--accent-blue)')+'20;color:'+(evColors[ev.type]||'var(--accent-blue)')+';font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+ev.text+'</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // Upcoming events timeline
+  html+='<div class="card" style="margin-top:16px;padding:20px;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'
+    +'<div class="card-title">Upcoming Events</div>'
+    +'<span class="card-badge badge-blue">TIMELINE</span></div>';
+  var upcoming=events.filter(function(e){return e.week>=G.week;}).sort(function(a,b){return a.week-b.week;}).slice(0,10);
+  if(!upcoming.length) html+='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">No upcoming events. Schedule an interview or trailer drop!</div>';
+  else{
+    html+='<div style="position:relative;padding-left:24px;">';
+    html+='<div style="position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border);"></div>';
+    upcoming.forEach(function(ev){
+      var weeksAway=ev.week-G.week;
+      var d=weekToDate(ev.week,G.year);
+      var evColors={release:'#E63946',ceremony:'#FFD700',interview:'#00B4D8',trailer:'#9B5DE5',premiere:'#4ade80'};
+      var c=evColors[ev.type]||'var(--accent-blue)';
+      html+='<div style="position:relative;margin-bottom:12px;padding:8px 12px;background:'+c+'08;border-left:3px solid '+c+';border-radius:0 8px 8px 0;">'
+        +'<div style="position:absolute;left:-20px;top:12px;width:10px;height:10px;border-radius:50%;background:'+c+';border:2px solid var(--primary);"></div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+        +'<div><div style="font-size:12px;font-weight:600;color:var(--text-white);">'+ev.text+'</div>'
+        +'<div style="font-size:10px;color:var(--text-muted);">'+d.label+'</div></div>'
+        +'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+c+'20;color:'+c+';font-weight:600;">'+(weeksAway===0?'THIS WEEK':weeksAway+' week'+(weeksAway>1?'s':''))+'</span>'
+        +'</div></div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+
+  // Action buttons
+  html+='<div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">'
+    +'<button class="btn btn-blue" onclick="scheduleInterview()" style="display:flex;align-items:center;gap:6px;">'
+    +'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>'
+    +'Interview ($50K)</button>'
+    +'<button class="btn btn-purple" onclick="scheduleTrailerDrop()" style="display:flex;align-items:center;gap:6px;">'
+    +'<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M4 2a1 1 0 00-1 1v10a1 1 0 001.5.87l8-5a1 1 0 000-1.74l-8-5A1 1 0 004 2z"/></svg>'
+    +'Trailer Drop ($100K)</button>'
+    +'<button class="btn btn-gold" onclick="scheduleScreening()" style="display:flex;align-items:center;gap:6px;">'
+    +'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5 14h6"/></svg>'
+    +'Press Screening ($200K)</button>'
+    +'</div>';
+
+  container.innerHTML=html;
+};
+
+window.scrollCalTo=function(){};
+
+window.scheduleScreening=function(){
+  if(!G.calendarEvents)G.calendarEvents=[];
+  if(G.money<200000){notify('Error','Need $200K.','error');return;}
+  var w=G.week+rnd(1,3);
+  G.calendarEvents.push({week:w,type:'interview',text:'Press Screening'});
+  G.reputation=clamp(G.reputation+rnd(3,6),0,100);
+  G.fans+=rnd(500,2000);
+  G.money-=200000;
+  notify('Scheduled','Press screening week '+w+'. +Rep, +Fans!','success');
+  renderCalendar();
+};
+
+// --- 2. DASHBOARD OVERHAUL — More cinematic with activity feed ---
+var _v7UpdateAllUI=updateAllUI;
+updateAllUI=function(){
+  document.getElementById('money-display').textContent='$'+formatMoney(G.money);
+  document.getElementById('rep-display').textContent=G.reputation;
+  document.getElementById('fans-display').textContent=formatMoney(G.fans);
+  document.getElementById('week-display').textContent=G.week;
+  document.getElementById('year-display').textContent=G.year;
+  document.getElementById('movies-count').textContent=G.completedMovies.length+(G.tvShows?'+'+G.tvShows.length+'tv':'');
+  document.getElementById('studio-name-display').textContent=G.studioName;
+  document.getElementById('era-display').textContent=G.era+' ERA';
+
+  // Cinematic dashboard stats
+  var totalRevenue=0;
+  G.completedMovies.forEach(function(m){totalRevenue+=m.boxOffice?m.boxOffice.worldwide:0;});
+  var avgCritic=0;
+  if(G.completedMovies.length>0){
+    G.completedMovies.forEach(function(m){avgCritic+=m.criticScore||0;});
+    avgCritic=Math.round(avgCritic/G.completedMovies.length);
+  }
+  var studioLevel=STUDIO_LEVELS[G.studioLevel]?STUDIO_LEVELS[G.studioLevel].name:'Indie';
+
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-card" style="background:linear-gradient(135deg,rgba(74,222,128,.08),rgba(74,222,128,.02));border-color:rgba(74,222,128,.2);">'
+    +'<div style="font-size:9px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">TREASURY</div>'
+    +'<div class="stat-card-value" style="color:#4ade80;font-size:24px;">$'+formatMoney(G.money)+'</div>'
+    +'<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Weekly: <span style="color:#4ade80;">+$'+formatMoney(G.weeklyPassiveIncome||0)+'</span></div></div>'
+
+    +'<div class="stat-card" style="background:linear-gradient(135deg,rgba(0,180,216,.08),rgba(0,180,216,.02));border-color:rgba(0,180,216,.2);">'
+    +'<div style="font-size:9px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">REPUTATION</div>'
+    +'<div class="stat-card-value" style="color:var(--accent-blue);font-size:24px;">'+G.reputation+'</div>'
+    +'<div style="margin-top:4px;height:3px;background:var(--primary);border-radius:2px;overflow:hidden;"><div style="height:100%;width:'+G.reputation+'%;background:var(--accent-blue);border-radius:2px;"></div></div></div>'
+
+    +'<div class="stat-card" style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(255,215,0,.02));border-color:rgba(255,215,0,.2);">'
+    +'<div style="font-size:9px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">AWARDS</div>'
+    +'<div class="stat-card-value" style="color:var(--accent-gold);font-size:24px;">'+G.awards.length+'</div>'
+    +'<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Avg Critic: <span style="color:var(--accent-gold);">'+avgCritic+'</span></div></div>'
+
+    +'<div class="stat-card" style="background:linear-gradient(135deg,rgba(155,93,229,.08),rgba(155,93,229,.02));border-color:rgba(155,93,229,.2);">'
+    +'<div style="font-size:9px;color:var(--text-muted);letter-spacing:2px;margin-bottom:4px;">STUDIO RANK</div>'
+    +'<div class="stat-card-value" style="color:var(--accent-purple);font-size:18px;">'+studioLevel+'</div>'
+    +'<div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Total Gross: <span style="color:var(--accent-purple);">$'+formatMoney(totalRevenue)+'</span></div></div>';
+
+  // Cinematic greeting based on time/progress
+  var greetEl=document.getElementById('dash-greeting');
+  var subEl=document.getElementById('dash-subtitle');
+  if(greetEl){
+    var greetings;
+    if(G.completedMovies.length===0&&(!G.tvShows||G.tvShows.length===0)){
+      greetings={title:'Welcome to Hollywood, '+G.studioName,sub:'Your studio awaits. Create your first production to begin your legacy.'};
+    } else if(G.completedMovies.length>=10){
+      greetings={title:'The '+G.studioName+' Empire',sub:G.completedMovies.length+' films completed. $'+formatMoney(totalRevenue)+' total worldwide gross. '+G.awards.length+' awards won.'};
+    } else if(G.reputation>=70){
+      greetings={title:G.studioName+' — Industry Titan',sub:'Your reputation precedes you. Week '+G.week+', '+G.year+'.'};
+    } else {
+      greetings={title:G.studioName+' Studios',sub:'Week '+G.week+' of '+G.year+'. '+G.completedMovies.length+' films, '+G.awards.length+' awards.'};
+    }
+    greetEl.textContent=greetings.title;
+    subEl.textContent=greetings.sub;
+  }
+
+  // Active productions — cinematic
+  var prodDiv=document.getElementById('active-productions');
+  var prodHtml='';
+  if(G.currentMovie){
+    prodHtml+='<div style="padding:12px;border-left:3px solid var(--accent-red);background:rgba(230,57,70,.05);border-radius:0 8px 8px 0;margin-bottom:8px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+      +'<div><div style="font-weight:700;font-size:14px;">'+G.currentMovie.title+'</div>'
+      +'<div style="font-size:10px;color:var(--accent-gold);letter-spacing:1px;margin-top:2px;">IN PRODUCTION</div></div>'
+      +'<span class="card-badge badge-red" style="animation:pulse 2s infinite;">LIVE</span></div></div>';
+  }
+  if(G.tvShows){
+    G.tvShows.filter(function(t){return!t.cancelled;}).forEach(function(tv){
+      var statusColor=tv.airing?'#4ade80':'var(--accent-blue)';
+      prodHtml+='<div style="padding:12px;border-left:3px solid '+statusColor+';background:'+statusColor+'08;border-radius:0 8px 8px 0;margin-bottom:8px;">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;">'
+        +'<div><div style="font-weight:700;font-size:13px;">'+tv.title+' <span style="font-size:9px;padding:2px 6px;background:var(--accent-blue)22;color:var(--accent-blue);border-radius:3px;margin-left:4px;">TV</span></div>'
+        +'<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">S'+tv.currentSeason+' — '+(tv.airing?'Airing | '+formatMoney(tv.viewership)+' viewers':tv.phase+' (Ep '+tv.episodesCompleted+'/'+tv.episodes+')')+'</div></div>'
+        +'<span class="card-badge" style="background:'+statusColor+'22;color:'+statusColor+';">'+(tv.airing?'AIRING':tv.phase.toUpperCase())+'</span></div></div>';
+    });
+  }
+  if(!prodHtml){
+    prodDiv.innerHTML='<div style="text-align:center;padding:32px 20px;">'
+      +'<svg viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="var(--text-muted)" stroke-width="1.2" opacity=".4" style="margin-bottom:12px;"><rect x="4" y="8" width="40" height="28" rx="4"/><path d="M16 20l12 8-12 8z" fill="var(--text-muted)" opacity=".3"/></svg>'
+      +'<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">No active productions</div>'
+      +'<button class="btn btn-red btn-sm" onclick="showTab(\'new-movie\')">CREATE A PRODUCTION</button></div>';
+  } else {
+    prodDiv.innerHTML=prodHtml;
+  }
+  renderLibrary();
+};
+
+// --- 3. MAIN MENU CINEMATIC OVERHAUL ---
+(function(){
+  var menu=document.getElementById('main-menu');
+  if(!menu)return;
+
+  // Add film reel decoration
+  var reelHTML='<div class="menu-film-reel" style="position:absolute;top:50%;left:-60px;transform:translateY(-50%);opacity:.06;">'
+    +'<svg viewBox="0 0 120 600" width="120" height="600" fill="var(--text-white)">';
+  for(var i=0;i<15;i++){
+    reelHTML+='<rect x="10" y="'+(i*40)+'" width="100" height="30" rx="4"/>';
+  }
+  reelHTML+='</svg></div>';
+  reelHTML+='<div class="menu-film-reel" style="position:absolute;top:50%;right:-60px;transform:translateY(-50%);opacity:.06;">'
+    +'<svg viewBox="0 0 120 600" width="120" height="600" fill="var(--text-white)">';
+  for(var j=0;j<15;j++){
+    reelHTML+='<rect x="10" y="'+(j*40)+'" width="100" height="30" rx="4"/>';
+  }
+  reelHTML+='</svg></div>';
+
+  var bg=menu.querySelector('.menu-bg');
+  if(bg) bg.insertAdjacentHTML('beforeend',reelHTML);
+
+  // Add floating particles
+  var particleCSS=document.createElement('style');
+  particleCSS.textContent=''
+    +'@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) scale(1);opacity:0}}'
+    +'@keyframes menuPulse{0%,100%{text-shadow:0 0 40px rgba(255,215,0,.2)}50%{text-shadow:0 0 80px rgba(255,215,0,.4),0 0 120px rgba(230,57,70,.1)}}'
+    +'.menu-particle{position:absolute;width:3px;height:3px;background:var(--accent-gold);border-radius:50%;pointer-events:none;}'
+    +'.menu-logo{animation:shimmer 4s linear infinite,menuPulse 6s ease infinite !important;}'
+    +'.menu-tagline-bar{display:flex;gap:24px;justify-content:center;margin-top:16px;margin-bottom:40px;}'
+    +'.menu-tagline-item{font-size:10px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;display:flex;align-items:center;gap:6px;}'
+    +'.menu-tagline-dot{width:4px;height:4px;border-radius:50%;background:var(--accent-gold);opacity:.5;}';
+  document.head.appendChild(particleCSS);
+
+  // Add particles to menu bg
+  var particleHTML='';
+  for(var p=0;p<20;p++){
+    var left=rnd(5,95);
+    var delay=rnd(0,15);
+    var dur=rnd(8,18);
+    particleHTML+='<div class="menu-particle" style="left:'+left+'%;animation:floatUp '+dur+'s '+delay+'s linear infinite;opacity:0;"></div>';
+  }
+  if(bg) bg.insertAdjacentHTML('beforeend',particleHTML);
+
+  // Enhance menu content
+  var mc=menu.querySelector('.menu-content');
+  if(mc){
+    var subtitle=mc.querySelector('.menu-subtitle');
+    if(subtitle){
+      subtitle.outerHTML='<div class="menu-subtitle">A Cinematic Empire Simulation</div>'
+        +'<div class="menu-tagline-bar">'
+        +'<div class="menu-tagline-item"><div class="menu-tagline-dot"></div>Produce</div>'
+        +'<div class="menu-tagline-item"><div class="menu-tagline-dot"></div>Direct</div>'
+        +'<div class="menu-tagline-item"><div class="menu-tagline-dot"></div>Dominate</div>'
+        +'</div>';
+    }
+  }
+
+  // Update version
+  var ver=menu.querySelector('.menu-version');
+  if(ver) ver.textContent='V 3.0 — EMPIRE PICTURES';
+})();
+
+// --- 4. ENHANCED NOTIFICATIONS WITH SCREEN EFFECTS ---
+var _origNotify=notify;
+notify=function(title,text,type){
+  _origNotify(title,text,type);
+  // Screen flash for important events
+  if(type==='success'&&(title.indexOf('Complete')!==-1||title.indexOf('Season')!==-1||title.indexOf('Wrapped')!==-1)){
+    var flash=document.createElement('div');
+    flash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,215,0,.08);z-index:1999;pointer-events:none;animation:fadeIn .15s ease reverse forwards;';
+    document.body.appendChild(flash);
+    setTimeout(function(){flash.remove();},300);
+  }
+};
+
+// --- 5. SCORE ANIMATION ON EPISODE/MOVIE COMPLETION ---
+var _origFinishTVEpisode=finishTVEpisode;
+window.finishTVEpisode=function(){
+  var epData=window._tvEpData;
+  var castQ=epData.castQuality||0;
+  var soundQ=epData.soundScore||0;
+  var editQ=Math.round(((epData.editPacing||50)+(epData.editTension||50)+(epData.editEmotion||50))/3);
+  var shootQ=epData.shootQuality||0;
+  var totalScore=clamp(Math.round((epData.quality*2+castQ+shootQ+editQ+soundQ)/6),10,100);
+
+  var ctx=window._tvProducing;
+  var tv=G.tvShows.find(function(t){return t.id===ctx.tvId;});
+  if(!tv)return;
+
+  if(!tv.episodeScores)tv.episodeScores=[];
+  tv.episodeScores.push(totalScore);
+  tv.episodesCompleted++;
+  tv.quality+=totalScore;
+
+  if(tv.episodesCompleted>=tv.episodes){
+    var avgQ=Math.round(tv.quality/tv.episodes);
+    tv.airing=true;
+    tv.phase='Complete';
+    var showrunnerBonus=tv.showrunner?tv.showrunner.vision/5:0;
+    tv.quality=clamp(Math.round(avgQ+showrunnerBonus),10,100);
+    tv.criticScore=clamp(tv.quality+rnd(-10,10),5,100);
+    tv.audienceScore=clamp(tv.quality+rnd(-5,15),5,100);
+    tv.viewership=Math.round(tv.audienceScore*10000+tv.budgetPerEp/10);
+    tv.seasons.push({season:tv.currentSeason,quality:tv.quality,criticScore:tv.criticScore});
+    G.reputation=clamp(G.reputation+Math.round(tv.criticScore/15),0,100);
+    G.fans+=tv.viewership;
+    G.skillPoints+=tv.criticScore>70?2:1;
+    G.money+=Math.round(tv.viewership*tv.quality*0.1);
+
+    // Cinematic season wrap screen
+    var ratingLabel=tv.criticScore>=85?'MASTERPIECE':tv.criticScore>=70?'ACCLAIMED':tv.criticScore>=50?'SOLID':tv.criticScore>=30?'MEDIOCRE':'FLOP';
+    var ratingColor=tv.criticScore>=70?'#4ade80':tv.criticScore>=50?'var(--accent-gold)':'var(--accent-red)';
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen" style="background:radial-gradient(ellipse at 50% 40%,#1a1520,var(--primary));">'
+      +'<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:slideUp .8s ease;">'
+      +'<div style="font-size:11px;letter-spacing:4px;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">Season '+tv.currentSeason+' Complete</div>'
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:42px;font-weight:700;margin-bottom:4px;">'+tv.title+'</div>'
+      +'<div style="font-size:12px;color:var(--text-muted);margin-bottom:32px;">'+tv.genre+' | '+tv.platform+' | '+tv.episodes+' Episodes</div>'
+      +'<div style="font-size:72px;font-weight:700;color:'+ratingColor+';font-family:\'JetBrains Mono\',monospace;margin-bottom:8px;animation:countUp .5s ease;">'+tv.criticScore+'<span style="font-size:28px;color:var(--text-muted);">/100</span></div>'
+      +'<div style="font-size:14px;letter-spacing:3px;color:'+ratingColor+';font-weight:700;margin-bottom:32px;">'+ratingLabel+'</div>'
+      +'<div style="display:flex;gap:32px;margin-bottom:32px;">'
+      +'<div style="text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--accent-gold);">'+tv.criticScore+'</div><div style="font-size:9px;color:var(--text-muted);letter-spacing:1px;">CRITICS</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--accent-blue);">'+tv.audienceScore+'</div><div style="font-size:9px;color:var(--text-muted);letter-spacing:1px;">AUDIENCE</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:24px;font-weight:700;color:#4ade80;">'+formatMoney(tv.viewership)+'</div><div style="font-size:9px;color:var(--text-muted);letter-spacing:1px;">VIEWERS</div></div>'
+      +'<div style="text-align:center;"><div style="font-size:24px;font-weight:700;color:var(--accent-purple);">$'+formatMoney(Math.round(tv.viewership*tv.quality*0.1))+'</div><div style="font-size:9px;color:var(--text-muted);letter-spacing:1px;">REVENUE</div></div>'
+      +'</div>'
+      // Episode score breakdown
+      +'<div style="display:flex;gap:4px;margin-bottom:24px;">'
+      +tv.episodeScores.map(function(s,i){
+        var epColor=s>=70?'#4ade80':s>=50?'var(--accent-gold)':'var(--accent-red)';
+        return '<div style="text-align:center;width:40px;"><div style="height:'+(s*0.6+10)+'px;background:'+epColor+'60;border:1px solid '+epColor+';border-radius:4px 4px 0 0;display:flex;align-items:flex-end;justify-content:center;"><span style="font-size:8px;font-weight:700;color:'+epColor+';padding:2px;">'+s+'</span></div>'
+          +'<div style="font-size:7px;color:var(--text-muted);margin-top:2px;">E'+(i+1)+'</div></div>';
+      }).join('')
+      +'</div>'
+      +'<button class="btn btn-red btn-lg" onclick="document.getElementById(\'minigame-container\').innerHTML=\'\';updateAllUI();renderTVShows();" style="animation:glow 3s ease infinite;">CONTINUE</button>'
+      +'</div></div>';
+
+    notify('Season '+tv.currentSeason+' Complete!','"'+tv.title+'" premieres! Critics: '+tv.criticScore+'/100 | Viewers: '+formatMoney(tv.viewership),'success');
+    addNews('"'+tv.title+'" S'+tv.currentSeason+' premieres on '+tv.platform+' to '+formatMoney(tv.viewership)+' viewers.');
+  } else {
+    // Episode wrap with better presentation
+    document.getElementById('minigame-container').innerHTML='<div class="minigame-fullscreen" style="background:radial-gradient(ellipse at 50% 40%,#1a1520,var(--primary));">'
+      +'<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:slideUp .6s ease;">'
+      +'<div style="font-size:10px;letter-spacing:3px;color:var(--text-muted);text-transform:uppercase;">Episode '+(ctx.epIndex+1)+' of '+tv.episodes+'</div>'
+      +'<div style="font-family:\'Playfair Display\',Georgia,serif;font-size:28px;font-weight:700;margin:8px 0 24px;">That\'s a Wrap!</div>'
+      +'<div style="font-size:64px;font-weight:700;color:'+(totalScore>=70?'#4ade80':totalScore>=50?'var(--accent-gold)':'var(--accent-red)')+';font-family:\'JetBrains Mono\',monospace;animation:countUp .5s ease;">'+totalScore+'<span style="font-size:24px;color:var(--text-muted);">/100</span></div>'
+      +'<div style="margin:16px 0 24px;font-size:12px;color:var(--text-muted);">'+(tv.episodes-tv.episodesCompleted)+' episodes remaining</div>'
+      // Score breakdown
+      +'<div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;justify-content:center;">'
+      +'<div style="text-align:center;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;"><div style="font-size:16px;font-weight:700;color:var(--accent-gold);">'+epData.quality+'</div><div style="font-size:8px;color:var(--text-muted);">WRITING</div></div>'
+      +'<div style="text-align:center;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;"><div style="font-size:16px;font-weight:700;color:var(--accent-blue);">'+castQ+'</div><div style="font-size:8px;color:var(--text-muted);">CAST</div></div>'
+      +'<div style="text-align:center;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;"><div style="font-size:16px;font-weight:700;color:var(--accent-red);">'+shootQ+'</div><div style="font-size:8px;color:var(--text-muted);">SHOOTING</div></div>'
+      +'<div style="text-align:center;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;"><div style="font-size:16px;font-weight:700;color:var(--accent-purple);">'+editQ+'</div><div style="font-size:8px;color:var(--text-muted);">EDITING</div></div>'
+      +'<div style="text-align:center;padding:8px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;"><div style="font-size:16px;font-weight:700;color:#4ade80;">'+soundQ+'</div><div style="font-size:8px;color:var(--text-muted);">SOUND</div></div>'
+      +'</div>'
+      // Progress bar
+      +'<div style="width:300px;margin-bottom:24px;">'
+      +'<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:4px;"><span>Season Progress</span><span>'+tv.episodesCompleted+'/'+tv.episodes+'</span></div>'
+      +'<div class="progress-bar" style="height:8px;"><div class="progress-fill progress-gold" style="width:'+(tv.episodesCompleted/tv.episodes*100)+'%;"></div></div></div>'
+      // Prev episode scores
+      +(tv.episodeScores.length>1?'<div style="display:flex;gap:3px;margin-bottom:20px;">'+tv.episodeScores.map(function(s,i){
+        var c2=s>=70?'#4ade80':s>=50?'var(--accent-gold)':'var(--accent-red)';
+        return '<div style="width:28px;height:'+(s*0.4+8)+'px;background:'+c2+'50;border:1px solid '+c2+';border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:'+c2+';">'+s+'</div>';
+      }).join('')+'</div>':'')
+      +'<button class="btn btn-red btn-lg" onclick="continueNextEpisode()" style="min-width:200px;">NEXT EPISODE &rarr;</button>'
+      +'</div></div>';
+    window.continueNextEpisode=function(){
+      produceEpisode(ctx.tvId,tv.episodesCompleted);
+    };
+    updateAllUI();
+    return;
+  }
+  document.getElementById('minigame-container').innerHTML='';
+  updateAllUI();
+  renderTVShows();
+};
+
+// --- 6. NEWS FEED ENHANCEMENT ---
+var _origGenNews=generateNews;
+generateNews=function(){
+  _origGenNews();
+  // Also render news in dashboard
+  var feed=document.getElementById('news-feed');
+  if(!feed||!G.newsLog)return;
+  var recent=G.newsLog.slice(-6).reverse();
+  if(!recent.length){feed.innerHTML='<div style="color:var(--text-muted);font-size:12px;padding:8px;">No news yet.</div>';return;}
+  feed.innerHTML=recent.map(function(n,i){
+    return '<div style="padding:10px 0;border-bottom:1px solid var(--border);'+(i===0?'animation:fadeIn .5s ease;':'')+'font-size:12px;">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start;">'
+      +'<div style="width:6px;height:6px;border-radius:50%;background:var(--accent-red);margin-top:5px;flex-shrink:0;'+(i===0?'animation:pulse 2s infinite;':'')+'"></div>'
+      +'<div><div style="color:var(--text-light);">'+n+'</div></div></div></div>';
+  }).join('');
+};
+
+// --- 7. QUICK ACTIONS BAR on dashboard ---
+(function(){
+  var dashTab=document.getElementById('tab-dashboard');
+  if(!dashTab)return;
+  var quickActionsHTML='<div class="card" style="margin-top:16px;padding:16px;">'
+    +'<div style="font-size:10px;color:var(--text-muted);letter-spacing:2px;margin-bottom:12px;">QUICK ACTIONS</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+    +'<button class="btn btn-red btn-sm" onclick="showTab(\'new-movie\')" style="display:flex;align-items:center;gap:4px;">'
+    +'<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v12M2 8h12"/></svg> New Movie</button>'
+    +'<button class="btn btn-blue btn-sm" onclick="showTab(\'new-movie\');setTimeout(function(){toggleProductionMode(\'tv\')},100)" style="display:flex;align-items:center;gap:4px;">'
+    +'<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="12" height="8" rx="1.5"/><path d="M5 14h6"/></svg> New TV Show</button>'
+    +'<button class="btn btn-sm" onclick="advanceWeek()" style="display:flex;align-items:center;gap:4px;">'
+    +'<svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M4 2l9 6-9 6z"/></svg> Next Week</button>'
+    +'<button class="btn btn-gold btn-sm" onclick="showTab(\'calendar\')" style="display:flex;align-items:center;gap:4px;">'
+    +'<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6h12"/></svg> Calendar</button>'
+    +'<button class="btn btn-purple btn-sm" onclick="showTab(\'skills\')" style="display:flex;align-items:center;gap:4px;">'
+    +'<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="4" r="2"/><circle cx="4" cy="10" r="2"/><circle cx="12" cy="10" r="2"/><path d="M6 5.5L5 8M10 5.5L11 8"/></svg> Skills</button>'
+    +'</div></div>';
+  dashTab.insertAdjacentHTML('beforeend',quickActionsHTML);
+})();
+
+// --- 8. STUDIO MILESTONE TRACKER ---
+(function(){
+  var dashTab=document.getElementById('tab-dashboard');
+  if(!dashTab)return;
+
+  var _origUI2=updateAllUI;
+  updateAllUI=function(){
+    _origUI2();
+    var milestonesDiv=document.getElementById('dash-milestones');
+    if(!milestonesDiv)return;
+    var milestones=[
+      {name:'First Movie',done:G.completedMovies.length>=1,icon:'&#127916;'},
+      {name:'5 Films',done:G.completedMovies.length>=5,icon:'&#127902;'},
+      {name:'First Award',done:G.awards.length>=1,icon:'&#127942;'},
+      {name:'$50M Gross',done:G.completedMovies.reduce(function(s,m){return s+(m.boxOffice?m.boxOffice.worldwide:0);},0)>=50000000,icon:'&#128176;'},
+      {name:'TV Empire',done:G.tvShows&&G.tvShows.length>=3,icon:'&#128250;'},
+      {name:'Rep 50+',done:G.reputation>=50,icon:'&#11088;'},
+      {name:'Blockbuster Hit',done:G.completedMovies.some(function(m){return m.boxOffice&&m.boxOffice.worldwide>100000000;}),icon:'&#128165;'},
+      {name:'Critics Darling',done:G.completedMovies.some(function(m){return m.criticScore>=90;}),icon:'&#127775;'}
+    ];
+    var completed=milestones.filter(function(m){return m.done;}).length;
+    milestonesDiv.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+      +'<div class="card-title" style="font-size:14px;">Milestones</div>'
+      +'<span style="font-size:11px;color:var(--accent-gold);font-weight:600;">'+completed+'/'+milestones.length+'</span></div>'
+      +'<div style="display:flex;gap:4px;margin-bottom:8px;">'
+      +milestones.map(function(m2){return '<div style="flex:1;height:4px;border-radius:2px;background:'+(m2.done?'var(--accent-gold)':'var(--primary)')+';"></div>';}).join('')
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">'
+      +milestones.map(function(m2){
+        return '<div style="text-align:center;padding:6px;border-radius:6px;background:'+(m2.done?'rgba(255,215,0,.08)':'var(--primary)')+';border:1px solid '+(m2.done?'rgba(255,215,0,.3)':'var(--border)')+';opacity:'+(m2.done?'1':'.4')+';">'
+          +'<div style="font-size:16px;margin-bottom:2px;">'+m2.icon+'</div>'
+          +'<div style="font-size:8px;color:'+(m2.done?'var(--accent-gold)':'var(--text-muted)')+';font-weight:600;letter-spacing:.5px;">'+m2.name+'</div></div>';
+      }).join('')
+      +'</div>';
+  };
+
+  dashTab.insertAdjacentHTML('beforeend','<div class="card" style="margin-top:16px;padding:16px;" id="dash-milestones"></div>');
+})();
+
+// --- 9. ADVANCE WEEK POLISH — show ticker of what happened ---
+var _origAdvanceWeek=advanceWeek;
+advanceWeek=function(){
+  _origAdvanceWeek();
+  // Process calendar events that trigger this week
+  if(G.calendarEvents){
+    var triggered=G.calendarEvents.filter(function(e){return e.week===G.week;});
+    triggered.forEach(function(ev){
+      if(ev.type==='interview'){
+        G.reputation=clamp(G.reputation+rnd(1,3),0,100);
+        G.fans+=rnd(200,1000);
+        notify('Event',''+ev.text+' this week! +Rep, +Fans.','success');
+      }
+      if(ev.type==='ceremony'){
+        notify('Event',''+ev.text+' is happening!','info');
+      }
+    });
+    G.calendarEvents=G.calendarEvents.filter(function(e){return e.week>G.week;});
+  }
+  // Passive income from airing shows
+  if(G.tvShows){
+    var tvIncome=0;
+    G.tvShows.forEach(function(tv){
+      if(tv.airing&&!tv.cancelled){
+        var income=Math.round(tv.viewership*tv.quality*0.05);
+        tvIncome+=income;
+      }
+    });
+    if(tvIncome>0){
+      G.money+=tvIncome;
+      G.weeklyPassiveIncome=(G.weeklyPassiveIncome||0)+tvIncome;
+    }
+  }
+};
+
+// --- 10. IMPROVED NEWS TICKER ---
+(function(){
+  var ticker=document.querySelector('.ticker-text');
+  if(ticker&&G&&G.newsLog&&G.newsLog.length>0){
+    ticker.textContent=G.newsLog[G.newsLog.length-1];
+  }
+})();
+
+// --- 11. SHOOTING MINIGAME FEEDBACK IMPROVEMENT (TV) ---
+// Add screen shake on successful takes
+var _origShootFinish=window.tvShootTake;
+if(_origShootFinish){
+  var origTvShootTake=_origShootFinish;
+  window.tvShootTake=function(){
+    origTvShootTake();
+    // Add brief camera shake
+    var mc=document.getElementById('minigame-container');
+    if(mc){
+      mc.style.animation='shake .2s ease';
+      setTimeout(function(){mc.style.animation='';},200);
+    }
+  };
+}
+
 </script>
 </body>
 </html>
