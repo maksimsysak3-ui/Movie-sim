@@ -5977,6 +5977,15 @@ advanceWeek=function(){
   }
 })();
 
+// --- FIX: Intro screen auto-dismiss ---
+(function(){
+  var intro=document.getElementById('intro-screen');
+  if(intro){
+    setTimeout(function(){intro.classList.add('fade-out');},3000);
+    setTimeout(function(){intro.remove();},4500);
+  }
+})();
+
 // --- 11. SHOOTING MINIGAME FEEDBACK IMPROVEMENT (TV) ---
 // Add screen shake on successful takes
 var _origShootFinish=window.tvShootTake;
